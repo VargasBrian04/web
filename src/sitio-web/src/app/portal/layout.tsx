@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/lib/auth";
+import ThemeToggle from "@/components/landing/ThemeToggle";
 
 /**
  * Layout del portal: exige sesión (el middleware ya filtra por rol),
@@ -69,6 +70,7 @@ export default async function PortalLayout({ children }: { children: React.React
               {l.label}
             </Link>
           ))}
+          <ThemeToggle />
           <form
             action={async () => {
               "use server";

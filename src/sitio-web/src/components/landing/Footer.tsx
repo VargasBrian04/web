@@ -21,7 +21,7 @@ export default function Footer() {
         </div>
         <nav className="flex flex-wrap gap-4 text-sm">
           <Link href="/login" className="hover:text-white">
-            Portal de usuarios
+            Acceder
           </Link>
           <Link href="/inscripciones" className="hover:text-white">
             Inscripciones

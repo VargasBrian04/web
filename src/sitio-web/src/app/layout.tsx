@@ -17,7 +17,15 @@ export default function RootLayout({
   children
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        {/* Aplica el tema guardado antes del primer pintado (sin parpadeo). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem("csl-theme")==="oscuro")document.documentElement.dataset.theme="oscuro"}catch(e){}`,
+          }}
+        />
+      </head>
       <body>
         <IntroAnimation />
         <Navbar />

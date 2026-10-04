@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 const groups = [
   {
     label: "Institución",
+    icon: "🏛️",
     links: [
       { href: "/#historia", label: "Historia" },
       { href: "/#mision", label: "Misión" },
@@ -16,19 +19,20 @@ const groups = [
   },
   {
     label: "Académica",
+    icon: "📚",
     links: [
       { href: "/#oferta", label: "Oferta académica" },
       { href: "/#niveles", label: "Niveles" },
       { href: "/#estadisticas", label: "Estadísticas" },
-      { href: "/#calificaciones", label: "Calificaciones" },
       { href: "/noticias", label: "Noticias" },
     ],
   },
   {
     label: "Admisiones",
+    icon: "📝",
     links: [
       { href: "/#requisitos", label: "Requisitos" },
-      { href: "/#matriculas", label: "Matrículas" },
+      { href: "/registro", label: "Registro" },
       { href: "/inscripciones", label: "Inscripciones" },
       { href: "/#contacto", label: "Contacto" },
     ],
@@ -39,73 +43,91 @@ const flatLinks = groups.flatMap((g) => g.links);
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) =>
+    href.startsWith("/#")
+      ? pathname === "/" || pathname === "/inicio"
+      : pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--institutional)]/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--institutional)]/95 shadow-md backdrop-blur">
       <div className="container-c flex h-16 items-center justify-between gap-2">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/" className="flex min-w-0 items-center gap-3">
           <img
             src="/images/logo-colegio.png"
             alt="Escudo del colegio"
-            className="h-10 w-10 rounded-full bg-white object-contain p-0.5"
+            className="h-10 w-10 shrink-0 rounded-full bg-white object-contain p-0.5 shadow"
           />
           <div className="leading-tight">
-            <p className="text-sm font-bold text-white">
+            <p className="truncate text-sm font-bold text-white">
               Mariscal Francisco Solano López
             </p>
-            <p className="text-xs text-stone-300">Caaguazú - Paraguay</p>
+            <p className="hidden text-xs text-stone-300 sm:block">Caaguazú - Paraguay</p>
           </div>
         </Link>
 
         {/* Escritorio: grupos con desplegable */}
-        <nav className="hidden items-center gap-1 lg:flex">
-          {groups.map((g) => (
-            <div key={g.label} className="group relative">
-              <button className="rounded-lg px-3 py-2 text-sm text-stone-100 transition-colors hover:bg-white/10 hover:text-white">
-                {g.label} ▾
-              </button>
-              <div className="invisible absolute left-0 top-full w-52 translate-y-1 rounded-xl border border-stone-200 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                {g.links.map((l) => (
-                  <a
-                    key={l.label}
-                    href={l.href}
-                    className="block rounded-lg px-3 py-2 text-sm text-stone-700 hover:bg-[var(--paper)] hover:text-[var(--institutional)]"
-                  >
-                    {l.label}
-                  </a>
-                ))}
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Principal">
+          {groups.map((g) => {
+            const active = g.links.some((l) => isActive(l.href));
+            return (
+              <div key={g.label} className="group relative">
+                <button
+                  aria-current={active ? "true" : undefined}
+                  className={`rounded-lg px-3 py-2 text-sm transition-all hover:-translate-y-px hover:bg-white/10 hover:text-white hover:shadow ${
+                    active ? "bg-white/15 font-bold text-white shadow" : "text-stone-100"
+                  }`}
+                >
+                  {g.icon} {g.label} ▾
+                </button>
+                <div className="invisible absolute left-0 top-full w-56 translate-y-1 rounded-xl border border-stone-200 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                  {g.links.map((l) => (
+                    <a
+                      key={l.label}
+                      href={l.href}
+                      aria-current={isActive(l.href) ? "page" : undefined}
+                      className={`block rounded-lg px-3 py-2 text-sm transition-colors hover:bg-[var(--paper)] hover:text-[var(--institutional)] ${
+                        isActive(l.href) ? "bg-[var(--paper)] font-bold text-[var(--institutional)]" : "text-stone-700"
+                      }`}
+                    >
+                      {l.label}
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           <a
             href="/#galeria"
-            className="rounded-lg px-3 py-2 text-sm text-stone-100 transition-colors hover:bg-white/10 hover:text-white"
+            className="rounded-lg px-3 py-2 text-sm text-stone-100 transition-all hover:-translate-y-px hover:bg-white/10 hover:text-white"
           >
-            Galería
+            🖼️ Galería
           </a>
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <ThemeToggle />
           <a
             href="https://aprendizaje.mec.edu.py/aprendizaje/familia/documentos"
             target="_blank"
             rel="noopener noreferrer"
             title="Consultar calificaciones oficiales en el MEC"
-            className="rounded-lg border border-[var(--gold)] px-3 py-2 text-sm font-bold text-[var(--gold)] transition-colors hover:bg-[var(--gold)] hover:text-white"
+            className="rounded-lg border border-[var(--gold)] px-3 py-2 text-sm font-bold text-[var(--gold)] transition-all hover:-translate-y-px hover:bg-[var(--gold)] hover:text-white hover:shadow"
           >
-            Calificaciones ↗
+            ✓ Calificaciones ↗
           </a>
           <Link
             href="/acceso"
             className="rounded-lg px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
           >
-            Acceder
+            🔑 Acceder
           </Link>
           <Link
-            href="/inscripciones"
-            className="rounded-lg bg-[var(--gold)] px-3 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
+            href="/registro"
+            className="rounded-lg bg-[var(--gold)] px-3 py-2 text-sm font-bold text-white shadow transition-all hover:-translate-y-px hover:opacity-90 hover:shadow-md"
           >
-            Inscripciones
+            ✨ Registro
           </Link>
         </div>
 
@@ -120,18 +142,27 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <nav className="max-h-[70vh] overflow-y-auto border-t border-white/10 bg-[var(--institutional)] px-4 py-4 lg:hidden">
+        <nav className="max-h-[70vh] overflow-y-auto border-t border-white/10 bg-[var(--institutional)] px-4 py-4 lg:hidden" aria-label="Móvil">
+          <div className="mb-3 flex items-center justify-between px-2">
+            <p className="text-xs font-bold uppercase tracking-wide text-[var(--gold)]">
+              Menú
+            </p>
+            <ThemeToggle />
+          </div>
           {groups.map((g) => (
             <div key={g.label} className="mb-3">
               <p className="px-2 text-xs font-bold uppercase tracking-wide text-[var(--gold)]">
-                {g.label}
+                {g.icon} {g.label}
               </p>
               {g.links.map((l) => (
                 <a
                   key={l.label}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-2 py-1.5 text-sm text-stone-100 hover:bg-white/10"
+                  aria-current={isActive(l.href) ? "page" : undefined}
+                  className={`block rounded-lg px-2 py-2 text-sm transition-colors hover:bg-white/10 ${
+                    isActive(l.href) ? "bg-white/15 font-bold text-white" : "text-stone-100"
+                  }`}
                 >
                   {l.label}
                 </a>
@@ -141,24 +172,24 @@ export default function Navbar() {
           <a
             href="/#galeria"
             onClick={() => setOpen(false)}
-            className="block rounded-lg px-2 py-1.5 text-sm text-stone-100 hover:bg-white/10"
+            className="block rounded-lg px-2 py-2 text-sm text-stone-100 hover:bg-white/10"
           >
-            Galería
+            🖼️ Galería
           </a>
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3 grid grid-cols-2 gap-2">
             <Link
               href="/acceso"
               onClick={() => setOpen(false)}
-              className="flex-1 rounded-lg border border-white/30 px-3 py-2 text-center text-sm font-semibold text-white"
+              className="rounded-lg border border-white/30 px-3 py-2.5 text-center text-sm font-semibold text-white"
             >
-              Acceder
+              🔑 Acceder
             </Link>
             <Link
-              href="/inscripciones"
+              href="/registro"
               onClick={() => setOpen(false)}
-              className="flex-1 rounded-lg bg-[var(--gold)] px-3 py-2 text-center text-sm font-bold text-white"
+              className="rounded-lg bg-[var(--gold)] px-3 py-2.5 text-center text-sm font-bold text-white"
             >
-              Inscripciones
+              ✨ Registro
             </Link>
           </div>
         </nav>

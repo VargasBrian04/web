@@ -15,7 +15,6 @@ import {
   RequirementsSection,
   EnrollmentInfoSection,
   ConductSection,
-  GradesAccessSection
 } from "@/components/landing/Institucional";
 
 export default function HomePage() {
@@ -34,7 +33,6 @@ export default function HomePage() {
       <RequirementsSection />
       <EnrollmentInfoSection />
       <ConductSection />
-      <GradesAccessSection />
       <ContactSection />
     </>
   );

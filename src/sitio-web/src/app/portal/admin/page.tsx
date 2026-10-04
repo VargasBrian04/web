@@ -1,5 +1,6 @@
 import AdminBoard from "@/components/portal/AdminBoard";
 import AdminUsers from "@/components/portal/AdminUsers";
+import AccountRequests from "@/components/portal/AccountRequests";
 
 export const metadata = { title: "Panel de Administración" };
 
@@ -19,6 +20,7 @@ export default function AdminPage() {
         </p>
       </section>
       <AdminBoard />
+      <AccountRequests />
       <AdminUsers />
     </div>
   );

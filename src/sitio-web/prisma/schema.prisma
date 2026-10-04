@@ -421,6 +421,25 @@ model Observation {
 }
 
 // ============================================================================
+// SOLICITUDES DE CUENTA (tutores y docentes; revisa Dirección)
+// ============================================================================
+
+model AccountRequest {
+  id         String           @id @default(cuid())
+  type       String           // TUTOR | DOCENTE
+  payload    Json             // datos validados del formulario
+  status     EnrollmentStatus @default(PENDIENTE)
+  note       String?          // nota de Dirección al revisar
+  reviewedBy String?          // userId del admin que revisó
+  reviewedAt DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@index([status])
+  @@map("account_requests")
+}
+
+// ============================================================================
 // BLOG / NOTICIAS (administrado por Dirección; lo público solo ve PUBLICADA)
 // ============================================================================
 

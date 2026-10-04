@@ -302,9 +302,8 @@ export const conductRules: { category: string; rules: string[] }[] = [
 ];
 
 export const enrollmentInfo = {
-  cost: "Institución pública: la enseñanza es gratuita. Solo podrían aplicar aranceles administrativos mínimos. " + PENDING + " (confirmar en Secretaría).",
-  dates: PENDING + ": calendario oficial de matriculación a confirmar por la Dirección.",
-  payment: "Modalidades de pago (si aplicaran aranceles): " + PENDING + ". Consultar en Secretaría.",
+  cost: "Institución pública: la enseñanza es gratuita y no se cobra matrícula ni aranceles.",
+  dates: PENDING + ": calendario oficial de inscripciones a confirmar por la Dirección.",
   steps: [
     "Completar la solicitud online en la sección Inscripciones o en Secretaría.",
     "Presentar los documentos requeridos según el nivel (ver Requisitos).",

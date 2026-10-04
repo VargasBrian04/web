@@ -640,21 +640,20 @@ export function RequirementsSection() {
   );
 }
 
-/* 10. Matrículas */
+/* 10. Inscripciones (la institución no cobra matrícula: es gratuita) */
 export function EnrollmentInfoSection() {
   return (
     <section id="matriculas" className="container-c py-20">
       <SectionHeader
-        title="Matrículas"
-        desc="Fechas, costos, modalidades y procedimiento. Gestión disponible en Secretaría y en el panel de administración (/portal/admin)."
+        title="Inscripciones"
+        desc="La enseñanza es gratuita y no se cobra matrícula. Gestión disponible en Secretaría y en el panel de administración (/portal/admin)."
       />
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         <Reveal>
           <div className="h-full rounded-2xl bg-[var(--institutional)] p-8 text-white shadow-md">
-            <h3 className="text-lg font-bold text-[var(--gold)]">Costos y fechas</h3>
+            <h3 className="text-lg font-bold text-[var(--gold)]">Gratuita y sin aranceles</h3>
             <p className="mt-3 text-sm leading-relaxed text-stone-100">{enrollmentInfo.cost}</p>
             <p className="mt-3 text-sm leading-relaxed text-stone-100">{enrollmentInfo.dates}</p>
-            <p className="mt-3 text-sm leading-relaxed text-stone-100">{enrollmentInfo.payment}</p>
           </div>
         </Reveal>
         <Reveal delay={120}>
@@ -671,7 +670,7 @@ export function EnrollmentInfoSection() {
               ))}
             </ol>
             <a href="/inscripciones" className="btn-primary mt-6">
-              Ir al portal de inscripciones
+              Ir a inscripciones
             </a>
           </div>
         </Reveal>

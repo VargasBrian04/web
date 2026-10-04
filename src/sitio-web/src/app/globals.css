@@ -5,7 +5,51 @@
   --institutional-light: #795548;
   --gold: #a67c52;         /* marrón dorado de acento */
   --paper: #faf6f1;        /* fondo blanco cálido */
+  color-scheme: light;
 }
+
+/* TEMA 2 — negro y blanco (elegante, alto contraste). Se activa con
+   data-theme="oscuro" en <html>; la preferencia se guarda en localStorage. */
+[data-theme="oscuro"] {
+  --institutional: #161616;
+  --institutional-light: #2b2b2b;
+  --gold: #9ca3af;
+  --paper: #101010;
+  color-scheme: dark;
+}
+
+[data-theme="oscuro"] body {
+  background-color: #101010;
+  color: #e7e7e7;
+}
+
+/* Superficies claras más usadas → oscuras (sin duplicar componentes) */
+[data-theme="oscuro"] .bg-white { background-color: #1b1b1b !important; }
+[data-theme="oscuro"] .bg-slate-50 { background-color: #1b1b1b !important; }
+[data-theme="oscuro"] .bg-slate-100 { background-color: #232323 !important; }
+[data-theme="oscuro"] .bg-amber-50 { background-color: #26200f !important; }
+[data-theme="oscuro"] .bg-emerald-50 { background-color: #0f241a !important; }
+[data-theme="oscuro"] .bg-red-50 { background-color: #2a1212 !important; }
+[data-theme="oscuro"] .bg-blue-50 { background-color: #101d2e !important; }
+[data-theme="oscuro"] .text-slate-900 { color: #f5f5f5 !important; }
+[data-theme="oscuro"] .text-slate-800 { color: #e7e7e7 !important; }
+[data-theme="oscuro"] .text-slate-700 { color: #d4d4d4 !important; }
+[data-theme="oscuro"] .text-slate-600 { color: #b5b5b5 !important; }
+[data-theme="oscuro"] .text-slate-500 { color: #9a9a9a !important; }
+[data-theme="oscuro"] .text-slate-400 { color: #8a8a8a !important; }
+[data-theme="oscuro"] .text-stone-700 { color: #d4d4d4 !important; }
+[data-theme="oscuro"] .text-stone-600 { color: #b5b5b5 !important; }
+[data-theme="oscuro"] .border-slate-200,
+[data-theme="oscuro"] .border-slate-300,
+[data-theme="oscuro"] .border-stone-200,
+[data-theme="oscuro"] .border-stone-100 { border-color: #2e2e2e !important; }
+[data-theme="oscuro"] input,
+[data-theme="oscuro"] select,
+[data-theme="oscuro"] textarea { background-color: #1b1b1b !important; color: #f0f0f0 !important; }
+[data-theme="oscuro"] input::placeholder,
+[data-theme="oscuro"] textarea::placeholder { color: #8a8a8a !important; }
+[data-theme="oscuro"] input:disabled,
+[data-theme="oscuro"] select:disabled { background-color: #242424 !important; }
 
 @layer base {
   html {

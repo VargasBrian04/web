@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const SEEN_KEY = "csl-intro-seen";
 
@@ -10,22 +10,22 @@ const ROLES = [
     icon: "👨‍🏫",
     title: "Soy Docente",
     desc: "Ingresá con tu usuario al portal docente.",
-    msg: "El portal docente estará disponible próximamente."
+    href: "/login?next=/portal/profesor",
   },
   {
     id: "padre",
     icon: "👨‍👩‍👧",
     title: "Soy Padre / Tutor",
     desc: "Ingresá para ver las notas de tus hijos.",
-    msg: "El portal de padres estará disponible próximamente."
+    href: "/login?next=/portal/padre",
   },
   {
     id: "alumno",
     icon: "🎒",
     title: "Soy Alumno",
     desc: "Ingresá para ver tus calificaciones.",
-    msg: "El portal del alumno estará disponible próximamente."
-  }
+    href: "/login?next=/portal/alumno",
+  },
 ];
 
 function Escudo() {
@@ -113,8 +113,6 @@ export default function IntroAnimation() {
   const [stage, setStage] = useState<"flame" | "roles" | null>(null);
   const [flameLeaving, setFlameLeaving] = useState(false);
   const [rolesLeaving, setRolesLeaving] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const toastTimer = useRef<number | null>(null);
 
   useEffect(() => {
     try {
@@ -176,12 +174,6 @@ export default function IntroAnimation() {
     return () => document.removeEventListener("keydown", onKey);
   }, [stage, goRoles, close]);
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    if (toastTimer.current) window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(null), 2600);
-  };
-
   if (!stage) return null;
 
   return (
@@ -224,16 +216,15 @@ export default function IntroAnimation() {
             <p>Elegí tu perfil para ir a tu zona.</p>
             <div className="rg-cards">
               {ROLES.map((r) => (
-                <button
+                <a
                   key={r.id}
-                  type="button"
+                  href={r.href}
                   className="rg-card"
-                  onClick={() => showToast(r.msg)}
                 >
                   <div className="ico">{r.icon}</div>
                   <h3>{r.title}</h3>
                   <p>{r.desc}</p>
-                </button>
+                </a>
               ))}
             </div>
             <button type="button" className="rg-visit" onClick={close}>
@@ -242,8 +233,6 @@ export default function IntroAnimation() {
           </div>
         </div>
       )}
-
-      {toast && <div className="csl-toast show">{toast}</div>}
     </>
   );
 }

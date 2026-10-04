@@ -142,7 +142,7 @@ export function AcademicOfferSection() {
 
         <p className="mt-8 text-sm text-slate-500">
           Consulta disponibilidad de cupos, horarios y turnos en la Secretaría
-          del colegio o a través del portal de inscripciones.
+          del colegio o a través del registro de inscripciones.
         </p>
       </div>
     </section>
@@ -177,7 +177,7 @@ export function ContactSection() {
           <ul className="mt-6 space-y-2 text-sm text-stone-200">
             <li>Ciudad de Caaguazú, Departamento de Caaguazú, Paraguay</li>
             <li>Secretaría del colegio: lunes a viernes de 07:00 a 17:00</li>
-            <li>Portal de inscripciones disponible en "/inscripciones"</li>
+            <li>Portal de inscripciones disponible en "/registro"</li>
             <li>
               GPS: -25.46817°, -56.01172° ·{" "}
               <a
