@@ -52,6 +52,22 @@ MIGRACIONES PENDIENTES (correr con la DB levantada)
 
 ZONAS PRIVADAS — CÓMO FUNCIONAN (2026-10-01)
 ----------------------------------------------------------------
+BLOG / NOTICIAS (2026-10-04) — sistema completo con DB
+----------------------------------------------------------------
+- Modelo NewsPost (slug único estable, título, contenido HTML, categoría,
+  imagen subida o estática, BORRADOR/PUBLICADA, fecha de publicación).
+- Públicas: /noticias (4 recientes + botón Ver más), /noticias/todas
+  (paginada de 9), /noticias/[slug] (lectura). Todo desde la DB con
+  fallback estático si la DB cae. Los borradores jamás se ven.
+- Dirección: /portal/admin/noticias (solo ADMIN) — crear con editor
+  (negrita/cursiva/listas/enlace), portada PNG/JPG/WEBP ≤10MB con
+  arrastrar/soltar, guardar borrador o publicar, editar (misma pantalla),
+  eliminar con confirmación. Slug no cambia al editar (sin duplicados).
+- API: GET /api/news (limit/page/all), POST/GET/PATCH/DELETE
+  /api/news/[id], imagen pública /api/news/[id]/image.
+- Migración: prisma/migrations/*_news. Seed: las 4 existentes (mismos slugs).
+- Tras deploy: correr seed una vez para poblar news_posts.
+----------------------------------------------------------------
 - /login -> /portal deriva por rol (middleware protege /portal/*).
 - ALUMNO (/portal/alumno): Centro MEC oficial + promedio interno,
   notas por período, asistencia (60 últimos), tareas de su

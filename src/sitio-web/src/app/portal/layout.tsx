@@ -43,6 +43,7 @@ export default async function PortalLayout({ children }: { children: React.React
             ]
           : [
               { href: "/portal/admin", label: "Administración" },
+              { href: "/portal/admin/noticias", label: "Blog / Noticias" },
               { href: "/portal/perfil", label: "Mi perfil" },
               { href: "/portal/profesor", label: "Ver como docente" },
               { href: "/portal/alumno", label: "Ver como alumno" },

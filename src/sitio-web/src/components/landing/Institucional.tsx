@@ -464,8 +464,47 @@ function newsPillClass(category: string) {
   return newsPill[category] ?? "bg-[var(--gold)]";
 }
 
-export function NewsSection() {
-  const [featured, ...rest] = newsPosts;
+export async function NewsSection() {
+  type Item = {
+    slug: string; title: string; date: string; category: string;
+    author: string; image: string | null; excerpt: string;
+  };
+  let items: Item[];
+  let total = 0;
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const where = { status: "PUBLICADA" as const };
+    const [count, rows] = await Promise.all([
+      prisma.newsPost.count({ where }),
+      prisma.newsPost.findMany({
+        where,
+        select: {
+          id: true, slug: true, title: true, excerpt: true, category: true,
+          imageUrl: true, imageFile: true, publishedAt: true, authorName: true,
+        },
+        orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+        take: 4,
+      }),
+    ]);
+    if (!rows.length) throw new Error("vacío");
+    total = count;
+    const fmt = (d: Date | null) =>
+      d ? d.toLocaleDateString("es-PY", { day: "2-digit", month: "2-digit", year: "numeric" }) : "";
+    items = (rows as any[]).map((n: any) => ({
+      slug: n.slug,
+      title: n.title,
+      date: fmt(n.publishedAt),
+      category: n.category,
+      author: n.authorName ?? "Dirección",
+      image: n.imageFile ? `/api/news/${n.id}/image` : n.imageUrl,
+      excerpt: n.excerpt ?? "",
+    }));
+  } catch {
+    total = newsPosts.length;
+    items = newsPosts.slice(0, 4).map((n) => ({ ...n, image: n.image as string | null }));
+  }
+  const [featured, ...rest] = items;
+  if (!featured) return null;
   return (
     <section id="noticias" className="container-c py-20">
       <SectionHeader
@@ -479,13 +518,19 @@ export function NewsSection() {
         >
           <span className="absolute left-1/2 top-0 z-10 h-14 w-6 -translate-x-1/2 bg-[#b91c1c] shadow-md [clip-path:polygon(0_0,100%_0,100%_100%,50%_82%,0_100%)]" />
           <div className="p-6 sm:p-8">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={featured.image}
-              alt={featured.title}
-              loading="lazy"
-              className="h-64 w-full rounded-2xl border-4 border-white object-cover shadow-lg sm:h-full sm:min-h-[270px]"
-            />
+            {featured.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={featured.image}
+                alt={featured.title}
+                loading="lazy"
+                className="h-64 w-full rounded-2xl border-4 border-white object-cover shadow-lg sm:h-full sm:min-h-[270px]"
+              />
+            ) : (
+              <div className="flex h-64 w-full items-center justify-center rounded-2xl bg-[var(--paper)] text-6xl sm:h-full sm:min-h-[270px]">
+                📰
+              </div>
+            )}
           </div>
           <div className="relative p-6 sm:p-8">
             <span className={`inline-block rounded-lg px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white ${newsPillClass(featured.category)}`}>
@@ -515,8 +560,14 @@ export function NewsSection() {
               className={`relative block h-full rounded-2xl border border-[#eadfc9] bg-[#fffdf6] p-5 shadow-[0_10px_26px_rgba(62,42,34,0.14)] transition-all hover:-translate-y-1 hover:rotate-0 hover:shadow-[0_18px_38px_rgba(62,42,34,0.22)] ${i % 2 ? "rotate-[0.6deg]" : "rotate-[-0.6deg]"}`}
             >
               <span className="absolute -top-3 left-1/2 h-6 w-24 -translate-x-1/2 -rotate-2 bg-[#d2be9f]/80 shadow-sm" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={n.image} alt={n.title} className="h-44 w-full rounded-xl border-4 border-white object-cover shadow" loading="lazy" />
+              {n.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={n.image} alt={n.title} className="h-44 w-full rounded-xl border-4 border-white object-cover shadow" loading="lazy" />
+              ) : (
+                <div className="flex h-44 w-full items-center justify-center rounded-xl bg-[var(--paper)] text-5xl">
+                  📰
+                </div>
+              )}
               <span className={`mt-4 inline-block rounded-lg px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white ${newsPillClass(n.category)}`}>
                 {n.category}
               </span>
@@ -533,6 +584,13 @@ export function NewsSection() {
           </Reveal>
         ))}
       </div>
+      {total > items.length && (
+        <div className="mt-10 text-center">
+          <a href="/noticias/todas" className="btn-primary">
+            Ver más noticias →
+          </a>
+        </div>
+      )}
     </section>
   );
 }

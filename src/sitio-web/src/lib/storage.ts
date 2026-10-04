@@ -16,6 +16,13 @@ export const ALLOWED_MIME: Record<string, string> = {
   "image/png": ".png",
 };
 
+/** Imágenes del blog: PNG, JPG y WEBP (máx 10 MB, igual que planillas). */
+export const NEWS_IMAGE_MIME: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+};
+
 export function uploadsDir() {
   // Raíz del proyecto sitio-web/uploads (gitignored, servido solo vía API con auth).
   return path.join(process.cwd(), "uploads");
@@ -27,12 +34,15 @@ export function isAllowedMime(mime: string) {
 
 export async function saveBuffer(
   buf: Buffer,
-  mime: string
+  mime: string,
+  allowed: Record<string, string> = ALLOWED_MIME,
+  label = "PDF/JPG/PNG"
 ): Promise<{ fileName: string; size: number }> {
-  if (!isAllowedMime(mime)) throw new Error("Tipo de archivo no permitido (solo PDF/JPG/PNG)");
+  if (!(mime in allowed))
+    throw new Error(`Tipo de archivo no permitido (solo ${label})`);
   if (buf.length > MAX_FILE_BYTES) throw new Error("Archivo muy pesado (máx 10 MB)");
   if (buf.length === 0) throw new Error("Archivo vacío");
-  const ext = ALLOWED_MIME[mime];
+  const ext = allowed[mime];
   const fileName = `${randomUUID()}${ext}`;
   await mkdir(uploadsDir(), { recursive: true });
   await writeFile(path.join(uploadsDir(), fileName), buf);

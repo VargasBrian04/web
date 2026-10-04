@@ -58,6 +58,11 @@ enum DocumentType {
   OTRO
 }
 
+enum NewsStatus {
+  BORRADOR
+  PUBLICADA
+}
+
 // ============================================================================
 // USUARIOS (tabla central con roles)
 // ============================================================================
@@ -413,4 +418,28 @@ model Observation {
 
   @@index([studentId, visibleToTutor])
   @@map("observations")
+}
+
+// ============================================================================
+// BLOG / NOTICIAS (administrado por Dirección; lo público solo ve PUBLICADA)
+// ============================================================================
+
+model NewsPost {
+  id          String     @id @default(cuid())
+  slug        String     @unique // URL estable: no cambia al editar
+  title       String
+  excerpt     String?    // si vacío, se genera del contenido
+  content     String     // HTML del editor (se sanitiza al mostrar)
+  category    String     // Inscripciones | Académico | Institucional
+  imageUrl    String?    // imagen estática existente (/images/...) — solo seed
+  imageFile   String?    // archivo subido (uploads/) — creado por Dirección
+  status      NewsStatus @default(BORRADOR)
+  publishedAt DateTime?  // fecha de publicación (ordena portada y listados)
+  authorId    String?    // userId que la creó/actualizó
+  authorName  String?    // ej: "Dirección"
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([status, publishedAt])
+  @@map("news_posts")
 }

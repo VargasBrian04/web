@@ -284,6 +284,36 @@ async function main() {
     });
   }
 
+  console.log("Sembrando noticias existentes (4 publicadas)...");
+  const { newsPosts } = await import("../src/data/institucional.js");
+  for (const n of newsPosts as {
+    slug: string;
+    title: string;
+    date: string;
+    category: string;
+    author: string;
+    image: string;
+    excerpt: string;
+    content: string[];
+  }[]) {
+    const html = n.content.map((p) => `<p>${p}</p>`).join("");
+    await prisma.newsPost.upsert({
+      where: { slug: n.slug },
+      update: {},
+      create: {
+        slug: n.slug,
+        title: n.title,
+        excerpt: n.excerpt,
+        content: html,
+        category: n.category,
+        imageUrl: n.image,
+        status: "PUBLICADA",
+        publishedAt: new Date(n.date + "T12:00:00"),
+        authorName: n.author,
+      },
+    });
+  }
+
   console.log("Seed completado.");
   console.log("Cuentas (demo: 12345678 · Luis: n4cio210, cambiar tras probar):");
   console.log("  - luis.velazquez (Administrador real, sin correo — vincular en Mi perfil)");

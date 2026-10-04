@@ -1,20 +1,75 @@
 import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import { newsPosts } from "@/data/institucional";
+import { sanitizeHtml } from "@/lib/news";
 
-export function generateStaticParams() {
-  return newsPosts.map((n) => ({ slug: n.slug }));
+export const dynamic = "force-dynamic";
+
+function fmtDate(d: Date | null): string {
+  if (!d) return "";
+  return d.toLocaleDateString("es-PY", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+type View = {
+  title: string;
+  excerpt: string;
+  contentHtml: string | null;
+  paragraphs: string[];
+  category: string;
+  date: string;
+  author: string;
+  image: string | null;
+};
+
+async function getPost(slug: string): Promise<View | null> {
+  try {
+    const n = await prisma.newsPost.findUnique({
+      where: { slug },
+      select: {
+        title: true, excerpt: true, content: true, category: true,
+        imageUrl: true, imageFile: true, id: true,
+        status: true, publishedAt: true, authorName: true,
+      },
+    });
+    if (n && n.status === "PUBLICADA") {
+      return {
+        title: n.title,
+        excerpt: n.excerpt ?? "",
+        contentHtml: sanitizeHtml(n.content),
+        paragraphs: [],
+        category: n.category,
+        date: fmtDate(n.publishedAt),
+        author: n.authorName ?? "Dirección",
+        image: n.imageFile ? `/api/news/${n.id}/image` : n.imageUrl,
+      };
+    }
+  } catch {
+    // sin DB: abajo el fallback estático
+  }
+  const post = newsPosts.find((p) => p.slug === slug);
+  if (!post) return null;
+  return {
+    title: post.title,
+    excerpt: post.excerpt,
+    contentHtml: null,
+    paragraphs: post.content,
+    category: post.category,
+    date: post.date.split("-").reverse().join("/"),
+    author: post.author,
+    image: post.image,
+  };
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = newsPosts.find((n) => n.slug === slug);
+  const post = await getPost(slug);
   if (!post) return { title: "Noticia no encontrada" };
   return { title: post.title, description: post.excerpt };
 }
 
 export default async function NoticiaPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = newsPosts.find((n) => n.slug === slug);
+  const post = await getPost(slug);
   if (!post) notFound();
 
   return (
@@ -37,22 +92,31 @@ export default async function NoticiaPage({ params }: { params: Promise<{ slug: 
           </div>
           <span className="z-10 ml-auto text-3xl">📢</span>
         </div>
-        <div className="mt-3 overflow-hidden rounded-2xl border-2 border-[#e8d3a3] bg-[#fffdf6]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={post.image} alt={post.title} className="max-h-[440px] w-full object-cover" />
-        </div>
+        {post.image && (
+          <div className="mt-3 overflow-hidden rounded-2xl border-2 border-[#e8d3a3] bg-[#fffdf6]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={post.image} alt={post.title} className="max-h-[440px] w-full object-cover" />
+          </div>
+        )}
         <div className="mt-3 rounded-2xl border-2 border-[#e8d3a3] bg-[#fffdf6] p-6 sm:p-8">
           <p className="text-xs font-bold uppercase tracking-wide text-[var(--gold)]">
-            {post.category} · {post.date} · Por {post.author}
+            {post.category}{post.date ? ` · ${post.date}` : ""} · Por {post.author}
           </p>
           <h1 className="mt-2 text-3xl font-extrabold text-[var(--institutional)] sm:text-4xl">
             {post.title}
           </h1>
-          {post.content.map((p, i) => (
-            <p key={i} className="mt-5 leading-relaxed text-stone-700">
-              {p}
-            </p>
-          ))}
+          {post.contentHtml ? (
+            <div
+              className="[&_a]:font-semibold [&_a]:text-[var(--institutional)] [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--gold)] [&_blockquote]:pl-4 [&_h2]:mt-6 [&_h2]:text-xl [&_h2]:font-extrabold [&_h2]:text-[var(--institutional)] [&_h3]:mt-5 [&_h3]:font-bold [&_li]:mt-1 [&_ol]:mt-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:mt-5 [&_p]:leading-relaxed [&_p]:text-stone-700 [&_strong]:font-extrabold [&_ul]:mt-4 [&_ul]:list-disc [&_ul]:pl-6"
+              dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+            />
+          ) : (
+            post.paragraphs.map((p, i) => (
+              <p key={i} className="mt-5 leading-relaxed text-stone-700">
+                {p}
+              </p>
+            ))
+          )}
         </div>
         <div className="flex justify-center pb-1 pt-4">
           <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#c9a35c] bg-[#4a0e18] text-2xl shadow-lg">
