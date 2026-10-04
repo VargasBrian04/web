@@ -388,6 +388,35 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 .dash-sec:first-child{margin-top:0}
 .reg-ok-tel{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .reg-ok-tel a{background:var(--paper);border:1px solid #e7e0d8;border-radius:12px;padding:12px;font-weight:800;color:var(--inst);text-align:center;font-size:1rem}
+.reg-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.reg-tab{padding:12px;border-radius:12px;border:2px solid #d6c9bc;background:#fff;font-weight:800;cursor:pointer;font-size:.9rem;color:var(--mut)}
+.reg-tab.on{border-color:var(--gold);background:var(--paper);color:var(--inst)}
+.reg-sec{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--inst);margin:14px 0 2px}
+.reg-err{display:none;color:#b91c1c;font-size:.75rem;font-weight:700;margin-top:4px}
+.reg-err.show{display:block}
+.reg-hijo{border:1px solid #e7e0d8;border-radius:12px;padding:12px;margin-top:10px;background:#fff}
+.reg-hijo h4{color:var(--inst);font-size:.85rem;display:flex;justify-content:space-between;align-items:center;margin:0 0 4px}
+.reg-hijo h4 button{border:0;background:#fee2e2;color:#991b1b;border-radius:8px;padding:4px 10px;font-size:.72rem;font-weight:800;cursor:pointer}
+.reg-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.reg-chip{display:inline-flex;align-items:center;border:2px solid #d6c9bc;border-radius:999px;padding:8px 14px;font-size:.82rem;font-weight:800;cursor:pointer;background:#fff;min-height:44px;color:#57534e}
+.reg-chip.on{border-color:var(--inst);background:var(--inst);color:#fff}
+.reg-add{width:100%;border:2px dashed var(--gold);background:none;border-radius:12px;padding:10px;font-weight:800;color:var(--inst);cursor:pointer;margin-top:10px}
+.reg-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.reg-tag{display:inline-flex;align-items:center;gap:6px;background:var(--paper);border:1px solid #e7e0d8;border-radius:999px;padding:6px 8px 6px 12px;font-size:.78rem;font-weight:700}
+.reg-tag button{border:0;background:#fff;border-radius:50%;width:20px;height:20px;font-size:.65rem;cursor:pointer;color:#991b1b}
+/* tema oscuro: vista previa */
+[data-theme="oscuro"] body{background:#101010;color:#e7e7e7}
+[data-theme="oscuro"] .card,[data-theme="oscuro"] .login-card,[data-theme="oscuro"] .ncard,[data-theme="oscuro"] .bach-detail,[data-theme="oscuro"] .dash-card,[data-theme="oscuro"] .news-paper{background:#1b1b1b!important;border-color:#2e2e2e!important;color:#e7e7e7}
+[data-theme="oscuro"] .card h3,[data-theme="oscuro"] .card h4,[data-theme="oscuro"] h2.sec-title,[data-theme="oscuro"] .login-body label,[data-theme="oscuro"] .acc-title{color:#f5f5f5!important}
+[data-theme="oscuro"] .muted,[data-theme="oscuro"] .login-body p,[data-theme="oscuro"] p.muted{color:#a8a8a8!important}
+[data-theme="oscuro"] .wrap,[data-theme="oscuro"] section.band{background:#101010!important}
+[data-theme="oscuro"] .login-body input,[data-theme="oscuro"] .login-body select,[data-theme="oscuro"] .login-body textarea{background:#242424!important;color:#f0f0f0!important;border-color:#3a3a3a!important}
+[data-theme="oscuro"] header{background:#0d0d0d!important}
+[data-theme="oscuro"] footer{background:#0d0d0d!important}
+[data-theme="oscuro"] .reg-hijo,[data-theme="oscuro"] .reg-tab{background:#242424!important;color:#e7e7e7}
+[data-theme="oscuro"] .reg-chip{background:#242424!important;color:#e7e7e7}
+[data-theme="oscuro"] .menu{background:#1b1b1b!important;border-color:#2e2e2e!important}
+[data-theme="oscuro"] .menu a{color:#e7e7e7!important}
 .demo-tag{display:inline-block;background:#fef3c7;color:#92400e;font-size:.65rem;font-weight:800;padding:2px 9px;border-radius:99px;text-transform:uppercase}
 #toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:#2e201b;color:#fff;padding:12px 22px;border-radius:12px;font-size:.86rem;z-index:460;transition:transform .35s;box-shadow:0 12px 30px rgba(0,0,0,.4);border-left:5px solid var(--gold)}
 #toast.show{transform:translate(-50%,0)}
@@ -399,6 +428,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 </style>
 </head>
 <body>
+<script>try{if(localStorage.getItem("csl-theme")==="oscuro"){document.documentElement.dataset.theme="oscuro"}}catch(e){}</script>
 <div id="progress"></div>
 <div id="loader"><div class="loader-badge">SL</div></div>
 
@@ -515,20 +545,21 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 <div><b>Mariscal Francisco Solano López</b><span>Caaguazú - Paraguay</span></div>
 </div>
 <div class="links">
-<div class="drop"><button>Institución ▾</button><div class="menu">
+<div class="drop"><button>🏛️ Institución ▾</button><div class="menu">
 <a href="#historia">Historia</a><a href="#mision">Misión</a><a href="#vision">Visión</a><a href="#docentes">Docentes</a><a href="#normas">Convivencia</a>
 </div></div>
-<div class="drop"><button>Académica ▾</button><div class="menu">
-<a href="#oferta">Oferta académica</a><a href="#niveles">Niveles</a><a href="#estadisticas">Estadísticas</a><a href="#calificaciones">Calificaciones</a><a href="#noticias">Noticias</a>
+<div class="drop"><button>📚 Académica ▾</button><div class="menu">
+<a href="#oferta">Oferta académica</a><a href="#niveles">Niveles</a><a href="#estadisticas">Estadísticas</a><a href="#noticias">Noticias</a>
 </div></div>
-<div class="drop"><button>Admisiones ▾</button><div class="menu">
-<a href="#requisitos">Requisitos</a><a href="#matriculas">Matrículas</a><a href="#contacto">Contacto</a>
+<div class="drop"><button>📝 Admisiones ▾</button><div class="menu">
+<a href="#requisitos">Requisitos</a><a href="#matriculas">Inscripciones</a><a href="#contacto">Contacto</a>
 </div></div>
-<div class="drop"><button>Galería</button><div class="menu"><a href="#galeria">Ver galería</a></div></div>
+<div class="drop"><button>🖼️ Galería</button><div class="menu"><a href="#galeria">Ver galería</a></div></div>
 </div>
 <div class="btns">
-<a class="btn btn-ghost" href="https://aprendizaje.mec.edu.py/aprendizaje/familia/documentos" target="_blank" rel="noopener">Calificaciones ↗</a>
-<button class="btn btn-ghost" id="navLoginBtn" style="background:transparent" onclick="showRoles()">Acceder</button>
+<a class="btn btn-ghost" href="https://aprendizaje.mec.edu.py/aprendizaje/familia/documentos" target="_blank" rel="noopener">✓ Calificaciones ↗</a>
+<button class="btn btn-ghost" id="navLoginBtn" style="background:transparent" onclick="showRoles()">🔑 Acceder</button>
+<button class="btn btn-ghost" id="navThemeBtn" style="background:transparent" onclick="togglePreviewTheme()" title="Cambiar apariencia">🌙</button>
 <div id="navProfile" style="display:none;position:relative">
 <button class="btn" id="chipBtn" onclick="toggleChip(event)" style="background:rgba(255,255,255,.14);color:#fff;gap:8px"><span id="chipAvatar" style="font-size:1.1rem">👨‍🏫</span><span id="chipName" style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Usuario</span><span id="chipRole" style="background:var(--gold);border-radius:99px;padding:2px 9px;font-size:.68rem">Docente</span></button>
 <div id="chipMenu" style="display:none;position:absolute;right:0;top:110%;min-width:220px;background:#fff;border:1px solid #e7e0d8;border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.3);padding:8px;z-index:500">
@@ -543,9 +574,10 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 </div>
 </nav>
 <div id="mobileMenu">
+<a class="l" href="#" onclick="togglePreviewTheme();return false" style="font-weight:800">🌙/☀️ Cambiar apariencia</a>
 <a class="cat">Institución</a><a class="l" href="#historia">Historia</a><a class="l" href="#mision">Misión</a><a class="l" href="#vision">Visión</a><a class="l" href="#docentes">Docentes</a><a class="l" href="#normas">Convivencia</a>
-<a class="cat">Académica</a><a class="l" href="#oferta">Oferta académica</a><a class="l" href="#niveles">Niveles</a><a class="l" href="#estadisticas">Estadísticas</a><a class="l" href="#calificaciones">Calificaciones</a><a class="l" href="#noticias">Noticias</a>
-<a class="cat">Admisiones</a><a class="l" href="#requisitos">Requisitos</a><a class="l" href="#matriculas">Matrículas</a><a class="l" href="#galeria">Galería</a><a class="l" href="#contacto">Contacto</a>
+<a class="cat">Académica</a><a class="l" href="#oferta">Oferta académica</a><a class="l" href="#niveles">Niveles</a><a class="l" href="#estadisticas">Estadísticas</a><a class="l" href="#noticias">Noticias</a>
+<a class="cat">Admisiones</a><a class="l" href="#requisitos">Requisitos</a><a class="l" href="#matriculas">Inscripciones</a><a class="l" href="#galeria">Galería</a><a class="l" href="#contacto">Contacto</a>
 </div>
 </header>
 
@@ -661,13 +693,12 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 
 <!-- MATRICULAS -->
 <section id="matriculas" class="band"><div class="wrap">
-<h2 class="sec-title reveal">Matrículas</h2>
-<p class="muted reveal">Información de matriculación. Gestión también disponible en Secretaría y el panel de administración.</p>
+<h2 class="sec-title reveal">Inscripciones</h2>
+<p class="muted reveal">La enseñanza es gratuita y no se cobra matrícula. Gestión en Secretaría y el panel de administración.</p>
 <div class="grid2">
-<div class="hist reveal"><h3>Costos y fechas</h3>
-<p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Institución pública: la enseñanza es gratuita. Aranceles administrativos mínimos: <span class="pend">Información pendiente</span></p>
-<p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Calendario oficial de matriculación: <span class="pend">Información pendiente</span></p>
-<p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Modalidades de pago (si aplicaran): <span class="pend">Información pendiente</span></p></div>
+<div class="hist reveal"><h3>Gratuita y sin aranceles</h3>
+<p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Institución pública: la enseñanza es gratuita y no se cobra matrícula ni aranceles.</p>
+<p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Calendario oficial de inscripciones a confirmar por la Dirección.</p></div>
 <div class="card reveal"><h3 style="color:var(--inst)">Procedimiento</h3><ul style="margin-top:12px;display:grid;gap:10px;font-size:.9rem;color:#57534e;list-style:none">
 <li><b>1.</b> Completar la solicitud online o en Secretaría.</li>
 <li><b>2.</b> Presentar los documentos del nivel (ver Requisitos).</li>
@@ -683,17 +714,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 <div class="grid2" id="normGrid"></div>
 </section>
 
-<!-- CALIFICACIONES -->
-<section id="calificaciones" class="band"><div class="wrap">
-<h2 class="sec-title reveal">¿Cómo querés ingresar?</h2>
-<p class="muted reveal">Elegí tu perfil para ir a tu zona. El acceso al portal requiere usuario y contraseña.</p>
-<div class="grid3">
-<div class="card reveal"><h3 style="color:var(--inst)">👨‍🏫 Soy docente</h3><p class="muted" style="font-size:.87rem">Portal docente: nómina, carga de notas (1 a 5), asistencia y tareas.</p><p class="muted" style="font-size:.82rem">Acceso con usuario y contraseña en la web institucional.</p></div>
-<div class="card reveal"><h3 style="color:var(--inst)">👨‍👩‍👧 Soy padre / tutor</h3><p class="muted" style="font-size:.87rem">Notas de tus hijos vinculados, asistencia y tareas pendientes.</p><p class="muted" style="font-size:.82rem">El alumno queda registrado como hijo del padre/tutor.</p></div>
-<div class="hist reveal"><h3>🏫 Soy visitante</h3><p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Explorá la galería, noticias, oferta académica e inscripciones.</p><a class="btn btn-gold" style="margin-top:14px" href="#galeria">Ver galería</a></div>
-</div>
-<p class="muted reveal" style="margin-top:14px;font-size:.8rem">Documentos oficiales de calificaciones solo en la plataforma del MEC.</p>
-</div></section>
+<!-- CALIFICACIONES (acceso real en /acceso y botón Acceder; sin sección duplicada) -->
 
 <!-- CONTACTO -->
 <section id="contacto"><div class="wrap" style="display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:end">
@@ -706,7 +727,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 
 <footer><div class="foot">
 <div><b>Colegio Nacional Mariscal Francisco Solano López</b><br><span style="font-size:.82rem">Educación Media Pública · Caaguazú, Paraguay</span></div>
-<div style="font-size:.82rem">© 2026 · Vista previa de prueba — FASE 0 seguridad + FASE 1 documentos aplicadas en sitio-web\ (requiere: docker compose up -d + prisma migrate)</div>
+<div style="font-size:.82rem">© 2026 · Colegio Nacional Mariscal Francisco Solano López · Caaguazú, Paraguay</div>
 </div></footer>
 
 <button id="top" title="Volver arriba">↑</button>
@@ -740,39 +761,83 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 
 <!-- SOLICITUD DE REGISTRO (docentes/tutores: se envía por correo a Dirección) -->
 <div id="regModal">
-<div class="login-card" style="width:min(480px,94vw)">
-<div class="login-head"><div class="lic">📝</div><h3 id="regTitle">Solicitud de registro</h3><p>Docentes y tutores · La revisa Dirección</p></div>
+<div class="login-card" style="width:min(640px,94vw);max-height:92vh;overflow-y:auto">
+<div class="login-head"><div class="lic">📝</div><h3 id="regTitle">Solicitud de registro</h3><p>Tutores y docentes · La revisa Dirección</p></div>
 <div class="login-body">
-<form id="regForm" onsubmit="return submitReg(event)">
-<label for="rgTipo">Soy</label>
-<select id="rgTipo" onchange="regTipoChange()"><option value="Docente">Docente</option><option value="Tutor">Tutor / Encargado</option></select>
-<label for="rgNom">Nombres</label>
-<input id="rgNom" type="text" placeholder="Tus nombres" autocomplete="given-name">
-<label for="rgApe">Apellidos</label>
-<input id="rgApe" type="text" placeholder="Tus apellidos" autocomplete="family-name">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-<div><label for="rgCi">Cédula</label><input id="rgCi" type="text" inputmode="numeric" placeholder="Ej. 4567890"></div>
-<div><label for="rgTel">Teléfono</label><input id="rgTel" type="tel" placeholder="Ej. 0975 123456" autocomplete="tel"></div>
+<div class="reg-tabs">
+<button type="button" id="regTabT" class="reg-tab on" onclick="regTab('tutor')">👨‍👩‍👧 Soy tutor</button>
+<button type="button" id="regTabD" class="reg-tab" onclick="regTab('docente')">👨‍🏫 Soy docente</button>
 </div>
-<label for="rgMail">Correo</label>
-<input id="rgMail" type="email" placeholder="tu@correo.com" autocomplete="email">
-<label for="rgDato" id="rgDatoLabel">Materias que enseñás (ej. Matemática 2.º B)</label>
-<input id="rgDato" type="text" placeholder="Ej. Matemática 2.º B">
-<div class="login-err" id="rgErr">Completá nombres, cédula y un contacto (teléfono o correo).</div>
-<div style="background:var(--paper);border:1px solid #e7e0d8;border-radius:10px;padding:10px 12px;margin-top:12px;font-size:.78rem;color:var(--mut)">📬 Se enviará a <b>colegionacionalemd6@gmail.com</b> · 📞 0975 493753 · 0982 296194 · 0971 884497<br>🔒 Tus datos solo se usan para crear tu cuenta.</div>
-<button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:16px;padding:13px" type="submit">Enviar solicitud →</button>
+<div class="login-err" id="regTopErr" style="display:none"></div>
+<form id="regFormT" onsubmit="return submitRegT(event)">
+<div class="reg-sec">1 · Datos personales</div>
+<label for="rtNom">Nombres *</label>
+<input id="rtNom" type="text" placeholder="Tus nombres" autocomplete="given-name">
+<div class="reg-err" id="e-rtNom">Obligatorio</div>
+<label for="rtApe">Apellidos *</label>
+<input id="rtApe" type="text" placeholder="Tus apellidos" autocomplete="family-name">
+<div class="reg-err" id="e-rtApe">Obligatorio</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div><label for="rtCi">Cédula *</label><input id="rtCi" type="text" inputmode="numeric" placeholder="Ej. 4567890"><div class="reg-err" id="e-rtCi">Cédula inválida (6 a 10 dígitos)</div></div>
+<div><label for="rtTel">Teléfono *</label><input id="rtTel" type="tel" placeholder="Ej. 0975 123456" autocomplete="tel"><div class="reg-err" id="e-rtTel">Mínimo 6 dígitos</div></div>
+</div>
+<label for="rtMail">Correo *</label>
+<input id="rtMail" type="email" placeholder="tu@correo.com" autocomplete="email">
+<div class="reg-err" id="e-rtMail">Correo inválido</div>
+<div class="reg-sec">2 · Hijos a cargo</div>
+<div id="rtHijos"></div>
+<button type="button" class="reg-add" onclick="rtAddHijo()">＋ Agregar otro hijo</button>
+<div class="reg-err" id="e-rtHijos"></div>
+<button class="btn btn-gold" id="rtSend" style="width:100%;justify-content:center;margin-top:16px;padding:13px" type="submit">Enviar solicitud →</button>
+</form>
+<form id="regFormD" style="display:none" onsubmit="return submitRegD(event)">
+<div class="reg-sec">1 · Datos personales</div>
+<label for="rdNom">Nombres *</label>
+<input id="rdNom" type="text" placeholder="Tus nombres" autocomplete="given-name">
+<div class="reg-err" id="e-rdNom">Obligatorio</div>
+<label for="rdApe">Apellidos *</label>
+<input id="rdApe" type="text" placeholder="Tus apellidos" autocomplete="family-name">
+<div class="reg-err" id="e-rdApe">Obligatorio</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div><label for="rdCi">Cédula *</label><input id="rdCi" type="text" inputmode="numeric" placeholder="Ej. 4567890"><div class="reg-err" id="e-rdCi">Cédula inválida (6 a 10 dígitos)</div></div>
+<div><label for="rdTel">Teléfono *</label><input id="rdTel" type="tel" placeholder="Ej. 0975 123456" autocomplete="tel"><div class="reg-err" id="e-rdTel">Mínimo 6 dígitos</div></div>
+</div>
+<label for="rdMail">Correo *</label>
+<input id="rdMail" type="email" placeholder="tu@correo.com" autocomplete="email">
+<div class="reg-err" id="e-rdMail">Correo inválido</div>
+<div class="reg-sec">2 · Materia principal *</div>
+<label for="rdMP">Materia</label>
+<select id="rdMP" onchange="document.getElementById('rdMPOtraBox').style.display=this.value==='__OTRA__'?'':'none'"><option value="">Seleccionar…</option></select>
+<div class="reg-err" id="e-rdMP">Elegí tu materia principal</div>
+<div id="rdMPOtraBox" style="display:none"><label for="rdMPOtra">¿Cuál?</label><input id="rdMPOtra" type="text" maxlength="80" placeholder="Ej: Física"></div>
+<div class="reg-sec">3 · Otras materias (opcional)</div>
+<p style="font-size:.78rem;color:var(--mut)">Podés completar esta información ahora o agregarla después desde tu perfil.</p>
+<div style="display:flex;gap:8px;margin-top:6px">
+<select id="rdOtraSel" onchange="document.getElementById('rdOtraLibreBox').style.display=this.value==='__OTRA__'?'':'none'" style="flex:1"><option value="">Seleccionar…</option></select>
+<button type="button" class="btn" style="background:var(--paper);border:2px dashed var(--gold);color:var(--inst);font-weight:800;padding:10px 14px" onclick="rdAddOtra()">＋</button>
+</div>
+<div id="rdOtraLibreBox" style="display:none;margin-top:6px"><input id="rdOtraLibre" type="text" maxlength="80" placeholder="¿Cuál? Ej: Química"></div>
+<div class="reg-err" id="e-rdOtras"></div>
+<div class="reg-tags" id="rdOtrasTags"></div>
+<div class="reg-sec">4 · Asignación académica</div>
+<label for="rdNivel">Nivel educativo *</label>
+<select id="rdNivel" onchange="rdNivelChange()"><option value="">Seleccionar…</option><option value="EEB">Educación Escolar Básica</option><option value="MEDIA">Educación Media</option></select>
+<div class="reg-err" id="e-rdNivel">Elegí el nivel</div>
+<div style="margin-top:8px"><b style="font-size:.8rem">Cursos en los que enseña *</b><div class="reg-chips" id="rdCursos"></div><div class="reg-err" id="e-rdCursos">Elegí al menos un curso</div></div>
+<div id="rdBachBox" style="display:none;margin-top:8px"><b style="font-size:.8rem">¿En qué bachiller(es) enseñás? *</b><div class="reg-chips" id="rdBach"></div><div class="reg-err" id="e-rdBach">Indicá al menos un bachiller</div></div>
+<button class="btn btn-gold" id="rdSend" style="width:100%;justify-content:center;margin-top:16px;padding:13px" type="submit">Enviar solicitud →</button>
 </form>
 <div id="regOk" style="display:none;text-align:center">
 <div style="font-size:2.6rem">✅</div>
-<h3 style="color:var(--inst);margin-top:8px">¡Solicitud lista!</h3>
-<p style="font-size:.85rem;color:var(--mut);margin-top:6px">Tu solicitud fue enviada a Dirección.<br>Si el envío directo falló, se abrió tu correo: tocá <b>enviar</b>.<br>También podés escribirnos directo:</p>
+<h3 style="color:var(--inst);margin-top:8px">¡Solicitud enviada!</h3>
+<p style="font-size:.85rem;color:var(--mut);margin-top:6px">Dirección la revisará y te contactará.<br>También podés escribirnos directo:</p>
 <div class="reg-ok-tel">
 <a href="tel:+595975493753">📞 0975 493753</a>
 <a href="tel:+595982296194">📞 0982 296194</a>
 <a href="tel:+595971884497">📞 0971 884497</a>
 </div>
 </div>
-<p class="login-foot"><a onclick="closeReg()">← Volver</a></p>
+<p class="login-foot"><a onclick="closeReg()">← Volver</a> · <a href="/registro">Abrir versión completa →</a></p>
 </div>
 </div>
 </div>
@@ -827,21 +892,51 @@ function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.c
 function doLogin(e){if(e)e.preventDefault();var u=document.getElementById('liUser').value.trim(),p=document.getElementById('liPass').value;if(!u||!p){document.getElementById('liErr').style.display='block';return false}
 closeLogin();setSession(u,loginRole);hideRoles();var d=document.getElementById('dashModal');if(d)d.classList.remove('open');toast('Bienvenido/a, '+displayName());if(typeof sfx==='function')sfx('ok');setTimeout(function(){scrollTo({top:0,behavior:'smooth'})},150);return false}
 function fillDemo(email){document.getElementById('liUser').value=email;document.getElementById('liPass').value='12345678';document.getElementById('liErr').style.display='none';toast('Credencial de prueba cargada: '+email)}
-/* Solicitud de registro: se arma un correo a Dirección con los datos (EDITAR este correo) */
-var REGISTRO_EMAIL='colegionacionalemd6@gmail.com';
-var REGISTRO_TELS=['0975 493753','0982 296194','0971 884497'];
-function openReg(){closeLogin();document.getElementById('regForm').style.display='';document.getElementById('regOk').style.display='none';document.getElementById('rgErr').style.display='none';regTipoChange();document.getElementById('regModal').classList.add('open')}
-function regTipoChange(){var t=document.getElementById('rgTipo').value;var l=document.getElementById('rgDatoLabel');var i=document.getElementById('rgDato');if(t==='Tutor'){l.textContent='Hijos a cargo (nombres y cursos)';i.placeholder='Ej. Ana Gómez 8.º A, José Gómez 5.º B'}else{l.textContent='Materias que enseñás (ej. Matemática 2.º B)';i.placeholder='Ej. Matemática 2.º B'}}
+/* Solicitudes reales a la base de datos (POST /api/solicitudes + catálogo). */
+var REG_CAT=null,REG_TAB='tutor',REG_SENDING=false;
+function openReg(tab){closeLogin();regTab(tab||'tutor');if(!rtHijos.length)rtAddHijo();document.getElementById('regTopErr').style.display='none';document.getElementById('regModal').classList.add('open');loadRegCat()}
+function rdNivelChange(){rdCursosSel=[];rdBachSel=[];paintRegChips()}
 function closeReg(){document.getElementById('regModal').classList.remove('open')}
-function submitReg(e){if(e)e.preventDefault();
-var tipo=document.getElementById('rgTipo').value,nom=document.getElementById('rgNom').value.trim(),ape=document.getElementById('rgApe').value.trim(),ci=document.getElementById('rgCi').value.trim(),tel=document.getElementById('rgTel').value.trim(),mail=document.getElementById('rgMail').value.trim(),dato=document.getElementById('rgDato').value.trim();
-if(!nom||!ape||!/^\d{6,10}$/.test(ci)||(!tel&&!mail)){document.getElementById('rgErr').style.display='block';return false}
-var subj='Solicitud de registro - '+tipo+' - '+nom+' '+ape+' (CI '+ci+')';
-var body='SOLICITUD DE REGISTRO - COLEGIO MCAL. SOLANO LÓPEZ\n\nPerfil: '+tipo+'\nNombres: '+nom+'\nApellidos: '+ape+'\nCédula: '+ci+'\nTeléfono: '+(tel||'-')+'\nCorreo: '+(mail||'-')+'\n'+(tipo==='Tutor'?'Hijos a cargo: ':'Materias: ')+(dato||'-')+'\n\nEnviado desde la página web.';
-var showOk=function(sent){document.getElementById('regForm').style.display='none';document.getElementById('regOk').style.display='block';toast(sent?'Solicitud enviada a Dirección':'Revisá tu correo para enviarla');sfx('ok')};
-/* Envío real al correo de Dirección (servicio formsubmit). Si falla, abre el correo del visitante. */
-try{fetch('https://formsubmit.co/ajax/'+REGISTRO_EMAIL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({Perfil:tipo,Nombres:nom,Apellidos:ape,'Cédula':ci,'Teléfono':tel||'-',Correo:mail||'-',Detalle:dato||'-',_subject:subj,_template:'table'})}).then(function(r){if(r.ok){showOk(true)}else{throw 0}}).catch(function(){window.location.href='mailto:'+REGISTRO_EMAIL+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);showOk(false)})}catch(e){window.location.href='mailto:'+REGISTRO_EMAIL+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);showOk(false)}
+function regTab(t){REG_TAB=t;document.getElementById('regTabT').classList.toggle('on',t==='tutor');document.getElementById('regTabD').classList.toggle('on',t==='docente');document.getElementById('regFormT').style.display=t==='tutor'?'':'none';document.getElementById('regFormD').style.display=t==='docente'?'':'none';document.getElementById('regOk').style.display='none'}
+function loadRegCat(){if(REG_CAT){paintRegCat();return}fetch('/api/catalogo').then(function(r){return r.json()}).then(function(j){if(j.data){REG_CAT=j.data;paintRegCat()}else{regTopErr('No se pudo cargar la oferta académica')}}).catch(function(){regTopErr('Sin conexión con el servidor')})}
+function regTopErr(m){var e=document.getElementById('regTopErr');if(!m){e.style.display='none';return}e.textContent=m;e.style.display='block'}
+function setErr(id,msg){var e=document.getElementById(id);if(!e)return;if(msg){e.textContent=msg;e.classList.add('show')}else{e.classList.remove('show')}}
+function valPerson(p){var e={};if(!/^\d{6,10}$/.test(p.ci))e.ci='Cédula inválida (6 a 10 dígitos)';if(!p.firstName)e.firstName='Obligatorio';if(!p.lastName)e.lastName='Obligatorio';if(p.phone.replace(/\D/g,'').length<6)e.phone='Mínimo 6 dígitos';if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email))e.email='Correo inválido';return e}
+function paintRegCat(){if(!REG_CAT)return;var mp=document.getElementById('rdMP'),os=document.getElementById('rdOtraSel');var subj=REG_CAT.subjects.map(function(s){return '<option value="'+s.code+'">'+s.name+' ('+s.code+')</option>'}).join('');mp.innerHTML='<option value="">Seleccionar…</option>'+subj+'<option value="__OTRA__">Otra materia (especificar)…</option>';os.innerHTML='<option value="">Seleccionar…</option>'+subj+'<option value="__OTRA__">Otra materia (especificar)…</option>';rdNivelChange()}
+/* ---- tutor ---- */
+var rtHijos=[];
+function rtAddHijo(){if(rtHijos.length>=8)return;rtHijos.push({nombre:'',nivel:'',curso:'',bachiller:''});rtPaintHijos()}
+function rtDelHijo(i){if(rtHijos.length<=1)return;rtHijos.splice(i,1);rtPaintHijos()}
+function rtPaintHijos(){var box=document.getElementById('rtHijos');box.innerHTML='';rtHijos.forEach(function(h,i){var d=document.createElement('div');d.className='reg-hijo';var courses=h.nivel==='EEB'?(REG_CAT?REG_CAT.eebGrades:[]):h.nivel==='MEDIA'?(REG_CAT?REG_CAT.mediaCourses:[]):[];var co=courses.map(function(c){return '<option value="'+c+'"'+(h.curso===c?' selected':'')+'>'+c+(h.nivel==='EEB'?' grado':' curso')+'</option>'}).join('');var bachs=(REG_CAT?REG_CAT.bachilleratos:[]).map(function(b){return '<option value="'+b.code+'"'+(h.bachiller===b.code?' selected':'')+'>'+b.shortName+' — '+b.name+'</option>'}).join('');d.innerHTML='<h4>Hijo '+(i+1)+(rtHijos.length>1?'<button type="button" onclick="rtDelHijo('+i+')">✕ Quitar</button>':'')+'</h4><label>Nombre y apellido del alumno *</label><input data-f="nombre" value="'+h.nombre.replace(/"/g,'&quot;')+'" placeholder="Ej: Ana Gómez"><div class="reg-err" data-e="nombre"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px"><div><label>Nivel *</label><select data-f="nivel"><option value="">Seleccionar…</option><option value="EEB"'+(h.nivel==='EEB'?' selected':'')+'>Educación Escolar Básica</option><option value="MEDIA"'+(h.nivel==='MEDIA'?' selected':'')+'>Educación Media</option></select><div class="reg-err" data-e="nivel"></div></div><div><label>Curso *</label><select data-f="curso"><option value="">'+(h.nivel?'Seleccionar…':'Primero el nivel')+'</option>'+co+'</select><div class="reg-err" data-e="curso"></div></div></div>'+(h.nivel==='MEDIA'?'<div style="margin-top:6px"><label>Bachiller *</label><select data-f="bachiller"><option value="">Seleccionar bachiller…</option>'+bachs+'</select><div class="reg-err" data-e="bachiller"></div></div>':'');var q=function(f){return d.querySelector('[data-f="'+f+'"]')},qe=function(f){return d.querySelector('[data-e="'+f+'"]')};q('nombre').oninput=function(){h.nombre=this.value};q('nivel').onchange=function(){h.nivel=this.value;h.curso='';h.bachiller='';rtPaintHijos()};var qc=q('curso');if(qc)qc.onchange=function(){h.curso=this.value};var qb=q('bachiller');if(qb)qb.onchange=function(){h.bachiller=this.value};h._qe=qe;box.appendChild(d)})}
+function rtShowErr(i,f,msg){var h=rtHijos[i];if(h&&h._qe){var e=h._qe(f);if(e){if(msg){e.textContent=msg;e.classList.add('show')}else e.classList.remove('show')}}}
+function submitRegT(e){if(e)e.preventDefault();if(REG_SENDING)return false;regTopErr(null);
+var p={ci:document.getElementById('rtCi').value.trim(),firstName:document.getElementById('rtNom').value.trim(),lastName:document.getElementById('rtApe').value.trim(),phone:document.getElementById('rtTel').value.trim(),email:document.getElementById('rtMail').value.trim()};
+var pe=valPerson(p);setErr('e-rtCi',pe.ci);setErr('e-rtNom',pe.firstName);setErr('e-rtApe',pe.lastName);setErr('e-rtTel',pe.phone);setErr('e-rtMail',pe.email);
+var ok=Object.keys(pe).length===0;
+rtHijos.forEach(function(h,i){var msgs={};if(!h.nombre.trim())msgs.nombre='Obligatorio';if(h.nivel!=='EEB'&&h.nivel!=='MEDIA')msgs.nivel='Elegí el nivel';var vc=h.nivel==='EEB'?(REG_CAT?REG_CAT.eebGrades:[]):h.nivel==='MEDIA'?(REG_CAT?REG_CAT.mediaCourses:[]):[];if(!h.curso||vc.indexOf(h.curso)<0)msgs.curso='Elegí el curso';if(h.nivel==='MEDIA'&&!h.bachiller)msgs.bachiller='Elegí el bachiller';['nombre','nivel','curso','bachiller'].forEach(function(f){rtShowErr(i,f,msgs[f])});if(Object.keys(msgs).length)ok=false});
+if(!ok){regTopErr('Revisá los campos marcados en rojo');return false}
+REG_SENDING=true;var btn=document.getElementById('rtSend');btn.textContent='Enviando…';
+fetch('/api/solicitudes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'tutor',ci:p.ci,firstName:p.firstName,lastName:p.lastName,phone:p.phone,email:p.email,hijos:rtHijos.map(function(h){return{nombre:h.nombre.trim(),nivel:h.nivel,curso:h.curso,bachiller:h.nivel==='MEDIA'?h.bachiller:null}})})}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){REG_SENDING=false;btn.textContent='Enviar solicitud →';if(!x.ok){regTopErr(x.j.error||'No se pudo enviar')}else{regShowOk()}}).catch(function(){REG_SENDING=false;btn.textContent='Enviar solicitud →';regTopErr('Sin conexión con el servidor')});
 return false}
+/* ---- docente ---- */
+var rdOtras=[];
+function rdLabel(code){if(code.indexOf('OTRA:')===0)return code.slice(5)+' (a revisar)';var s=(REG_CAT?REG_CAT.subjects:[]).find(function(x){return x.code===code});return s?s.name+' ('+s.code+')':code}
+function rdNivelChange(){var n=document.getElementById('rdNivel').value;var box=document.getElementById('rdBachBox');box.style.display=n==='MEDIA'?'':'none';paintRegChips()}
+function paintRegChips(){var n=document.getElementById('rdNivel').value;var courses=n==='EEB'?(REG_CAT?REG_CAT.eebGrades:[]):n==='MEDIA'?(REG_CAT?REG_CAT.mediaCourses:[]):[];var cb=document.getElementById('rdCursos');cb.innerHTML='';courses.forEach(function(c){var b=document.createElement('button');b.type='button';b.className='reg-chip'+(rdCursosSel.indexOf(c)>=0?' on':'');b.textContent=(rdCursosSel.indexOf(c)>=0?'✓ ':'')+c;b.onclick=function(){var i=rdCursosSel.indexOf(c);if(i>=0)rdCursosSel.splice(i,1);else if(rdCursosSel.length<6)rdCursosSel.push(c);paintRegChips()};cb.appendChild(b)});var bb=document.getElementById('rdBach');bb.innerHTML='';(REG_CAT?REG_CAT.bachilleratos:[]).forEach(function(x){var b=document.createElement('button');b.type='button';b.className='reg-chip'+(rdBachSel.indexOf(x.code)>=0?' on':'');b.title=x.name;b.textContent=(rdBachSel.indexOf(x.code)>=0?'✓ ':'')+x.shortName;b.onclick=function(){var i=rdBachSel.indexOf(x.code);if(i>=0)rdBachSel.splice(i,1);else if(rdBachSel.length<8)rdBachSel.push(x.code);paintRegChips()};bb.appendChild(b)})}
+var rdCursosSel=[],rdBachSel=[];
+function rdAddOtra(){var sel=document.getElementById('rdOtraSel').value;setErr('e-rdOtras',null);if(!sel){setErr('e-rdOtras','Elegí una materia de la lista');return}var v=sel;if(sel==='__OTRA__'){var t=document.getElementById('rdOtraLibre').value.trim();if(!t){setErr('e-rdOtras','Describí la materia');return}v='OTRA:'+t.slice(0,80)}var mp=document.getElementById('rdMP').value;var mpv=mp==='__OTRA__'?'OTRA:'+document.getElementById('rdMPOtra').value.trim():mp;if((v===mpv&&mpv)||rdOtras.indexOf(v)>=0){setErr('e-rdOtras','Esa materia ya está agregada');return}if(rdOtras.length>=6){setErr('e-rdOtras','Máximo 6 materias');return}rdOtras.push(v);document.getElementById('rdOtraSel').value='';document.getElementById('rdOtraLibre').value='';rdPaintOtras()}
+function rdPaintOtras(){var box=document.getElementById('rdOtrasTags');box.innerHTML='';rdOtras.forEach(function(o){var s=document.createElement('span');s.className='reg-tag';s.textContent=rdLabel(o);var b=document.createElement('button');b.type='button';b.textContent='✕';b.onclick=function(){rdOtras=rdOtras.filter(function(x){return x!==o});rdPaintOtras()};s.appendChild(b);box.appendChild(s)})}
+function submitRegD(e){if(e)e.preventDefault();if(REG_SENDING)return false;regTopErr(null);
+var p={ci:document.getElementById('rdCi').value.trim(),firstName:document.getElementById('rdNom').value.trim(),lastName:document.getElementById('rdApe').value.trim(),phone:document.getElementById('rdTel').value.trim(),email:document.getElementById('rdMail').value.trim()};
+var pe=valPerson(p);setErr('e-rdCi',pe.ci);setErr('e-rdNom',pe.firstName);setErr('e-rdApe',pe.lastName);setErr('e-rdTel',pe.phone);setErr('e-rdMail',pe.email);
+var mp=document.getElementById('rdMP').value,mpO=document.getElementById('rdMPOtra').value.trim();var mpErr=null;if(!mp)mpErr='Elegí tu materia principal';else if(mp==='__OTRA__'&&!mpO)mpErr='Describí la materia';setErr('e-rdMP',mpErr);
+var n=document.getElementById('rdNivel').value;var asErr=null;if(!n)asErr='Elegí el nivel educativo';else if(!rdCursosSel.length)asErr='Elegí al menos un curso';else if(n==='MEDIA'&&!rdBachSel.length)asErr='Indicá en qué bachiller(es) enseñás';setErr('e-rdNivel',(!n)?asErr:null);setErr('e-rdCursos',(n&&!rdCursosSel.length)?asErr:null);setErr('e-rdBach',(n==='MEDIA'&&!rdBachSel.length)?asErr:null);
+var ok=Object.keys(pe).length===0&&!mpErr&&!asErr;
+if(!ok){regTopErr('Revisá los campos marcados en rojo');return false}
+REG_SENDING=true;var btn=document.getElementById('rdSend');btn.textContent='Enviando…';
+fetch('/api/solicitudes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'docente',ci:p.ci,firstName:p.firstName,lastName:p.lastName,phone:p.phone,email:p.email,materiaPrincipal:mp==='__OTRA__'?('OTRA:'+mpO):mp,otrasMaterias:rdOtras,nivel:n,cursos:rdCursosSel,bachilleres:n==='MEDIA'?rdBachSel:[]})}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){REG_SENDING=false;btn.textContent='Enviar solicitud →';if(!x.ok){regTopErr(x.j.error||'No se pudo enviar')}else{regShowOk()}}).catch(function(){REG_SENDING=false;btn.textContent='Enviar solicitud →';regTopErr('Sin conexión con el servidor')});
+return false}
+function regShowOk(){document.getElementById('regFormT').style.display='none';document.getElementById('regFormD').style.display='none';document.getElementById('regOk').style.display='block';toast('Solicitud enviada a Dirección');sfx('ok')}
 /* ¿Es cuenta de Dirección? (no carga notas: gestiona) */
 function isDirector(){return /luis|direccion|director|admin/i.test(lastUser||'')||/luis|direccion|director|admin/i.test((typeof profile!=='undefined'&&profile.name)||'')}
 var demoSolicitudes=[
@@ -910,6 +1005,10 @@ function tone(f,t0,dur,type,vol){if(!SFX.on||!SFX.ctx)return;try{var c=SFX.ctx,o
 function sfx(n){if(!SFX.on)return;sfxInit();if(!SFX.ctx)return;if(n==='click'){tone(660,0,.08,'triangle',.04)}else if(n==='pop'){tone(440,0,.09,'sine',.06);tone(660,.06,.1,'sine',.05)}else if(n==='ok'){tone(523,0,.11,'sine',.06);tone(659,.09,.11,'sine',.06);tone(784,.18,.18,'sine',.05)}else if(n==='err'){tone(180,0,.18,'sawtooth',.04)}}
 function toggleSnd(){SFX.on=!SFX.on;try{localStorage.setItem('csl_sound',SFX.on?'1':'0')}catch(e){}paintSnd();if(SFX.on)sfx('ok');else toast('Sonidos desactivados')}
 function paintSnd(){var b=document.getElementById('sndBtn');if(b)b.textContent=SFX.on?'🔊':'🔇'}
+function previewTheme(){try{return localStorage.getItem('csl-theme')==='oscuro'?'oscuro':'marrón'}catch(e){return 'marrón'}}
+function paintPreviewTheme(){var b=document.getElementById('navThemeBtn');if(b)b.textContent=previewTheme()==='oscuro'?'☀️':'🌙'}
+function togglePreviewTheme(){var next=previewTheme()==='oscuro'?'marrón':'oscuro';document.documentElement.dataset.theme=next==='oscuro'?'oscuro':'';try{localStorage.setItem('csl-theme',next)}catch(e){}paintPreviewTheme();toast(next==='oscuro'?'Tema negro y blanco':'Tema marrón y blanco')}
+paintPreviewTheme();
 try{if(navigator.connection&&navigator.connection.saveData)document.body.classList.add('lite')}catch(e){}
 document.addEventListener('click',function(e){var t=e.target&&e.target.closest?e.target.closest('button,.btn,.dash-btn,.rg-card,.bach-btn,.gal figure,.ncard,.book'):null;if(t)sfx('click')});
 document.addEventListener('pointerdown',function(e){var b=e.target&&e.target.closest?e.target.closest('.btn'):null;if(!b||matchMedia('(prefers-reduced-motion: reduce)').matches)return;var r=b.getBoundingClientRect(),s=document.createElement('span');s.className='ripple';var d=Math.max(r.width,r.height);s.style.width=s.style.height=d+'px';s.style.left=(e.clientX-r.left-d/2)+'px';s.style.top=(e.clientY-r.top-d/2)+'px';b.appendChild(s);setTimeout(function(){s.remove()},600)},{passive:true});
