@@ -18,6 +18,7 @@ declare module "next-auth" {
 }
 
 export const authConfig = {
+  trustHost: true, // obligatorio detrás del proxy de Vercel
   session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
   jwt: { maxAge: 8 * 60 * 60 },
   pages: { signIn: "/login" },
