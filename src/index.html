@@ -10,8 +10,8 @@
 #flameIntro,#flameIntro *,#roleGate,#roleGate *{-webkit-tap-highlight-color:transparent!important;tap-highlight-color:transparent;outline:none!important}
 #flameIntro,.rg-card,.rg-visit{user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .rg-card:focus,.rg-card:active,.rg-visit:focus,.rg-visit:active{outline:none!important;box-shadow:none}
-html{scroll-behavior:smooth;scroll-padding-top:76px}
-body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--paper);color:var(--ink);overflow-x:hidden}
+html{scroll-behavior:smooth;scroll-padding-top:76px;overflow-x:clip}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--paper);color:var(--ink);overflow-x:clip}
 a{text-decoration:none;color:inherit}
 img{max-width:100%}
 section{scroll-margin-top:70px}
@@ -327,6 +327,12 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 .sec-title{font-size:1.4rem}
 .rg-box h2{font-size:1.3rem}
 #sndBtn,#top{width:44px;height:44px}
+.brand{min-width:0}
+.brand b{font-size:.66rem;max-width:104px;line-height:1.25}
+#chipBtn{max-width:140px;gap:6px}
+#chipName{max-width:60px}
+.btns .btn-gold{padding:9px 10px;font-size:.72rem}
+.acc-body{overflow-x:auto}
 }
 /* modo liviano: ahorro de datos */
 .lite .fi-embers,.lite #particles{display:none}
@@ -899,7 +905,7 @@ addEventListener('scroll',function(){var h=document.documentElement;var p=h.scro
 /* Sonidos sintetizados (WebAudio, sin archivos) + ripple + tilt 3D sutil */
 var SFX={on:true,ctx:null};try{SFX.on=localStorage.getItem('csl_sound')!=='0'}catch(e){}
 function sfxInit(){if(!SFX.ctx){try{SFX.ctx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(SFX.ctx&&SFX.ctx.state==='suspended')SFX.ctx.resume()}
-document.addEventListener('pointerdown',sfxInit,{passive:true});
+document.addEventListener('pointerdown',function(){if(SFX.ctx&&SFX.ctx.state==='suspended')SFX.ctx.resume()},{passive:true});
 function tone(f,t0,dur,type,vol){if(!SFX.on||!SFX.ctx)return;try{var c=SFX.ctx,o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.value=f;var t=c.currentTime+t0;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol||.06,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.05)}catch(e){}}
 function sfx(n){if(!SFX.on)return;sfxInit();if(!SFX.ctx)return;if(n==='click'){tone(660,0,.08,'triangle',.04)}else if(n==='pop'){tone(440,0,.09,'sine',.06);tone(660,.06,.1,'sine',.05)}else if(n==='ok'){tone(523,0,.11,'sine',.06);tone(659,.09,.11,'sine',.06);tone(784,.18,.18,'sine',.05)}else if(n==='err'){tone(180,0,.18,'sawtooth',.04)}}
 function toggleSnd(){SFX.on=!SFX.on;try{localStorage.setItem('csl_sound',SFX.on?'1':'0')}catch(e){}paintSnd();if(SFX.on)sfx('ok');else toast('Sonidos desactivados')}
