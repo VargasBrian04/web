@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+.env
+.env.local
+uploads/
+*.log
+README*_private.md
+/public/images/gallery/
+.vercel

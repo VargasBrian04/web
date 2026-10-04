@@ -1,0 +1,416 @@
+// Esquema de base de datos del Colegio Nacional Mariscal Francisco Solano López
+// Stack: PostgreSQL + Prisma ORM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  ADMIN     // Dirección / Secretaría / Coordinación
+  TEACHER   // Docente
+  STUDENT   // Alumno matriculado
+  PARENT    // Madre, padre o encargado
+  ASPIRANT  // Aspirante a inscribirse (crea su cuenta en el portal de inscripción)
+}
+
+enum EnrollmentStatus {
+  PENDIENTE
+  EN_REVISION
+  APROBADA
+  RECHAZADA
+  CANCELADA
+}
+
+enum BachilleratoType {
+  TECNICO
+  CIENTIFICO
+}
+
+enum AttendanceStatus {
+  PRESENTE
+  TARDE
+  AUSENTE
+  JUSTIFICADO
+}
+
+enum SubmissionStatus {
+  PENDIENTE
+  ENTREGADA
+  CALIFICADA
+  NO_ENTREGADA
+}
+
+enum DocumentType {
+  PLANILLA
+  BOLETIN
+  CERTIFICADO
+  DOCUMENTO
+  FOTO
+  OTRO
+}
+
+// ============================================================================
+// USUARIOS (tabla central con roles)
+// ============================================================================
+
+model User {
+  id              String   @id @default(cuid())
+  ci              String   @unique // Cédula de identidad paraguaya
+  username        String   @unique // Nombre de usuario para ingresar (minúsculas, sin espacios)
+  email           String?  @unique // Correo vinculable: opcional, se puede agregar después desde Mi perfil
+  passwordHash    String
+  firstName       String
+  lastName        String
+  phone           String?
+  birthDate       DateTime?
+  address         String?
+  profileImageUrl String?
+  role            UserRole @default(ASPIRANT)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  teacherProfile Teacher?
+  studentProfile Student?
+  guardianProfile Guardian?
+
+  @@index([role])
+  @@index([ci])
+  @@map("users")
+}
+
+// ============================================================================
+// PERFILES SEGÚN ROL
+// ============================================================================
+
+model Teacher {
+  id       String   @id @default(cuid())
+  userId   String   @unique
+  user     User     @relation(fields: [userId], references: [id])
+  ruc      String?  // RUC de la institución (campo administrativo)
+  title    String?  // Título / grado académico
+  subjects TeacherSubject[]
+  groups   ClassTeacher[]
+  grades   Grade[]
+  attendance Attendance[]
+  assignments Assignment[]
+  documents Document[]
+  observations Observation[]
+
+  @@map("teachers")
+}
+
+model Student {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id])
+  academicId       String?  // Bachillerato en el que está matriculado
+  academic         Academic? @relation(fields: [academicId], references: [id])
+  groupId          String?  // Curso / división actual
+  group            Class?   @relation(fields: [groupId], references: [id])
+  enrollmentYear   Int?     // Año lectivo de ingreso
+  guardians        StudentGuardian[]
+  enrollments      Enrollment[]
+  grades           Grade[]
+  attendance       Attendance[]
+  submissions      AssignmentSubmission[]
+  documents        Document[]
+  observations     Observation[]
+
+  @@index([academicId])
+  @@map("students")
+}
+
+// Relación N-N: un alumno puede tener varios encargados y un encargado varios hijos
+model Guardian {
+  id       String   @id @default(cuid())
+  userId   String   @unique
+  user     User     @relation(fields: [userId], references: [id])
+  students StudentGuardian[]
+
+  @@map("guardians")
+}
+
+model StudentGuardian {
+  guardianId String
+  studentId  String
+  relation   String // ej: padre, madre, tutor
+  guardian   Guardian @relation(fields: [guardianId], references: [id])
+  student    Student  @relation(fields: [studentId], references: [id])
+
+  @@id([guardianId, studentId])
+  @@map("student_guardians")
+}
+
+// ============================================================================
+// OFERTA ACADÉMICA
+// ============================================================================
+
+model Academic {
+  id           String   @id @default(cuid())
+  code         String   @unique // ej: BTI-1, BTS-2
+  name         String
+  shortName    String // ej: BTI, BTS
+  type         BachilleratoType
+  description  String
+  duration     String // ej: "3 años (Ciclo Básico)"
+  level        String  // ej: "Nivel Medio"
+  shift        String? // mañana / tarde
+  active       Boolean @default(true)
+  createdAt    DateTime @default(now())
+  subjects     Subject[]
+  classes      Class[]
+  students     Student[]
+  enrollments  Enrollment[]
+
+  @@index([type])
+  @@map("academics")
+}
+
+model Subject {
+  id         String   @id @default(cuid())
+  academicId String
+  academic   Academic @relation(fields: [academicId], references: [id])
+  gradeYear  Int      // Curso (1º, 2º, 3º)
+  name       String
+  code       String
+  teachers   TeacherSubject[]
+  grades     Grade[]
+  attendance Attendance[]
+  assignments Assignment[]
+  documents  Document[]
+
+  @@unique([academicId, code])
+  @@map("subjects")
+}
+
+// Docentes por materia
+model TeacherSubject {
+  teacherId String
+  subjectId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  @@id([teacherId, subjectId])
+  @@map("teacher_subjects")
+}
+
+// Curso / división (ej: 1º "B", Tercer Año Técnico)
+model Class {
+  id        String   @id @default(cuid())
+  name      String // ej: "1º Curso B", "3º BTI"
+  shift     String
+  gradeYear Int?    // 1, 2, 3 (para "2.º Curso")
+  section   String? // A, B, C
+  academicId String?
+  academic  Academic? @relation(fields: [academicId], references: [id])
+  periodId  String?
+  period    Period?  @relation(fields: [periodId], references: [id])
+  students  Student[]
+  teachers  ClassTeacher[]
+  documents Document[]
+
+  @@map("classes")
+}
+
+model ClassTeacher {
+  classId   String
+  teacherId String
+  class     Class   @relation(fields: [classId], references: [id])
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  @@id([classId, teacherId])
+  @@map("class_teachers")
+}
+
+// ============================================================================
+// INSCRIPCIONES
+// ============================================================================
+
+model Enrollment {
+  id          String           @id @default(cuid())
+  studentId   String
+  student     Student          @relation(fields: [studentId], references: [id])
+  academicId  String
+  academic    Academic         @relation(fields: [academicId], references: [id])
+  periodLabel String // ej: "2026"
+  status      EnrollmentStatus @default(PENDIENTE)
+  documents   Json             @default("[]") // [{ name, url, type }] - acta de nacimiento, certificado de estudios, cédula, etc.
+  // Datos del tutor/encargado declarados en la solicitud online
+  tutorName     String?
+  tutorRelation String? // ej: madre, padre, tutor
+  tutorPhone    String?
+  tutorEmail    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Validación de que un estudiantes puede inscribirse una sola vez por ciclo
+  @@unique([studentId, academicId, periodLabel])
+  @@index([status])
+  @@map("enrollments")
+}
+
+// ============================================================================
+// PERÍODOS LECTIVOS
+// ============================================================================
+
+model Period {
+  id        String   @id @default(cuid())
+  label     String   @unique // ej: "2026", "2026-PrimerSemestre"
+  name      String   // ej: "Año 2026"
+  startDate DateTime
+  endDate   DateTime
+  grades    Grade[]
+  assignments Assignment[]
+  classes   Class[]
+  documents Document[]
+  observations Observation[]
+
+  @@map("periods")
+}
+
+// ============================================================================
+// CALIFICACIONES (notas)
+// ============================================================================
+
+model Grade {
+  id        String   @id @default(cuid())
+  studentId String
+  subjectId String
+  periodId  String
+  teacherId String?
+  score     Float    // Escala 1 - 5 (escala paraguaya)
+  note      String?  // Observación del docente
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student Student  @relation(fields: [studentId], references: [id])
+  subject Subject  @relation(fields: [subjectId], references: [id])
+  period  Period   @relation(fields: [periodId], references: [id])
+  teacher Teacher? @relation(fields: [teacherId], references: [id])
+
+  @@unique([studentId, subjectId, periodId])
+  @@index([studentId, periodId])
+  @@index([subjectId, teacherId])
+  @@map("grades")
+}
+
+// ============================================================================
+// ASISTENCIA
+// ============================================================================
+
+model Attendance {
+  id        String           @id @default(cuid())
+  studentId String
+  subjectId String?
+  classDate DateTime
+  status    AttendanceStatus
+  teacherId String?
+  note      String?
+
+  student  Student?  @relation(fields: [studentId], references: [id])
+  subject  Subject?  @relation(fields: [subjectId], references: [id])
+  teacher  Teacher?  @relation(fields: [teacherId], references: [id])
+
+  @@unique([studentId, subjectId, classDate])
+  @@index([classDate])
+  @@map("attendance")
+}
+
+// ============================================================================
+// TAREAS / ASIGNACIONES
+// ============================================================================
+
+model Assignment {
+  id          String   @id @default(cuid())
+  subjectId   String
+  teacherId   String?
+  periodId    String?
+  title       String
+  description String?
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  submissions AssignmentSubmission[]
+
+  subject  Subject?   @relation(fields: [subjectId], references: [id])
+  teacher  Teacher?   @relation(fields: [teacherId], references: [id])
+  period   Period?    @relation(fields: [periodId], references: [id])
+
+  @@index([subjectId])
+  @@map("assignments")
+}
+
+model AssignmentSubmission {
+  id           String           @id @default(cuid())
+  assignmentId String
+  studentId    String
+  status       SubmissionStatus @default(PENDIENTE)
+  fileUrl      String?
+  submittedAt  DateTime?
+  score        Float?
+  feedback     String?
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id])
+  student    Student   @relation(fields: [studentId], references: [id])
+
+  @@unique([assignmentId, studentId])
+  @@map("assignment_submissions")
+}
+
+// ============================================================================
+// DOCUMENTOS / PLANILLAS (PDF, JPG, PNG — archivos en disco, no en DB)
+// ============================================================================
+
+model Document {
+  id             String       @id @default(cuid())
+  title          String
+  type           DocumentType @default(DOCUMENTO)
+  studentId      String?
+  student        Student?     @relation(fields: [studentId], references: [id])
+  subjectId      String?
+  subject        Subject?     @relation(fields: [subjectId], references: [id])
+  classId        String?
+  class          Class?       @relation(fields: [classId], references: [id])
+  periodId       String?
+  period         Period?      @relation(fields: [periodId], references: [id])
+  teacherId      String?
+  teacher        Teacher?     @relation(fields: [teacherId], references: [id])
+  fileName       String       // clave en disco (uploads/)
+  fileUrl        String       // /api/documents/<id>/file
+  mime           String
+  size           Int
+  visibleToTutor Boolean      @default(true)
+  uploadedBy     String       // userId que subió
+  createdAt      DateTime     @default(now())
+
+  @@index([studentId, visibleToTutor])
+  @@index([classId, subjectId])
+  @@index([periodId])
+  @@map("documents")
+}
+
+model Observation {
+  id             String   @id @default(cuid())
+  studentId      String
+  student        Student  @relation(fields: [studentId], references: [id])
+  teacherId      String?
+  teacher        Teacher? @relation(fields: [teacherId], references: [id])
+  periodId       String?
+  period         Period?  @relation(fields: [periodId], references: [id])
+  text           String
+  visibleToTutor Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([studentId, visibleToTutor])
+  @@map("observations")
+}

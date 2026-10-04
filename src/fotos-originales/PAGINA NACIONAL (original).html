@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Informático - Col. Nac. E.M.D. Mcal. F. S. López</title>
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #f4f6f9;
+            --bg-card: #ffffff;
+            --bg-header: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --rojo-paraguay: #d52b1e;
+            --rojo-brillante: #ff3b30;
+            --azul-paraguay: #0038a8;
+            --azul-brillante: #0066ff;
+            --amarillo-fuego: #ffcc00;
+            --sombra: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --glow-color: rgba(0, 56, 168, 0.2);
+        }
+
+        body.dark-mode {
+            --bg-body: #090d16;
+            --bg-card: #131c2e;
+            --bg-header: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --sombra: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
+            --glow-color: rgba(0, 102, 255, 0.25);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif; 
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; 
+        }
+
+        body { 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden;
+        }
+
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #030712;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #intro-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .netflix-logo-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        /* Halo / Destello de luz institucional */
+        .intro-glow {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(213, 43, 30, 0.8) 0%, rgba(0, 56, 168, 0.8) 50%, transparent 70%);
+            filter: blur(50px);
+            opacity: 0;
+            animation: glowPulse 3.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .intro-text-wrapper {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            transform: scale(0.3) translateZ(-500px);
+            opacity: 0;
+            animation: netflixZoom 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .intro-letters {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 40%, var(--azul-brillante) 70%, var(--rojo-brillante) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            text-transform: uppercase;
+        }
+
+        .intro-subtext {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 6px;
+            color: #94a3b8;
+            margin-top: 0.8rem;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeInSub 1.5s ease forwards 1.2s;
+        }
+
+        .intro-line {
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--rojo-paraguay), #ffffff, var(--azul-paraguay));
+            margin-top: 15px;
+            border-radius: 2px;
+            box-shadow: 0 0 15px rgba(0, 102, 255, 0.8);
+            animation: lineExpand 2s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.8s;
+        }
+
+        .skip-intro-hint {
+            position: absolute;
+            bottom: 30px;
+            font-size: 0.85rem;
+            color: #64748b;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: pulseHint 2s infinite;
+        }
+
+        @keyframes netflixZoom {
+            0% {
+                transform: scale(0.2) translateZ(-400px);
+                opacity: 0;
+                filter: blur(12px);
+            }
+            30% {
+                opacity: 1;
+                filter: blur(0px);
+            }
+            75% {
+                transform: scale(1.1) translateZ(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.3) translateZ(100px);
+                opacity: 0.95;
+            }
+        }
+
+        @keyframes glowPulse {
+            0% { opacity: 0; transform: scale(0.5); }
+            40% { opacity: 0.9; transform: scale(1.4); }
+            80% { opacity: 0.6; transform: scale(1.8); }
+            100% { opacity: 0.2; transform: scale(2.2); }
+        }
+
+        @keyframes lineExpand {
+            to { width: 100%; }
+        }
+
+        @keyframes fadeInSub {
+            to { opacity: 1; }
+        }
+
+        @keyframes pulseHint {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.9; }
+        }
+
+        header {
+            background: var(--bg-header);
+            color: white; 
+            padding: 1.2rem 2rem; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+            max-width: 1200px; 
+            margin: 0 auto; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 1.5rem; 
+            flex-wrap: wrap;
+        }
+
+        .title-header { 
+            text-align: left; 
+            flex-grow: 1; 
+        }
+
+        .title-header h1 { 
+            font-size: 1.25rem; 
+            letter-spacing: 0.5px; 
+            text-transform: uppercase; 
+            color: #f8fafc; 
+            font-weight: 800; 
+            line-height: 1.2;
+        }
+
+        .title-header h2 { 
+            font-size: 0.88rem; 
+            color: #94a3b8; 
+            font-weight: 500; 
+            margin-top: 3px;
+        }
+
+        .header-actions { 
+            display: flex; 
+            gap: 1rem; 
+            align-items: center; 
+        }
+
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.08); 
+            color: #e2e8f0; 
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.6rem; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            width: 42px; 
+            height: 42px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .gallery-btn {
+            background: linear-gradient(135deg, var(--azul-paraguay), #0284c7);
+            color: white; 
+            border: none; 
+            padding: 0.65rem 1.3rem; 
+            border-radius: 10px;
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.9rem;
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 56, 168, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .gallery-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 56, 168, 0.4);
+        }
+
+        main { 
+            max-width: 1200px; 
+            margin: 2.5rem auto; 
+            padding: 0 1.5rem; 
+            flex-grow: 1; 
+            width: 100%; 
+        }
+
+        .hero-section { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 3rem; 
+        }
+
+        .crest-wrapper {
+            position: relative; 
+            width: 290px; 
+            margin: 0 auto; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
+
+        .crest-wrapper svg {
+            width: 100%; 
+            height: auto; 
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.2));
+        }
+
+        /* Capas de animación de llama viva */
+        .flame-base {
+            transform-origin: 115px 170px;
+            animation: flameMain 1.4s infinite alternate ease-in-out;
+        }
+
+        .flame-inner {
+            transform-origin: 115px 165px;
+            animation: flameInner 0.9s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+
+        .flame-core {
+            transform-origin: 115px 160px;
+            animation: flameCore 0.6s infinite alternate ease-in-out;
+        }
+
+        .flame-glow-effect {
+            transform-origin: 115px 140px;
+            animation: torchGlow 1.8s infinite alternate ease-in-out;
+            mix-blend-mode: screen;
+        }
+
+        /* Chispas flotantes */
+        .spark-1 { animation: sparkFly1 1.8s infinite ease-out; }
+        .spark-2 { animation: sparkFly2 2.2s infinite ease-out 0.6s; }
+        .spark-3 { animation: sparkFly3 1.5s infinite ease-out 1.1s; }
+
+        @keyframes flameMain {
+            0% {
+                transform: scale(1) rotate(-1.5deg);
+                filter: drop-shadow(0 -5px 10px rgba(255, 60, 0, 0.8));
+            }
+            50% {
+                transform: scale(1.05, 0.96) rotate(2deg) skewX(1deg);
+                filter: drop-shadow(0 -8px 15px rgba(255, 120, 0, 0.9));
+            }
+            100% {
+                transform: scale(0.97, 1.06) rotate(-2deg) skewX(-1.5deg);
+                filter: drop-shadow(0 -12px 20px rgba(237, 27, 36, 1));
+            }
+        }
+
+        @keyframes flameInner {
+            0% {
+                transform: scale(0.95) rotate(2deg);
+                fill: #ff9500;
+            }
+            50% {
+                transform: scale(1.08, 0.92) rotate(-2deg);
+                fill: #ffcc00;
+            }
+            100% {
+                transform: scale(1) rotate(1deg);
+                fill: #ff8000;
+            }
+        }
+
+        @keyframes flameCore {
+            0% {
+                transform: scale(0.9) translate(-1px, 1px);
+                fill: #ffffff;
+            }
+            100% {
+                transform: scale(1.1) translate(1px, -1px);
+                fill: #fff5cc;
+            }
+        }
+
+        @keyframes torchGlow {
+            0% { opacity: 0.3; transform: scale(0.85); }
+            100% { opacity: 0.75; transform: scale(1.2); }
+        }
+
+        @keyframes sparkFly1 {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(-12px, -45px) scale(0.2); }
+        }
+
+        @keyframes sparkFly2 {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(14px, -50px) scale(0.1); }
+        }
+
+        @keyframes sparkFly3 {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(-3px, -60px) scale(0.2); }
+        }
+
+
+        .open-book-container {
+            width: 100%; 
+            max-width: 950px; 
+            background: var(--bg-card); 
+            border-radius: 20px;
+            box-shadow: var(--sombra); 
+            padding: 2.5rem; 
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .book-pages { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 3rem; 
+            position: relative; 
+        }
+
+        .book-pages::before { 
+            content: ''; 
+            position: absolute; 
+            left: 50%; 
+            top: -10px; 
+            bottom: -10px; 
+            width: 2px; 
+            background: linear-gradient(to bottom, transparent, var(--border-color), transparent); 
+        }
+
+        .book-page h3 { 
+            font-size: 1.5rem; 
+            color: var(--azul-paraguay); 
+            margin-bottom: 1.2rem; 
+            text-align: center; 
+            font-weight: 800; 
+            letter-spacing: 1px;
+            position: relative;
+            padding-bottom: 0.6rem;
+        }
+
+        .book-page h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 35%;
+            right: 35%;
+            height: 3px;
+            background: var(--rojo-paraguay);
+            border-radius: 2px;
+        }
+
+        .book-page p { 
+            font-size: 0.98rem; 
+            line-height: 1.7; 
+            color: var(--text-main); 
+            text-align: justify; 
+        }
+
+        .cards-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 2rem; 
+            width: 100%; 
+            max-width: 1000px; 
+        }
+
+        .action-card { 
+            background: var(--bg-card); 
+            border-radius: 18px; 
+            padding: 2.2rem 1.8rem; 
+            text-align: center; 
+            box-shadow: var(--sombra); 
+            cursor: pointer; 
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); 
+            border: 2px solid transparent; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 1.2rem; 
+        }
+
+        .action-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.15);
+        }
+
+        .card-inscription { border-color: rgba(59, 130, 246, 0.3); }
+        .card-inscription:hover { border-color: #3b82f6; }
+
+        .card-padre { border-color: rgba(16, 185, 129, 0.3); }
+        .card-padre:hover { border-color: #10b981; }
+
+        .card-maestro { border-color: rgba(245, 158, 11, 0.3); }
+        .card-maestro:hover { border-color: #f59e0b; }
+
+        .card-icon { 
+            font-size: 2.2rem; 
+            width: 72px; 
+            height: 72px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .card-inscription .card-icon { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .card-padre .card-icon { background: linear-gradient(135deg, #10b981, #047857); }
+        .card-maestro .card-icon { background: linear-gradient(135deg, #f59e0b, #b45309); }
+
+        .action-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .extra-nav { 
+            display: flex; 
+            justify-content: center; 
+            gap: 1.2rem; 
+            flex-wrap: wrap; 
+        }
+
+        .nav-link-btn { 
+            background: var(--bg-card); 
+            color: var(--text-main); 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 30px; 
+            border: 1px solid var(--border-color); 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.9rem;
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            box-shadow: var(--sombra);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--azul-paraguay);
+            color: var(--azul-paraguay);
+        }
+
+        .view-section { 
+            display: none; 
+            background: var(--bg-card); 
+            border-radius: 20px; 
+            padding: 2.5rem; 
+            box-shadow: var(--sombra); 
+            border: 1px solid var(--border-color); 
+            animation: fadeInView 0.4s ease forwards;
+        }
+
+        @keyframes fadeInView {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .view-section.active { display: block; }
+
+        .back-btn { 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            border: 1px solid var(--border-color); 
+            padding: 0.6rem 1.2rem; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            margin-bottom: 1.8rem; 
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--border-color);
+        }
+
+        .form-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+            gap: 1.4rem; 
+            margin-top: 1.2rem; 
+        }
+
+        .form-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.5rem; 
+        }
+
+        .form-group.full-width { grid-column: 1 / -1; }
+
+        label { 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: var(--text-main); 
+        }
+
+        input, select { 
+            padding: 0.85rem 1rem; 
+            border: 1px solid var(--border-color); 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            border-radius: 10px; 
+            font-size: 0.95rem; 
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--azul-brillante);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+        }
+
+        .btn-submit { 
+            background: linear-gradient(135deg, var(--azul-paraguay), #0284c7); 
+            color: white; 
+            border: none; 
+            padding: 1rem 1.8rem; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            width: 100%; 
+            margin-top: 1.8rem; 
+            box-shadow: 0 4px 14px rgba(0, 56, 168, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 56, 168, 0.4);
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 1.2rem; 
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td { 
+            padding: 1rem; 
+            border: 1px solid var(--border-color); 
+            text-align: center; 
+            color: var(--text-main); 
+        }
+
+        th { 
+            background: var(--bg-body); 
+            color: var(--azul-paraguay); 
+            font-weight: 700;
+        }
+
+        .tab-btn { 
+            padding: 0.75rem 1.5rem; 
+            border: none; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            cursor: pointer; 
+            border-radius: 10px 10px 0 0; 
+            font-weight: 600; 
+            margin-right: 5px;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .tab-btn.active { 
+            background: var(--azul-paraguay); 
+            color: white; 
+            border-color: var(--azul-paraguay);
+        }
+
+        /* Notificación Toast personalizada sin alert() */
+        #custom-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #0f172a;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-left: 5px solid var(--azul-brillante);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 10000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #custom-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .book-pages { grid-template-columns: 1fr; gap: 2rem; }
+            .book-pages::before { display: none; }
+            .intro-letters { font-size: 3.2rem; letter-spacing: 6px; }
+            .intro-subtext { font-size: 0.85rem; letter-spacing: 3px; }
+            header { padding: 1rem; }
+            .title-header h1 { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="intro-screen" onclick="dismissIntro()">
+        <div class="intro-glow"></div>
+        <div class="netflix-logo-container">
+            <div class="intro-text-wrapper">
+                <div class="intro-letters">CNE</div>
+                <div class="intro-line"></div>
+                <div class="intro-subtext">Colegio E.M.D Mcal. López</div>
+            </div>
+        </div>
+        <div class="skip-intro-hint"><i class="fa-solid fa-hand-pointer"></i> Haz clic en cualquier lugar para ingresar</div>
+    </div>
+
+    <header>
+        <div class="header-container">
+            <div class="title-header">
+                <h1>Sistema Informático Del Colegio Nacional E.M.D</h1>
+                <h2>Mcal. Francisco Solano López - Caaguazú</h2>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Cambiar modo oscuro/claro">
+                    <i class="fa-solid fa-moon" id="theme-icon"></i>
+                </button>
+                <button class="gallery-btn" onclick="showView('galeria-view')">
+                    <i class="fa-solid fa-images"></i> Galería
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        
+        <div id="inicio-view" class="view-section active">
+            <div class="hero-section">
+                
+                <!-- ESCUDO VECTORIZADO CON ANTORCHA CON FUEGO DINÁMICO -->
+                <div class="crest-wrapper">
+                    <svg viewBox="0 0 320 380" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <!-- Gradientes de llama -->
+                            <radialGradient id="flameGlowGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffcc00" stop-opacity="0.8"/>
+                                <stop offset="50%" stop-color="#ff3b30" stop-opacity="0.4"/>
+                                <stop offset="100%" stop-color="#ff0000" stop-opacity="0"/>
+                            </radialGradient>
+                            
+                            <linearGradient id="outerFlameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                                <stop offset="0%" stop-color="#d52b1e"/>
+                                <stop offset="50%" stop-color="#ff5e00"/>
+                                <stop offset="100%" stop-color="#ffcc00"/>
+                            </linearGradient>
+
+                            <linearGradient id="innerFlameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                                <stop offset="0%" stop-color="#ff3b30"/>
+                                <stop offset="70%" stop-color="#ffcc00"/>
+                                <stop offset="100%" stop-color="#ffffff"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Fondo blanco con contorno -->
+                        <path d="M 10 10 L 310 10 L 310 320 Q 310 370 160 375 Q 10 370 10 320 Z" fill="#ffffff" stroke="#111111" stroke-width="4"/>
+                        
+                        <!-- Columna derecha: Banderas -->
+                        <path d="M 220 10 L 310 10 L 310 110 L 220 110 Z" fill="#E31B23" stroke="#111111" stroke-width="2"/>
+                        <path d="M 220 110 L 310 110 L 310 210 L 220 210 Z" fill="#FFFFFF" stroke="#111111" stroke-width="2"/>
+                        <path d="M 220 210 L 310 210 L 310 320 Q 310 370 220 360 Z" fill="#203864" stroke="#111111" stroke-width="2"/>
+
+                        <!-- Textos de la bandera derecha -->
+                        <text x="265" y="32" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle">M</text>
+                        <text x="265" y="52" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle">C</text>
+                        <text x="265" y="72" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle">A</text>
+                        <text x="265" y="92" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle">L.</text>
+
+                        <text x="265" y="150" font-family="'Times New Roman', serif" font-weight="bold" font-size="22" fill="#111111" text-anchor="middle">F.</text>
+                        <text x="265" y="185" font-family="'Times New Roman', serif" font-weight="bold" font-size="22" fill="#111111" text-anchor="middle">S.</text>
+
+                        <text x="265" y="240" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle">L</text>
+                        <text x="265" y="260" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle">O</text>
+                        <text x="265" y="280" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle">P</text>
+                        <text x="265" y="300" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle">E</text>
+                        <text x="265" y="320" font-family="'Times New Roman', serif" font-weight="bold" font-size="20" fill="#FFFFFF" text-anchor="middle">Z</text>
+
+                        <!-- División superior izquierda -->
+                        <line x1="10" y1="75" x2="220" y2="75" stroke="#111111" stroke-width="2"/>
+                        
+                        <text x="115" y="35" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#111111" text-anchor="middle">COL. NACIONAL</text>
+                        <text x="115" y="60" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#111111" text-anchor="middle">E. M. D.</text>
+
+                        <!-- Rayos de luz estáticos -->
+                        <g stroke="#111111" stroke-width="2.5">
+                            <line x1="115" y1="90" x2="115" y2="78"/>
+                            <line x1="130" y1="95" x2="142" y2="83"/>
+                            <line x1="145" y1="105" x2="162" y2="92"/>
+                            <line x1="155" y1="120" x2="175" y2="110"/>
+                            <line x1="160" y1="138" x2="182" y2="132"/>
+                            <line x1="160" y1="155" x2="182" y2="158"/>
+                            
+                            <line x1="100" y1="95" x2="88" y2="83"/>
+                            <line x1="85" y1="105" x2="68" y2="92"/>
+                            <line x1="75" y1="120" x2="55" y2="110"/>
+                            <line x1="70" y1="138" x2="48" y2="132"/>
+                            <line x1="70" y1="155" x2="48" y2="158"/>
+                        </g>
+
+                        <!-- ANTORCHA Y FLAMA ANIMADA -->
+                        <g id="torch-fire-group">
+                            <!-- Resplandor radiante de fondo -->
+                            <circle cx="115" cy="135" r="50" fill="url(#flameGlowGrad)" class="flame-glow-effect"/>
+
+                            <!-- Capa exterior de la flama (Rojo/Naranja) -->
+                            <path class="flame-base" d="M 115 82 Q 138 108 138 132 Q 148 116 152 130 Q 158 148 146 164 Q 135 177 115 177 Q 95 177 84 164 Q 72 148 78 130 Q 82 116 92 132 Q 92 108 115 82 Z" fill="url(#outerFlameGrad)" stroke="#111111" stroke-width="2"/>
+
+                            <!-- Capa interior de la flama (Amarillo brillante) -->
+                            <path class="flame-inner" d="M 115 98 Q 130 118 130 138 Q 136 128 140 138 Q 144 150 136 162 Q 128 172 115 172 Q 102 172 94 162 Q 86 150 90 138 Q 94 128 100 138 Q 100 118 115 98 Z" fill="url(#innerFlameGrad)"/>
+
+                            <!-- Núcleo ardiente central (Blanco/Cálido) -->
+                            <path class="flame-core" d="M 115 120 Q 124 135 124 148 Q 128 142 130 148 Q 132 156 126 164 Q 122 168 115 168 Q 108 168 104 164 Q 98 156 100 148 Q 102 142 106 148 Q 106 135 115 120 Z" fill="#ffffff"/>
+
+                            <!-- Chispas desprendidas -->
+                            <circle cx="110" cy="110" r="2.5" fill="#ffcc00" class="spark-1"/>
+                            <circle cx="122" cy="105" r="2" fill="#ff5e00" class="spark-2"/>
+                            <circle cx="115" cy="95" r="1.8" fill="#ffffff" class="spark-3"/>
+                        </g>
+
+                        <!-- Base de la antorcha -->
+                        <path d="M 98 175 L 132 175 L 126 188 L 104 188 Z" fill="#D1D5DB" stroke="#111111" stroke-width="2"/>
+
+                        <!-- Libro abierto -->
+                        <g stroke="#111111" stroke-width="2.5" stroke-linejoin="round">
+                            <path d="M 115 195 L 40 185 L 25 260 L 115 280 Z" fill="#FFFFFF"/>
+                            <path d="M 115 195 L 190 185 L 205 260 L 115 280 Z" fill="#FFFFFF"/>
+                            <path d="M 115 198 L 45 190 L 32 263 L 115 280 Z" fill="#FFFFFF"/>
+                            <path d="M 115 198 L 185 190 L 198 263 L 115 280 Z" fill="#FFFFFF"/>
+                            
+                            <path d="M 52 205 Q 80 210 110 205" fill="none"/>
+                            <path d="M 50 218 Q 80 223 110 218" fill="none"/>
+                            <path d="M 48 231 Q 80 236 110 231" fill="none"/>
+                            <path d="M 46 244 Q 80 249 110 244" fill="none"/>
+
+                            <path d="M 120 205 Q 150 210 178 205" fill="none"/>
+                            <path d="M 120 218 Q 150 223 180 218" fill="none"/>
+                            <path d="M 120 231 Q 150 236 182 231" fill="none"/>
+                            <path d="M 120 244 Q 150 249 184 244" fill="none"/>
+                            
+                            <polygon points="115,280 110,295 120,295" fill="#111111"/>
+                        </g>
+
+                        <!-- Texto inferior -->
+                        <text x="115" y="330" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#111111" text-anchor="middle" letter-spacing="1">CAAGUAZU</text>
+                    </svg>
+                </div>
+
+                <!-- VISIÓN Y MISIÓN (ESTILO LIBRO ABIERTO) -->
+                <div class="open-book-container">
+                    <div class="book-pages">
+                        <div class="book-page">
+                            <h3>VISIÓN</h3>
+                            <p>Brindar un espacio de convivencia donde enriquezca la dignidad humana y la unidad institucional, comprometida con la educación integral, con iniciativa, creatividad e innovación, responsables y respetuosos con su entorno, abierta al mundo globalizado.</p>
+                        </div>
+                        <div class="book-page">
+                            <h3>MISIÓN</h3>
+                            <p>Formar personas íntegras con el saber acorde a las necesidades socio ambientales; permitir que nuestros estudiantes sean proactivos, responsables y conscientes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TARJETAS PRINCIPALES -->
+                <div class="cards-container">
+                    <div class="action-card card-inscription" onclick="showView('inscripcion-view')">
+                        <div class="card-icon"><i class="fa-solid fa-user-plus"></i></div>
+                        <h3>QUIERO INSCRIBIRME</h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted);">Inscripciones abiertas para nuevos estudiantes.</p>
+                    </div>
+
+                    <div class="action-card card-padre" onclick="showView('padre-view')">
+                        <div class="card-icon"><i class="fa-solid fa-users-rectangle"></i></div>
+                        <h3>SOY PADRE/TUTOR</h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted);">Consulte calificaciones y tareas del alumno.</p>
+                    </div>
+
+                    <div class="action-card card-maestro" onclick="showView('maestro-view')">
+                        <div class="card-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+                        <h3>SOY MAESTRO</h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted);">Portal para el registro de calificaciones.</p>
+                    </div>
+                </div>
+
+                <!-- NAVEGACIÓN SECUNDARIA -->
+                <div class="extra-nav">
+                    <button class="nav-link-btn" onclick="showView('ubicacion-view')"><i class="fa-solid fa-location-dot"></i> Ubicación</button>
+                    <button class="nav-link-btn" onclick="showView('himno-view')"><i class="fa-solid fa-music"></i> Himno Nacional</button>
+                    <button class="nav-link-btn" onclick="showView('horarios-view')"><i class="fa-solid fa-calendar-days"></i> Horarios</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- INSCRIPCIÓN -->
+        <div id="inscripcion-view" class="view-section">
+            <button class="back-btn" onclick="showView('inicio-view')"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</button>
+            <h2 style="color: var(--azul-paraguay); font-size: 1.6rem;"><i class="fa-solid fa-file-signature"></i> Formulario de Inscripción</h2>
+            <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 1.2rem; margin: 1.5rem 0; border-radius: 8px;">
+                <i class="fa-solid fa-circle-info" style="color: #3b82f6;"></i> <strong>Requisito Importante:</strong> Se necesita adjuntar la <strong>copia de cédula del padre/tutor</strong> y del <strong>alumno/a</strong>.
+            </div>
+            <form onsubmit="handleFormSubmit(event, 'Solicitud de inscripción enviada correctamente.')">
+                <div class="form-grid">
+                    <div class="form-group"><label>Nombre *</label><input type="text" required placeholder="Ej. Carlos"></div>
+                    <div class="form-group"><label>Apellido *</label><input type="text" required placeholder="Ej. Benítez"></div>
+                    <div class="form-group"><label>Correo electrónico *</label><input type="email" required placeholder="ejemplo@correo.com"></div>
+                    <div class="form-group"><label>Teléfono *</label><input type="tel" required placeholder="0981 123456"></div>
+                    <div class="form-group"><label>Número de Cédula *</label><input type="text" required placeholder="Ej. 4.567.890"></div>
+                    <div class="form-group"><label>Barrio de residencia *</label><input type="text" required placeholder="Escriba su barrio"></div>
+                    <div class="form-group full-width">
+                        <label>Curso *</label>
+                        <select required>
+                            <option value="" disabled selected>SELECCIONAR CURSO...</option>
+                            <option>7mo ATM</option><option>7mo BTM</option><option>7mo CTM</option><option>7mo ATT</option><option>7mo BTT</option><option>7mo CTT</option>
+                            <option>8vo A TM</option><option>8vo B TM</option><option>8vo C TM</option><option>8vo A TT</option><option>8vo B TT</option><option>8vo C TT</option><option>8vo D TT</option>
+                            <option>9no A TM</option><option>9no B TM</option><option>9no C TM</option><option>9no A TT</option><option>9no B TT</option><option>9no C TT</option>
+                            <option>Ciencias Sociales TM</option><option>Ciencias Sociales TN</option><option>Ciencias Básicas A TM</option><option>Ciencias Básicas A TT</option><option>Ciencias Básicas B TM</option>
+                            <option>Bachillerato Técnico en Electricidad (BTE)</option><option>Bachillerato Técnico en Informática (BTI)</option>
+                            <option>Bachillerato Técnico en Salud (BTS)</option><option>Administración De Empresas (ADN)</option>
+                            <option>Bachiller Técnico en Contabilidad (BTC)</option><option>Bachiller Técnico en Construcción Civil (BTCC)</option>
+                            <option>Bachillerato Técnico en Agropecuaria (BTA)</option><option>Bachillerato Técnico en Mecánica (BTM)</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>¿Cuenta con RUE? *</label>
+                        <div style="display: flex; gap: 2rem; margin-top: 0.5rem;">
+                            <label style="font-weight: normal; cursor: pointer;"><input type="radio" name="rue" value="SI" required> SÍ</label>
+                            <label style="font-weight: normal; cursor: pointer;"><input type="radio" name="rue" value="NO" required> NO</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Enviar Solicitud</button>
+            </form>
+        </div>
+
+        <!-- PADRE -->
+        <div id="padre-view" class="view-section">
+            <button class="back-btn" onclick="showView('inicio-view')"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</button>
+            <h2 style="color: var(--azul-paraguay); font-size: 1.6rem;">Consulta de Calificaciones (Padres/Tutores)</h2>
+            <div style="max-width: 450px; margin: 1.5rem auto; text-align: center;">
+                <input type="text" id="cedula-search" placeholder="Ingrese N° de Cédula del Alumno" style="width: 100%; text-align: center; margin-bottom: 1rem;">
+                <button class="btn-submit" style="background: linear-gradient(135deg, #10b981, #047857);" onclick="consultarNotas()">Consultar Boletín</button>
+            </div>
+            <div id="res-padre" style="display: none; margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Boletín de Calificaciones - BTI</h3>
+                <table>
+                    <thead><tr><th>Materia</th><th>Nota 1° Etapa</th><th>Estado Tareas</th></tr></thead>
+                    <tbody>
+                        <tr><td>Matemática</td><td>5 (Cinco)</td><td><span style="color: #10b981; font-weight: bold;">Completo</span></td></tr>
+                        <tr><td>Programación</td><td>5 (Cinco)</td><td><span style="color: #10b981; font-weight: bold;">Completo</span></td></tr>
+                        <tr><td>Física</td><td>4 (Cuatro)</td><td><span style="color: #f59e0b; font-weight: bold;">Pendiente 1</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MAESTRO -->
+        <div id="maestro-view" class="view-section">
+            <button class="back-btn" onclick="showView('inicio-view')"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</button>
+            <h2 style="color: var(--azul-paraguay); font-size: 1.6rem;">Carga de Notas (Portal Docente)</h2>
+            <form onsubmit="handleFormSubmit(event, 'Calificación guardada en el sistema.')">
+                <div class="form-grid">
+                    <div class="form-group"><label>Alumno (CI o Nombre)</label><input type="text" placeholder="Ej. 4.567.890" required></div>
+                    <div class="form-group"><label>Materia</label><input type="text" placeholder="Ej. Algoritmos" required></div>
+                    <div class="form-group"><label>Calificación (1 al 5)</label><input type="number" min="1" max="5" required placeholder="5"></div>
+                </div>
+                <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #f59e0b, #b45309);">Guardar Nota</button>
+            </form>
+        </div>
+
+        <!-- HIMNO COMPLETO -->
+        <div id="himno-view" class="view-section">
+            <button class="back-btn" onclick="showView('inicio-view')"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</button>
+            <h2 style="color: var(--azul-paraguay);"><i class="fa-solid fa-music"></i> Himno Nacional Paraguayo</h2>
+            
+            <div style="margin-top: 1.5rem;">
+                <button class="tab-btn active" id="btn-es" onclick="switchHimno('es')">Español (Completo)</button>
+                <button class="tab-btn" id="btn-gn" onclick="switchHimno('gn')">Guaraní (Purahéi Guasu)</button>
+            </div>
+
+            <div id="himno-es" style="padding: 2rem; background: var(--bg-body); border-radius: 0 12px 12px 12px; border: 1px solid var(--border-color); text-align: center; line-height: 1.8;">
+                <h3 style="color: var(--rojo-paraguay); margin-bottom: 0.5rem;">CORO</h3>
+                <p><em>¡A los pueblos de América fiera<br>informó la costumbre triunfal,<br>que los reyes jamás de la tierra<br>volverán a gobernar!</em></p><br>
+                
+                <h4 style="color: var(--azul-paraguay); margin-bottom: 0.5rem;">ESTROFA I</h4>
+                <p>A los pueblos de América fiera<br>Informó la costumbre triunfal,<br>Que los reyes jamás de la tierra<br>Volverán a gobernar.</p><br>
+
+                <h4 style="color: var(--azul-paraguay); margin-bottom: 0.5rem;">ESTROFA II</h4>
+                <p>Nuestros padres, un tiempo gozaron<br>De la paz en su dicho suelo;<br>Mas la Patria los vio con anhelo<br>De sus derechos el yugo romper.</p><br>
+
+                <h4 style="color: var(--azul-paraguay); margin-bottom: 0.5rem;">ESTROFA III</h4>
+                <p>Nuestra Patria libre es y soberana,<br>Ni opresores jamás la hallarán;<br>Si en sus campos un día triunfaron,<br>Sus laureles jamás se ajarán.</p><br>
+
+                <h4 style="color: var(--azul-paraguay); margin-bottom: 0.5rem;">ESTROFA IV</h4>
+                <p>¡Libertad o con gloria morir!<br>Es el voto que el alma pronuncia,<br>Y que firme con fe representa<br>El valor del guerrero guaraní.</p>
+            </div>
+
+            <div id="himno-gn" style="display: none; padding: 2rem; background: var(--bg-body); border-radius: 0 12px 12px 12px; border: 1px solid var(--border-color); text-align: center; line-height: 1.8;">
+                <h3 style="color: var(--rojo-paraguay); margin-bottom: 0.5rem;">PURAHÉI GUASU GUARANÍME</h3>
+                <p>Tetããnguéra Amerikayguápe<br>Ikuatia tenondorã omombe'u,<br>Mburuvicha guasu yvy aragua<br>Ndopo'i mo'aiveimaha ñandehegui.</p><br>
+                <p>Sãso tekove pyhareve pĩro,<br>Ñande retã omimbíma pukavy,<br>Ijoja'ỹva teko jojareko<br>Torypápe ojaho'i tetã Paraguái.</p>
+            </div>
+        </div>
+
+        <!-- HORARIOS -->
+        <div id="horarios-view" class="view-section">
+            <button class="back-btn" onclick="showView('inicio-view')"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</button>
+            <h2 style="color: var(--azul-paraguay);"><i class="fa-solid fa-calendar-days"></i> Horario de Clases Interactivo</h2>
+            
+            <div style="margin: 1.5rem 0;">
+                <label>Seleccione Curso para visualizar:</label>
+                <select id="select-horario" onchange="cargarHorarioCurso()" style="width: 100%; font-weight: bold; margin-top: 0.5rem;">
+                    <option>Bachillerato Técnico en Informática (BTI)</option>
+                    <option>Bachillerato Técnico en Electricidad (BTE)</option>
+                    <option>7mo ATM</option>
+                    <option>8vo A TM</option>
+                    <option>9no A TM</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap;">
+                <button onclick="agregarFilaHorario()" style="background: #10b981; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600;"><i class="fa-solid fa-plus"></i> Agregar Hora</button>
+                <button onclick="limpiarHorario()" style="background: #dc2626; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600;"><i class="fa-solid fa-trash"></i> Limpiar</button>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table id="tabla-horarios">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Lunes</th>
+                            <th>Martes</th>
+                            <th>Miércoles</th>
+                            <th>Jueves</th>
+                            <th>Viernes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="horario-body">
+                        <tr>
+                            <td contenteditable="true">07:00 - 07:40</td>
+                            <td contenteditable="true">Matemática</td>
+                            <td contenteditable="true">Programación</td>
+                            <td contenteditable="true">Física</td>
+                            <td contenteditable="true">Química</td>
+                            <td contenteditable="true">Castellano</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- GALERÍA -->
+        <div id="galeria-view" class="view-section">
+            <button class="back-btn" onclick="showView('inicio-view')"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</button>
+            <h2 style="color: var(--azul-paraguay);"><i class="fa-solid fa-images"></i> Galería Institucional</h2>
+            <p style="margin: 1rem 0; color: var(--text-muted);">Carga fotos o videos de actividades escolares:</p>
+            <input type="file" accept="image/*,video/*" multiple style="margin-bottom: 1.5rem; width: 100%;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div style="height: 160px; background: #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #64748b;"><i class="fa-solid fa-image fa-2x"></i></div>
+                <div style="height: 160px; background: #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #64748b;"><i class="fa-solid fa-image fa-2x"></i></div>
+            </div>
+        </div>
+
+        <!-- UBICACIÓN -->
+        <div id="ubicacion-view" class="view-section">
+            <button class="back-btn" onclick="showView('inicio-view')"><i class="fa-solid fa-arrow-left"></i> Volver al Inicio</button>
+            <h2 style="color: var(--azul-paraguay);"><i class="fa-solid fa-location-dot"></i> Ubicación Institucional</h2>
+            <p style="margin-top: 0.5rem;"><strong>Coordenadas GPS:</strong> -25.46817°, -56.01172° (Caaguazú)</p>
+            <a href="https://www.google.com/maps?q=-25.46817,-56.01172" target="_blank" class="btn-submit" style="display: inline-flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none; max-width: 280px; margin: 1.2rem 0;">
+                <i class="fa-solid fa-map-location-dot"></i> Abrir en Google Maps
+            </a>
+            <div style="width: 100%; height: 380px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--sombra);">
+                <iframe src="https://maps.google.com/maps?q=-25.46817,-56.01172&hl=es&z=17&output=embed" style="width: 100%; height: 100%; border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="custom-toast">
+        <i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 1.4rem;"></i>
+        <span id="toast-message">Operación realizada con éxito.</span>
+    </div>
+
+    <script>
+        // Auto-cierre de intro al cabo de 3.8 segundos o al clic
+        let introDismissed = false;
+        
+        function dismissIntro() {
+            if (introDismissed) return;
+            introDismissed = true;
+            const intro = document.getElementById('intro-screen');
+            intro.classList.add('fade-out');
+            setTimeout(() => {
+                intro.style.display = 'none';
+            }, 800);
+        }
+
+        setTimeout(() => {
+            dismissIntro();
+        }, 3800);
+
+        function showView(viewId) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('theme-icon');
+            if(document.body.classList.contains('dark-mode')) {
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        function switchHimno(lang) {
+            if(lang === 'es') {
+                document.getElementById('himno-es').style.display = 'block';
+                document.getElementById('himno-gn').style.display = 'none';
+                document.getElementById('btn-es').classList.add('active');
+                document.getElementById('btn-gn').classList.remove('active');
+            } else {
+                document.getElementById('himno-es').style.display = 'none';
+                document.getElementById('himno-gn').style.display = 'block';
+                document.getElementById('btn-gn').classList.add('active');
+                document.getElementById('btn-es').classList.remove('active');
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        function handleFormSubmit(e, msg) {
+            e.preventDefault();
+            showToast(msg);
+            setTimeout(() => {
+                showView('inicio-view');
+            }, 1200);
+        }
+
+        function consultarNotas() {
+            const ci = document.getElementById('cedula-search').value.trim();
+            if(!ci) {
+                showToast('Por favor ingrese un número de cédula.');
+                return;
+            }
+            document.getElementById('res-padre').style.display = 'block';
+            showToast('Boletín encontrado para CI: ' + ci);
+        }
+
+        function agregarFilaHorario() {
+            const tbody = document.getElementById('horario-body');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td contenteditable="true">08:30 - 09:10</td>
+                <td contenteditable="true">Materia</td>
+                <td contenteditable="true">Materia</td>
+                <td contenteditable="true">Materia</td>
+                <td contenteditable="true">Materia</td>
+                <td contenteditable="true">Materia</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function limpiarHorario() {
+            document.getElementById('horario-body').innerHTML = '';
+            showToast('Tabla de horarios limpiada.');
+        }
+
+        function cargarHorarioCurso() {
+            const curso = document.getElementById('select-horario').value;
+            const tbody = document.getElementById('horario-body');
+            tbody.innerHTML = `
+                <tr>
+                    <td contenteditable="true">07:00 - 07:40</td>
+                    <td contenteditable="true">Clase (${curso})</td>
+                    <td contenteditable="true">Clase (${curso})</td>
+                    <td contenteditable="true">Clase (${curso})</td>
+                    <td contenteditable="true">Clase (${curso})</td>
+                    <td contenteditable="true">Clase (${curso})</td>
+                </tr>
+            `;
+            showToast('Horario actualizado para ' + curso);
+        }
+    </script>
+</body>
+</html>

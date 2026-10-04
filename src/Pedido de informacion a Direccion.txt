@@ -1,0 +1,106 @@
+PEDIDO DE INFORMACIÓN — SITIO WEB INSTITUCIONAL
+Colegio Nacional Mariscal Francisco Solano López · Caaguazú
+=============================================================
+Sr./Sra. Director/a: para completar la página web del colegio
+necesitamos que nos provea la siguiente información oficial.
+Puede responder punto por punto en este mismo documento.
+=============================================================
+
+1. PLANTEL DOCENTE (sección Repositorio de Docentes)
+-------------------------------------------------------------
+Por cada docente, indicar:
+  1.1  Nombre y apellido completos
+  1.2  Materia o área que enseña
+  1.3  Nivel (EEB / Nivel Medio) y cursos a su cargo
+  1.4  Cargo (docente, coordinador, tutor, etc.)
+  1.5  Fotografía (archivo de imagen, idealmente fondo neutro)
+  1.6  Breve descripción o perfil profesional (2 o 3 líneas)
+Respuesta:
+_______________________________________________________________
+
+2. HISTORIA DE LA INSTITUCIÓN  ✅ RECIBIDA (29/09/2026)
+-------------------------------------------------------------
+  Reseña del PEI integrada a la web (texto revisado guardado en
+  "Reseña Histórica (revisada).txt"). Aún por completar:
+  2.1  Frase trunca: reunión partidaria "del," (¿de qué sector?)
+  2.2  Frase trunca: "con mucha visión de futuro," (continuación)
+  2.3  Apellido de la profesora Hialina
+Respuesta:
+✅ Recibida parcial — pendientes 2.1, 2.2 y 2.3
+
+3. MISIÓN Y VISIÓN  ✅ RECIBIDAS (de "PAGINA NACIONAL.html")
+-------------------------------------------------------------
+  Misión y Visión oficiales integradas a la web.
+Respuesta:
+✅ Recibida
+
+4. ESTUDIANTES POR CURSO — NIVEL MEDIO  ✅ RECIBIDO (planillas Año 2026)
+-------------------------------------------------------------
+  Científico 337, Servicios 287, Industrial 332 y TOTAL EMT 956
+  integrados con detalle por orientación y curso.
+Respuesta:
+✅ Recibido
+
+5. OFERTA EDUCATIVA  ✅ NOMBRES CONFIRMADOS (planillas Año 2026)
+-------------------------------------------------------------
+  5.1  Nombre oficial: Agropecuaria (BTA) ✅
+  5.2  ADN = Administración de Negocios ✅ · Contabilidad = BTC ✅
+       Construcción Civil = BTCC ✅ · Electricidad = BTE ✅
+       Mecánica = BTM ✅
+  5.3  Turnos y sedes de cada orientación: Información pendiente
+Respuesta:
+✅ Recibido parcial — pendiente 5.3
+
+6. REQUISITOS DE INSCRIPCIÓN E INGRESO
+-------------------------------------------------------------
+  6.1  Lista oficial de documentos para la inscripción
+  6.2  Cupos disponibles por sección y turno (EEB y Media)
+  6.3  Requisitos específicos de cada orientación técnica
+       (Salud, Electricidad, Mecánica, etc.)
+  6.4  Requisitos para traslados desde otras instituciones
+Respuesta:
+_______________________________________________________________
+
+7. MATRÍCULAS 2026
+-------------------------------------------------------------
+  7.1  Fechas y calendario oficial de matriculación
+  7.2  Costos o aranceles administrativos (si corresponden;
+       la enseñanza es gratuita por ser institución pública)
+  7.3  Modalidades y lugares de pago (si corresponden)
+Respuesta:
+_______________________________________________________________
+
+8. NORMAS DE CONVIVENCIA
+-------------------------------------------------------------
+  8.1  Protocolo oficial ante conflictos entre estudiantes
+  8.2  Régimen de asistencia, tardanzas y sanciones
+  8.3  Reglamentación del uniforme y la presentación personal
+  8.4  Reglamento interno completo (si se desea publicar)
+Respuesta:
+_______________________________________________________________
+
+9. FOTOGRAFÍAS PARA LA GALERÍA
+-------------------------------------------------------------
+Enviar archivos de imagen (JPG o PNG) de:
+  9.1  Bachilleratos faltantes: BTI, BTE, Construcciones,
+       Agropecuario, Contabilidad, ADN, Científicos, EEB
+  9.2  Fachada e instalaciones de la institución
+  9.3  Actos escolares y eventos
+  9.4  Deportes y actividades culturales
+Indicar a qué bachillerato o actividad corresponde cada foto.
+Respuesta: (adjuntar archivos)
+_______________________________________________________________
+
+10. NOTICIAS Y CONTACTO
+-------------------------------------------------------------
+  10.1 Persona responsable de enviar noticias (nombre y
+       contacto) y frecuencia de publicación deseada
+  10.2 Teléfono, correo y horario de atención oficiales para
+       la sección Contacto
+Respuesta:
+_______________________________________________________________
+
+=============================================================
+Fecha del pedido: ____ / ____ / ________
+Solicitado por: ______________________________________________
+=============================================================

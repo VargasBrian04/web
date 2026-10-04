@@ -1,0 +1,134 @@
+COLEGIO NACIONAL MARISCAL FRANCISCO SOLANO LÓPEZ — SITIO WEB
+Caaguazú, Paraguay
+================================================================
+
+CONTENIDO DE ESTA CARPETA
+----------------------------------------------------------------
+1. sitio-web\          Proyecto web completo (Next.js 15 + React 19
+                       + Prisma + PostgreSQL). Para abrir y modificar.
+2. fotos-originales\   Copia de las fotos originales por bachiller
+                       (Mecanica, Salud, Sociales). Ya están integradas
+                       en sitio-web\public\images\galeria\.
+3. LEEME.txt           Este archivo.
+
+CÓMO VER LA PÁGINA (2 opciones)
+----------------------------------------------------------------
+A) Rápido, sin instalar nada:
+   - Hacer doble clic en "vista-previa.html" (vista previa estática,
+     funciona sin internet ni base de datos).
+   - Está sincronizada con el sitio: ingreso por rol (Docente,
+     Padre/Tutor, Visitante), galería con 25 fotos y login de
+     demostración.
+   - NOTA: los portales con datos reales (notas, asistencia, tareas)
+     solo funcionan con la opción B.
+
+B) Sitio completo (recomendado):
+   1. Instalar Node.js LTS desde https://nodejs.org/es
+   2. Abrir terminal en la carpeta sitio-web\
+   3. npm install
+   4. Levantar la base de datos:  docker compose up -d
+   5. Copiar variables:  copy .env.example .env   (y editarlas)
+   6. npx prisma generate
+   7. npm run prisma:migrate
+   8. npm run seed
+   9. npm run dev  ->  http://localhost:3000
+
+USUARIOS DE PRUEBA (demo: 12345678 · se entra con correo O usuario)
+----------------------------------------------------------------
+- luis.velazquez / colegionacionalemd6@gmail.com  Administrador real (recibe solicitudes)
+- direccion / direccion@colegio.edu.py   Administrador demo
+- profesor / profesor@colegio.edu.py     Docente (nómina, notas 1-5, asistencia, tareas, planillas)
+- alumno / alumno@colegio.edu.py        Alumno (notas, asistencia, tareas, documentos)
+- padre / padre@colegio.edu.py         Padre/Encargado (hijos, notas, asistencia, documentos)
+- Contraseña de Luis (n4cio210): cambiarla en Mi perfil tras la primera prueba.
+
+MIGRACIONES PENDIENTES (correr con la DB levantada)
+----------------------------------------------------------------
+- docker compose up -d   (si hay Docker; si no, apuntar DATABASE_URL al Postgres real)
+- npx prisma migrate dev --name fase1-documentos   (tablas Document/Observation/Class grado-sección)
+- npx prisma migrate dev --name login-username     (username único + correo opcional)
+- npm run seed   (crea a Luis + demos con usuario)
+- npm run dev  ->  http://localhost:3000
+
+ZONAS PRIVADAS — CÓMO FUNCIONAN (2026-10-01)
+----------------------------------------------------------------
+- /login -> /portal deriva por rol (middleware protege /portal/*).
+- ALUMNO (/portal/alumno): Centro MEC oficial + promedio interno,
+  notas por período, asistencia (60 últimos), tareas de su
+  bachillerato y estado de sus inscripciones.
+- PADRE (/portal/padre): Centro MEC + por cada hijo vinculado su
+  promedio, asistencia (presentes/total, ausencias), tareas
+  pendientes y tabla de notas. Vinculación la hace Secretaría
+  (tabla student_guardians).
+- DOCENTE (/portal/profesor): filtro materia+período, nómina con
+  nota actual, formulario cargar nota POST /api/grades (1-5),
+  pasar asistencia POST /api/attendance
+  (PRESENTE/TARDE/AUSENTE/JUSTIFICADO) y crear tarea
+  POST /api/assignments. Lee GET /api/teacher/roster.
+- ADMIN (/portal/admin): GET /api/admin/stats (usuarios por rol,
+  solicitudes por estado, conteos) + bandeja GET/PATCH
+  /api/enrollments (PENDIENTE->EN_REVISION->APROBADA/RECHAZADA;
+  al aprobar el aspirante pasa a STUDENT).
+- APIs nuevas: /api/attendance (GET/POST),
+  /api/assignments (GET/POST) + /api/assignments/submit (POST
+  alumno), /api/teacher/roster (GET docente/admin),
+  /api/admin/stats (GET admin).
+
+SELECTOR DE PERFIL (2026-10-01) — estilo "¿Cómo querés ingresar?"
+----------------------------------------------------------------
+- Componente: src/components/portal/RolePicker.tsx (3 píldoras
+  con ilustración arriba y barra redondeada con título + flecha:
+  Soy Docente / Soy Padre-Tutor / Soy Visitante. Sin botón de
+  alumno: el alumno queda registrado como hijo del padre/tutor).
+- Página: /acceso (src/app/acceso/page.tsx). Docente y Padre llevan
+  a /login?next=/portal/<zona>; Visitante va a la parte pública
+  (/#galeria).
+- Navbar "Acceder" ahora apunta a /acceso (escritorio y móvil).
+- Sección "Calificaciones" de la portada (#calificaciones) usa el
+  mismo selector en modo compacto.
+- /login mantiene el formulario y agrega enlace "← Elegir perfil".
+
+FOTOS NUEVAS INTEGRADAS (2026-10-01)
+----------------------------------------------------------------
+- Desde "FOTOS DEL COLEGIO": 8vo Grado (2) y BÁSICAS = Ciencias
+  Básicas del Nivel Medio (2).
+- Copiadas a sitio-web\public\images\galeria\ como
+  eeb-8vo-1.jpg, eeb-8vo-2.jpg, basicas-1.jpg, basicas-2.jpg
+  y registradas en src/data/institucional.ts (categoría
+  "Actividades académicas"). El resto de carpetas ya estaba
+  integrado (agro, constr, elec, info, mecanica, salud,
+  sociales, adm, palco, patio, despedida).
+
+OFERTA ACADÉMICA (2026-10-01)
+----------------------------------------------------------------
+- La zona #oferta muestra dos apartados: Nivel Medio (8
+  bachilleratos con foto) y Educación Escolar Básica (7.º, 8.º
+  y 9.º). Las fotos de Ciencias Básicas y 8.º NO están en la
+  galería general (a pedido): los archivos siguen en
+  sitio-web\public\images\galeria\ (basicas-*.jpg, eeb-8vo-*.jpg)
+  por si se quieren usar en las tarjetas de oferta.
+- vista-previa.html sincronizada: botones EEB (7.º/8.º/9.º) en la
+  oferta (galería "Próximamente" hasta recibir fotos), galería
+  general con 25 fotos.
+
+ESTRUCTURA DEL PROYECTO (sitio-web\)
+----------------------------------------------------------------
+- src/app/page.tsx            Portada (todas las secciones)
+- src/app/noticias/           Blog: listado + noticia individual
+- src/app/portal/             Portal privado por rol
+- src/app/api/                API (auth, inscripciones, notas)
+- src/components/landing/     Hero, Navbar, Sections, Institucional,
+                              GalleryExplorer, ui (reutilizables)
+- src/data/institucional.ts   DATOS: editar aquí textos, estadísticas,
+                              docentes, noticias y requisitos
+- prisma/schema.prisma        Base de datos (PostgreSQL 16)
+- public/images/galeria/      Fotos de la galería web
+
+PARA AGREGAR FOTOS NUEVAS
+----------------------------------------------------------------
+1. Copiarlas a sitio-web\public\images\galeria\
+2. Registrarlas en src/data/institucional.ts (lista galleryItems)
+   con su categoría: Institución, Actos escolares, Actividades
+   académicas, Deportes, Eventos, Proyectos, Actividades culturales.
+
+Fecha de organización: 29/09/2026
