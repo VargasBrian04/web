@@ -182,19 +182,19 @@ export default function EnrollmentWizard({ academics }: { academics: AcademicOpt
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md sm:p-8">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-md sm:p-8">
       {/* Indicador de pasos */}
-      <ol className="mb-8 flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
+      <ol className="mb-6 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide sm:mb-8 sm:gap-2 sm:text-xs">
         {["Nivel", "Aspirante", "Tutor", "Documentos"].map((label, i) => (
-          <li key={label} className="flex flex-1 items-center gap-2">
+          <li key={label} className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2">
             <span
-              className={`flex h-7 w-7 items-center justify-center rounded-full text-white ${
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white sm:h-7 sm:w-7 ${
                 i < step ? "bg-emerald-600" : i === step ? "bg-[var(--institutional)]" : "bg-slate-300"
               }`}
             >
               {i + 1}
             </span>
-            <span className={i === step ? "text-[var(--institutional)]" : "text-slate-400"}>{label}</span>
+            <span className={`truncate ${i === step ? "text-[var(--institutional)]" : "hidden text-slate-400 min-[420px]:inline"}`}>{label}</span>
           </li>
         ))}
       </ol>
@@ -301,18 +301,18 @@ export default function EnrollmentWizard({ academics }: { academics: AcademicOpt
                 const f = files[doc];
                 const isImage = !!f && f.type.startsWith("image/");
                 return (
-                  <div key={doc} className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-slate-700">{doc}</span>
+                  <div key={doc} className="rounded-lg border border-slate-200 px-3 py-2.5 text-sm sm:px-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                      <span className="font-semibold text-slate-700">{doc}</span>
                       <input
                         type="file"
                         accept=".pdf,.jpg,.jpeg,.png"
                         onChange={(e) => setFiles((prev) => ({ ...prev, [doc]: e.target.files?.[0] ?? null }))}
-                        className="text-xs text-slate-500"
+                        className="w-full min-w-0 text-xs text-slate-500 sm:w-auto"
                       />
                     </div>
                     {f && (
-                      <div className="mt-2 flex items-center gap-3">
+                      <div className="mt-2 flex flex-wrap items-center gap-2 sm:gap-3">
                         {isImage && <DocThumb file={f} doc={doc} onZoom={() => openZoom(doc)} />}
                         <button
                           type="button"
