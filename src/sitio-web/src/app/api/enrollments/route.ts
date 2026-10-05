@@ -2,9 +2,14 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { avisarInscripcion } from "@/lib/mail";
 import { normalizeUsername, usernameFromEmail } from "@/lib/users";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EEB_GRADES = ["7.º", "8.º", "9.º"];
+const MEDIA_COURSES = ["1.º", "2.º", "3.º"];
+const SECCIONES = ["A", "B"];
+const TURNOS = ["MAÑANA", "TARDE"];
 
 /**
  * POST /api/enrollments — Solicitud pública de inscripción (aspirantes).
@@ -23,13 +28,15 @@ export async function POST(request: Request) {
 
   const {
     firstName, lastName, ci, birthDate, phone, email, password, address,
-    guardian, academicId, periodLabel, documents
+    guardian, academicId, periodLabel, documents,
+    nivel, curso, seccion, turno
   } = body as {
     firstName?: string; lastName?: string; ci?: string; birthDate?: string;
     phone?: string; email?: string; password?: string; address?: string;
     guardian?: { name?: string; relation?: string; phone?: string; email?: string };
     academicId?: string; periodLabel?: string;
     documents?: { name: string; type: string; size: number }[];
+    nivel?: string; curso?: string; seccion?: string | null; turno?: string;
   };
 
   // ---- Validaciones ----
@@ -43,21 +50,40 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "La contraseña debe tener al menos 8 caracteres" }, { status: 400 });
   if (!guardian?.name?.trim() || !guardian?.phone?.trim())
     return NextResponse.json({ error: "Datos del tutor/encargado incompletos" }, { status: 400 });
-  if (!academicId)
-    return NextResponse.json({ error: "Debés seleccionar un bachillerato" }, { status: 400 });
+  // ---- Nivel solicitado ----
+  if (nivel !== "EEB" && nivel !== "MEDIA")
+    return NextResponse.json({ error: "Elegí el nivel (Básica o Media)" }, { status: 400 });
+  const validCourses = nivel === "EEB" ? EEB_GRADES : MEDIA_COURSES;
+  if (!curso || !validCourses.includes(curso))
+    return NextResponse.json({ error: "Curso inválido para el nivel" }, { status: 400 });
+  if (!turno || !TURNOS.includes(turno))
+    return NextResponse.json({ error: "Elegí el turno (Mañana o Tarde)" }, { status: 400 });
+
+  let academic: { id: string; code: string; name: string; shortName: string; active: boolean } | null = null;
+  if (nivel === "MEDIA") {
+    if (!academicId)
+      return NextResponse.json({ error: "Debés seleccionar un bachillerato" }, { status: 400 });
+    academic = await prisma.academic.findUnique({ where: { id: academicId } });
+    if (!academic || !academic.active)
+      return NextResponse.json({ error: "Bachillerato no disponible" }, { status: 400 });
+  }
+  // Sección solo para Escolar Básica y Ciencias Básicas (CCB, tienen A y B)
+  const necesitaSeccion = nivel === "EEB" || academic?.code === "CCB";
+  let sec: string | null = null;
+  if (necesitaSeccion) {
+    if (!seccion || !SECCIONES.includes(seccion))
+      return NextResponse.json({ error: "Elegí la sección (A o B)" }, { status: 400 });
+    sec = seccion;
+  }
   if (!Array.isArray(documents) || documents.length === 0)
     return NextResponse.json({ error: "Adjuntá al menos un documento" }, { status: 400 });
-
-  const academic = await prisma.academic.findUnique({ where: { id: academicId } });
-  if (!academic || !academic.active)
-    return NextResponse.json({ error: "Bachillerato no disponible" }, { status: 400 });
 
   const period = (periodLabel?.trim() || String(new Date().getFullYear()));
   const emailNorm = email.trim().toLowerCase();
   const ciNorm = ci.trim();
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Usuario existente por CI o email: se reutiliza, no se duplica
       const existing = await tx.user.findFirst({
         where: { OR: [{ ci: ciNorm }, { email: emailNorm }] }
@@ -102,16 +128,17 @@ export async function POST(request: Request) {
 
       const student = await tx.student.upsert({
         where: { userId: user.id },
-        update: { academicId: academic.id, enrollmentYear: Number(period) || null },
-        create: { userId: user.id, academicId: academic.id, enrollmentYear: Number(period) || null }
+        update: { academicId: academic?.id ?? null, enrollmentYear: Number(period) || null },
+        create: { userId: user.id, academicId: academic?.id ?? null, enrollmentYear: Number(period) || null }
       });
 
       const enrollment = await tx.enrollment.create({
         data: {
           studentId: student.id,
-          academicId: academic.id,
+          academicId: academic?.id ?? null,
           periodLabel: period,
           status: "PENDIENTE",
+          nivel, curso, seccion: sec, turno,
           documents: documents as object,
           tutorName: guardian.name!.trim(),
           tutorRelation: guardian.relation?.trim() || null,
@@ -123,8 +150,32 @@ export async function POST(request: Request) {
       return { enrollmentId: enrollment.id, username: user.username };
     });
 
+    // Aviso por correo a Dirección (no bloquea si el correo falla)
+    let emailSent = false;
+    try {
+      emailSent = await avisarInscripcion({
+        codigo: result.enrollmentId,
+        alumno: `${firstName.trim()} ${lastName.trim()}`,
+        ci: ciNorm,
+        nivel, curso,
+        seccion: sec,
+        turno,
+        bachiller: academic ? `${academic.shortName} — ${academic.name}` : null,
+        tutor: guardian.name!.trim(),
+        tutorTelefono: guardian.phone!.trim(),
+      });
+      if (emailSent) {
+        await prisma.enrollment.update({
+          where: { id: result.enrollmentId },
+          data: { emailSent: true },
+        });
+      }
+    } catch (e) {
+      console.error("aviso inscripcion", e);
+    }
+
     return NextResponse.json(
-      { data: { ...result, estado: "PENDIENTE", mensaje: "Solicitud recibida. Secretaría la revisará." } },
+      { data: { ...result, estado: "PENDIENTE", emailSent, mensaje: "Solicitud recibida. Secretaría la revisará." } },
       { status: 201 }
     );
   } catch (e: unknown) {

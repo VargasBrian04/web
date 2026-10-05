@@ -8,7 +8,12 @@ type Enrollment = {
   periodLabel: string;
   createdAt: string;
   tutorName?: string | null;
-  academic: { code: string; name: string; shortName: string };
+  nivel?: string | null;
+  curso?: string | null;
+  seccion?: string | null;
+  turno?: string | null;
+  emailSent?: boolean;
+  academic: { code: string; name: string; shortName: string } | null;
   student: { user: { firstName: string; lastName: string; ci: string; email: string; phone?: string | null } };
 };
 
@@ -152,7 +157,7 @@ export default function AdminBoard() {
             <thead>
               <tr className="border-b text-left text-slate-500">
                 <th className="py-2 pr-4">Aspirante</th>
-                <th className="py-2 pr-4">Bachillerato</th>
+                <th className="py-2 pr-4">Nivel / Bachillerato</th>
                 <th className="py-2 pr-4">Estado</th>
                 <th className="py-2">Acciones</th>
               </tr>
@@ -168,7 +173,13 @@ export default function AdminBoard() {
                       <p className="text-xs text-slate-500">CI {e.student.user.ci} · {e.student.user.email ?? "sin correo"}</p>
                       <p className="text-xs text-slate-500">Tutor: {e.tutorName ?? "—"} · Período {e.periodLabel}</p>
                     </td>
-                    <td className="py-2 pr-4 text-slate-600">{e.academic.name}</td>
+                    <td className="py-2 pr-4 text-slate-600">
+                      {e.academic ? e.academic.name : `EEB ${e.curso ?? ""}${e.seccion ? ` "${e.seccion}"` : ""}`.trim()}
+                      <p className="text-xs text-slate-500">
+                        Turno {e.turno === "MAÑANA" ? "Mañana" : e.turno === "TARDE" ? "Tarde" : "—"}
+                        {e.emailSent === false ? " · ✉️ aviso pendiente" : ""}
+                      </p>
+                    </td>
                     <td className="py-2 pr-4">
                       <span className={`rounded px-2 py-0.5 font-bold ${statusColor(e.status)}`}>{e.status}</span>
                     </td>

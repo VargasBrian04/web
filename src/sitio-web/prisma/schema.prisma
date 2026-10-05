@@ -245,10 +245,16 @@ model Enrollment {
   id          String           @id @default(cuid())
   studentId   String
   student     Student          @relation(fields: [studentId], references: [id])
-  academicId  String
-  academic    Academic         @relation(fields: [academicId], references: [id])
+  academicId  String?
+  academic    Academic?        @relation(fields: [academicId], references: [id])
   periodLabel String // ej: "2026"
   status      EnrollmentStatus @default(PENDIENTE)
+  // Nivel solicitado (EEB = 7.º–9.º sin bachillerato; MEDIA = 1.º–3.º con bachillerato)
+  nivel    String? // EEB | MEDIA
+  curso    String? // 7.º, 8.º, 9.º | 1.º, 2.º, 3.º
+  seccion  String? // A | B (solo EEB y Ciencias Básicas)
+  turno    String? // MAÑANA | TARDE
+  emailSent Boolean @default(false) // aviso enviado a Dirección
   documents   Json             @default("[]") // [{ name, url, type }] - acta de nacimiento, certificado de estudios, cédula, etc.
   // Datos del tutor/encargado declarados en la solicitud online
   tutorName     String?

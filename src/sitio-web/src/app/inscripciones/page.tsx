@@ -27,8 +27,8 @@ export default async function InscripcionesPage() {
       </p>
       <h1 className="section-title mt-3">Solicitud de inscripción online</h1>
       <p className="mt-2 text-slate-600">
-        Completá los 3 pasos. Tu solicitud ingresa como <strong>PENDIENTE</strong> y
-        Secretaría la revisa (Aprueba / Rechaza).
+        Completá los 4 pasos. Tu solicitud ingresa como <strong>PENDIENTE</strong>,
+        Dirección recibe el aviso por correo y Secretaría la revisa (Aprueba / Rechaza).
       </p>
 
       <div className="mt-8">
