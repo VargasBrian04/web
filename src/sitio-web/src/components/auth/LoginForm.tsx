@@ -14,6 +14,7 @@ export default function LoginForm() {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState<string | null>(params.get("error"));
   const [loading, setLoading] = useState(false);
 
@@ -91,15 +92,25 @@ export default function LoginForm() {
 
       <label className="mt-4 block text-sm font-semibold text-slate-700">
         Contraseña
-        <input
-          type="password"
-          required
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-[var(--institutional)]"
-          placeholder="••••••••"
-        />
+        <span className="relative mt-1 block">
+          <input
+            type={showPass ? "text" : "password"}
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 pr-12 outline-none focus:border-[var(--institutional)]"
+            placeholder="••••••••"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPass((v) => !v)}
+            title={showPass ? "Ocultar contraseña" : "Mostrar contraseña"}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-lg text-slate-500 hover:bg-slate-100"
+          >
+            {showPass ? "🙈" : "👁️"}
+          </button>
+        </span>
       </label>
 
       <button type="submit" disabled={loading} className="btn-primary mt-6 w-full justify-center">
