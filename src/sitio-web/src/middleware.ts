@@ -17,8 +17,29 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (!pathname.startsWith("/portal")) return NextResponse.next();
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  const role = (token as { role?: string } | null)?.role;
+  // La cookie de sesión cambia de nombre según el contexto
+  // (__Secure- en HTTPS, simple en HTTP). Se prueban ambas: el endpoint
+  // /api/auth/session la lee bien, pero getToken por defecto a veces
+  // busca el nombre equivocado y rebotaba a /login en bucle.
+  const secret = process.env.NEXTAUTH_SECRET;
+  let token: { role?: string } | null = null;
+  for (const [cookieName, secureCookie] of [
+    ["__Secure-authjs.session-token", true],
+    ["authjs.session-token", false],
+  ] as const) {
+    try {
+      const t = (await getToken({ req, secret, cookieName, secureCookie })) as {
+        role?: string;
+      } | null;
+      if (t) {
+        token = t;
+        break;
+      }
+    } catch {
+      /* probar el siguiente nombre */
+    }
+  }
+  const role = token?.role;
   if (!token || !role) {
     const url = new URL("/login", req.nextUrl);
     url.searchParams.set("next", pathname);
