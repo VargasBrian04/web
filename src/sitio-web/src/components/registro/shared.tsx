@@ -9,9 +9,18 @@ export type Catalog = {
   eebGrades: string[];
   mediaCourses: string[];
   secciones: string[];
+  turnos: string[];
+  seccionBachiller: string;
   bachilleratos: { code: string; shortName: string; name: string }[];
   subjects: { code: string; name: string; gradeYear: number; academicCode: string; academicShort: string }[];
 };
+
+const CCB = "CCB";
+
+/** La sección solo aplica a Escolar Básica y a Ciencias Básicas (tienen A y B). */
+export function necesitaSeccion(nivel: string, bachiller: string): boolean {
+  return nivel === "EEB" || bachiller === CCB;
+}
 
 export function useCatalog() {
   const [cat, setCat] = useState<Catalog | null>(null);

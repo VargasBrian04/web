@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 const SEEN_KEY = "csl-intro-seen";
@@ -110,18 +111,24 @@ function Escudo() {
 }
 
 export default function IntroAnimation() {
+  const pathname = usePathname();
   const [stage, setStage] = useState<"flame" | "roles" | null>(null);
   const [flameLeaving, setFlameLeaving] = useState(false);
   const [rolesLeaving, setRolesLeaving] = useState(false);
 
+  // La intro solo existe en la portada: en noticias, registro, portal, etc.
+  // nunca debe tapar el contenido (cada pestaña nueva reestrenaba el portón).
+  const onLanding = pathname === "/" || pathname === "/inicio";
+
   useEffect(() => {
+    if (!onLanding) return;
     try {
       if (sessionStorage.getItem(SEEN_KEY)) return;
     } catch {
       /* sin sessionStorage: mostrar igual */
     }
     setStage("flame");
-  }, []);
+  }, [onLanding]);
 
   const goRoles = useCallback(() => {
     setStage((s) => {
@@ -174,7 +181,7 @@ export default function IntroAnimation() {
     return () => document.removeEventListener("keydown", onKey);
   }, [stage, goRoles, close]);
 
-  if (!stage) return null;
+  if (!onLanding || !stage) return null;
 
   return (
     <>

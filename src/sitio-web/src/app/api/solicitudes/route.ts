@@ -7,9 +7,11 @@ import { CI_RE, EMAIL_RE, normalizeUsername } from "@/lib/users";
 
 const EEB_GRADES = ["7.º", "8.º", "9.º"];
 const MEDIA_COURSES = ["1.º", "2.º", "3.º"];
-const SECCIONES = ["A", "B", "C", "D"];
+const SECCIONES = ["A", "B"];
+const TURNOS = ["MAÑANA", "TARDE"];
+const CCB = "CCB"; // Ciencias Básicas: único bachillerato con secciones A/B
 
-type Hijo = { nombre: string; nivel: string; curso: string; seccion: string; bachiller?: string | null };
+type Hijo = { nombre: string; nivel: string; curso: string; seccion: string | null; turno: string; bachiller?: string | null };
 
 function bad(msg: string, status = 400) {
   return NextResponse.json({ error: msg }, { status });
@@ -66,8 +68,8 @@ export async function POST(request: Request) {
       const validCourses = h.nivel === "EEB" ? EEB_GRADES : MEDIA_COURSES;
       if (typeof h.curso !== "string" || !validCourses.includes(h.curso))
         return bad(`Hijo ${i + 1}: curso inválido para el nivel`);
-      const sec = typeof h.seccion === "string" ? h.seccion.trim().toUpperCase() : "";
-      if (!SECCIONES.includes(sec)) return bad(`Hijo ${i + 1}: sección inválida (A, B, C o D)`);
+      const turno = typeof h.turno === "string" ? h.turno.trim().toUpperCase() : "";
+      if (!TURNOS.includes(turno)) return bad(`Hijo ${i + 1}: turno inválido (Mañana o Tarde)`);
       let bachiller: string | null = null;
       if (h.nivel === "MEDIA") {
         if (typeof h.bachiller !== "string" || !h.bachiller.trim())
@@ -76,7 +78,15 @@ export async function POST(request: Request) {
         if (!found) return bad(`Hijo ${i + 1}: bachiller inexistente`);
         bachiller = found.code;
       }
-      clean.push({ nombre: (h.nombre as string).trim(), nivel: h.nivel as string, curso: h.curso as string, seccion: sec, bachiller });
+      // Sección solo para Escolar Básica y Ciencias Básicas (tienen A y B).
+      const necesitaSeccion = h.nivel === "EEB" || bachiller === CCB;
+      const secRaw = typeof h.seccion === "string" ? h.seccion.trim().toUpperCase() : "";
+      let seccion: string | null = null;
+      if (necesitaSeccion) {
+        if (!SECCIONES.includes(secRaw)) return bad(`Hijo ${i + 1}: sección inválida (A o B)`);
+        seccion = secRaw;
+      }
+      clean.push({ nombre: (h.nombre as string).trim(), nivel: h.nivel as string, curso: h.curso as string, seccion, turno, bachiller });
     }
     const created = await prisma.accountRequest.create({
       data: {
@@ -326,7 +336,7 @@ export async function PATCH(request: Request) {
           }
           vinculados.push(`${matches[0].user.firstName} ${matches[0].user.lastName}`);
         } else {
-          pendientes.push(`${h.nombre} (${h.nivel} ${h.curso}${h.bachiller ? ` · ${h.bachiller}` : ""})`);
+          pendientes.push(`${h.nombre} (${h.nivel} ${h.curso}${h.seccion ? ` "${h.seccion}"` : ""} · Turno ${h.turno === "MAÑANA" ? "Mañana" : "Tarde"}${h.bachiller ? ` · ${h.bachiller}` : ""})`);
         }
       }
       result.vinculados = vinculados;

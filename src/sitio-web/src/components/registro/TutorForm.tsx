@@ -3,13 +3,13 @@
 import { useState } from "react";
 import {
   FieldError, Person, PersonErrors, PersonFields, SectionTitle, SuccessView,
-  inputCls, useCatalog,
+  inputCls, necesitaSeccion, useCatalog,
 } from "./shared";
 
-type Hijo = { nombre: string; nivel: "" | "EEB" | "MEDIA"; curso: string; seccion: string; bachiller: string };
-type HijoErr = { nombre?: string; nivel?: string; curso?: string; seccion?: string; bachiller?: string };
+type Hijo = { nombre: string; nivel: "" | "EEB" | "MEDIA"; curso: string; seccion: string; turno: string; bachiller: string };
+type HijoErr = { nombre?: string; nivel?: string; curso?: string; seccion?: string; turno?: string; bachiller?: string };
 
-const BLANK_HIJO: Hijo = { nombre: "", nivel: "", curso: "", seccion: "", bachiller: "" };
+const BLANK_HIJO: Hijo = { nombre: "", nivel: "", curso: "", seccion: "", turno: "", bachiller: "" };
 
 /** Formulario de solicitud de cuenta para tutores/encargados. */
 export default function TutorForm() {
@@ -27,12 +27,15 @@ export default function TutorForm() {
       hs.map((h, j) => {
         if (j !== i) return h;
         const next = { ...h, [k]: v };
-        // Al cambiar de nivel se reinician curso y bachiller.
+        // Al cambiar de nivel se reinician curso, sección, turno y bachiller.
         if (k === "nivel") {
           next.curso = "";
           next.seccion = "";
+          next.turno = "";
           next.bachiller = "";
         }
+        // Al cambiar de bachiller se reinicia la sección (solo CCB la usa).
+        if (k === "bachiller") next.seccion = "";
         return next;
       })
     );
@@ -51,7 +54,9 @@ export default function TutorForm() {
       if (h.nivel !== "EEB" && h.nivel !== "MEDIA") e.nivel = "Elegí el nivel";
       const valid = h.nivel === "EEB" ? cat?.eebGrades : h.nivel === "MEDIA" ? cat?.mediaCourses : [];
       if (!h.curso || !valid?.includes(h.curso)) e.curso = "Elegí el curso";
-      if (!h.seccion || !(cat?.secciones ?? ["A", "B", "C", "D"]).includes(h.seccion)) e.seccion = "Elegí la sección";
+      if (!["MAÑANA", "TARDE"].includes(h.turno)) e.turno = "Elegí el turno";
+      if (necesitaSeccion(h.nivel, h.bachiller) && !(cat?.secciones ?? ["A", "B"]).includes(h.seccion))
+        e.seccion = "Elegí la sección";
       if (h.nivel === "MEDIA" && !h.bachiller) e.bachiller = "Elegí el bachiller";
       return e;
     });
@@ -86,7 +91,8 @@ export default function TutorForm() {
             nombre: h.nombre.trim(),
             nivel: h.nivel,
             curso: h.curso,
-            seccion: h.seccion,
+            seccion: necesitaSeccion(h.nivel, h.bachiller) ? h.seccion : null,
+            turno: h.turno,
             bachiller: h.nivel === "MEDIA" ? h.bachiller : null,
           })),
         }),
@@ -201,20 +207,36 @@ export default function TutorForm() {
                     <FieldError msg={e.curso} />
                   </label>
                   <label className="block text-sm font-semibold text-slate-700">
-                    Sección <span className="text-red-600">*</span>
+                    Turno <span className="text-red-600">*</span>
                     <select
-                      value={h.seccion}
-                      onChange={(e2) => setHijo(i, "seccion", e2.target.value)}
+                      value={h.turno}
+                      onChange={(e2) => setHijo(i, "turno", e2.target.value)}
                       disabled={sending || !h.nivel}
-                      className={`${inputCls} ${e.seccion ? "!border-red-500" : ""}`}
+                      className={`${inputCls} ${e.turno ? "!border-red-500" : ""}`}
                     >
                       <option value="">{h.nivel ? "Seleccionar…" : "Primero elegí el nivel"}</option>
-                      {(cat?.secciones ?? ["A", "B", "C", "D"]).map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
+                      <option value="MAÑANA">Mañana</option>
+                      <option value="TARDE">Tarde</option>
                     </select>
-                    <FieldError msg={e.seccion} />
+                    <FieldError msg={e.turno} />
                   </label>
+                  {necesitaSeccion(h.nivel, h.bachiller) && (
+                    <label className="block text-sm font-semibold text-slate-700">
+                      Sección <span className="text-red-600">*</span>
+                      <select
+                        value={h.seccion}
+                        onChange={(e2) => setHijo(i, "seccion", e2.target.value)}
+                        disabled={sending || !h.nivel}
+                        className={`${inputCls} ${e.seccion ? "!border-red-500" : ""}`}
+                      >
+                        <option value="">{h.nivel ? "Seleccionar…" : "Primero elegí el nivel"}</option>
+                        {(cat?.secciones ?? ["A", "B"]).map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                      <FieldError msg={e.seccion} />
+                    </label>
+                  )}
                   {h.nivel === "MEDIA" && (
                     <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
                       Bachiller <span className="text-red-600">*</span>
