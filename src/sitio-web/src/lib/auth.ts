@@ -46,7 +46,11 @@ export const authConfig = {
             });
         if (!user || !user.active) return null;
 
-        const valid = await bcrypt.compare(password, user.passwordHash);
+        let valid = await bcrypt.compare(password, user.passwordHash);
+        if (!valid && password !== password.trim()) {
+          // Autocompletados que agregan espacios al final
+          valid = await bcrypt.compare(password.trim(), user.passwordHash);
+        }
         if (!valid) return null;
 
         return {
