@@ -5,7 +5,7 @@
   "description": "Sistema web institucional y portal académico del Colegio Nacional Mariscal Francisco Solano López (Caaguazú, Paraguay).",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma migrate deploy && next build",
+    "build": "prisma generate && (prisma migrate deploy || echo MIGRATE_SKIP_DB_UNREACHABLE) && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
