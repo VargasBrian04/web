@@ -26,7 +26,6 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <IntroAnimation />
         <Navbar />
         <main>{children}</main>
         <Footer />
