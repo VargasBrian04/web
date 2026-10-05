@@ -18,7 +18,7 @@ export default function DocenteForm() {
   const [otraLibre, setOtraLibre] = useState("");
   const [otras, setOtras] = useState<string[]>([]);
   const [otrasErr, setOtrasErr] = useState<string | undefined>();
-  const [nivel, setNivel] = useState<"" | "EEB" | "MEDIA">("");
+  const [niveles, setNiveles] = useState<("EEB" | "MEDIA")[]>([]);
   const [cursos, setCursos] = useState<string[]>([]);
   const [bachilleres, setBachilleres] = useState<string[]>([]);
   const [asigErr, setAsigErr] = useState<string | undefined>();
@@ -27,7 +27,9 @@ export default function DocenteForm() {
   const [done, setDone] = useState(false);
 
   const subjects = cat?.subjects ?? [];
-  const courses = nivel === "EEB" ? cat?.eebGrades ?? [] : nivel === "MEDIA" ? cat?.mediaCourses ?? [] : [];
+  const eeb = cat?.eebGrades ?? [];
+  const media = cat?.mediaCourses ?? [];
+  const courses = [...(niveles.includes("EEB") ? eeb : []), ...(niveles.includes("MEDIA") ? media : [])];
 
   const toggle = (list: string[], v: string) =>
     list.includes(v) ? list.filter((x) => x !== v) : [...list, v];
@@ -82,9 +84,9 @@ export default function DocenteForm() {
     setMpErr(mp);
 
     let ae: string | undefined;
-    if (!nivel) ae = "Elegí el nivel educativo";
+    if (niveles.length < 1) ae = "Elegí al menos un nivel";
     else if (cursos.length < 1) ae = "Elegí al menos un curso";
-    else if (nivel === "MEDIA" && bachilleres.length < 1)
+    else if (niveles.includes("MEDIA") && bachilleres.length < 1)
       ae = "Indicá en qué bachiller(es) enseñás";
     setAsigErr(ae);
 
@@ -114,9 +116,9 @@ export default function DocenteForm() {
           materiaPrincipal:
             materiaPrincipal === "__OTRA__" ? `OTRA:${materiaPrincipalOtra.trim()}` : materiaPrincipal,
           otrasMaterias: otras,
-          nivel,
+          niveles,
           cursos,
-          bachilleres: nivel === "MEDIA" ? bachilleres : [],
+          bachilleres: niveles.includes("MEDIA") ? bachilleres : [],
         }),
       });
       const json = await res.json();
@@ -241,53 +243,86 @@ export default function DocenteForm() {
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <SectionTitle n="4" title="Asignación académica" desc="Niveles y cursos en los que enseñás." />
+        <SectionTitle n="4" title="Asignación académica" desc="Niveles y cursos en los que enseñás. Podés marcar Básica y Media a la vez." />
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <label className="block text-sm font-semibold text-slate-700">
-            Nivel educativo <span className="text-red-600">*</span>
-            <select
-              value={nivel}
-              onChange={(e) => {
-                const v = e.target.value as "" | "EEB" | "MEDIA";
-                setNivel(v);
-                setCursos([]);
-                setBachilleres([]);
-              }}
-              disabled={sending}
-              className={`${inputCls} ${asigErr && !nivel ? "!border-red-500" : ""}`}
-            >
-              <option value="">Seleccionar…</option>
-              <option value="EEB">Educación Escolar Básica</option>
-              <option value="MEDIA">Educación Media</option>
-            </select>
-          </label>
+          <div>
+            <p className="text-sm font-semibold text-slate-700">
+              Niveles <span className="text-red-600">*</span>
+            </p>
+            <div className="mt-1 flex flex-wrap gap-2">
+              {(["EEB", "MEDIA"] as const).map((n) => {
+                const on = niveles.includes(n);
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    disabled={sending}
+                    onClick={() => {
+                      setNiveles((l) => (l.includes(n) ? l.filter((x) => x !== n) : [...l, n]));
+                      setCursos([]);
+                      setBachilleres([]);
+                    }}
+                    aria-pressed={on}
+                    className={`min-h-[44px] rounded-full border-2 px-4 py-2 text-sm font-bold transition-colors ${on ? "border-[var(--institutional)] bg-[var(--institutional)] text-white" : "border-slate-300 text-slate-600 hover:border-[var(--institutional)]"}`}
+                  >
+                    {on ? "✓ " : ""}{n === "EEB" ? "Escolar Básica (7.º–9.º)" : "Media (1.º–3.º)"}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <div>
             <p className="text-sm font-semibold text-slate-700">
               Cursos en los que enseña <span className="text-red-600">*</span>
             </p>
-            {!nivel ? (
-              <p className="mt-1 text-sm text-slate-400">Primero elegí el nivel educativo.</p>
+            {niveles.length === 0 ? (
+              <p className="mt-1 text-sm text-slate-400">Primero elegí al menos un nivel.</p>
             ) : (
               <div className="mt-1 flex flex-wrap gap-2">
-                {courses.map((c) => {
-                  const on = cursos.includes(c);
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      disabled={sending}
-                      onClick={() => setCursos((l) => toggle(l, c))}
-                      aria-pressed={on}
-                      className={`min-h-[44px] rounded-full border-2 px-4 py-2 text-sm font-bold transition-colors ${on ? "border-[var(--institutional)] bg-[var(--institutional)] text-white" : "border-slate-300 text-slate-600 hover:border-[var(--institutional)]"}`}
-                    >
-                      {on ? "✓ " : ""}{c}
-                    </button>
-                  );
-                })}
+                {niveles.includes("EEB") && (
+                  <>
+                    {eeb.map((c) => {
+                      const on = cursos.includes(`${c}`);
+                      return (
+                        <button
+                          key={`EEB-${c}`}
+                          type="button"
+                          disabled={sending}
+                          onClick={() => setCursos((l) => toggle(l, `${c}`))}
+                          aria-pressed={on}
+                          title="Escolar Básica"
+                          className={`min-h-[44px] rounded-full border-2 px-4 py-2 text-sm font-bold transition-colors ${on ? "border-[var(--institutional)] bg-[var(--institutional)] text-white" : "border-slate-300 text-slate-600 hover:border-[var(--institutional)]"}`}
+                        >
+                          {on ? "✓ " : ""}{c} EEB
+                        </button>
+                      );
+                    })}
+                  </>
+                )}
+                {niveles.includes("MEDIA") && (
+                  <>
+                    {media.map((c) => {
+                      const on = cursos.includes(`${c}`);
+                      return (
+                        <button
+                          key={`MEDIA-${c}`}
+                          type="button"
+                          disabled={sending}
+                          onClick={() => setCursos((l) => toggle(l, `${c}`))}
+                          aria-pressed={on}
+                          title="Educación Media"
+                          className={`min-h-[44px] rounded-full border-2 px-4 py-2 text-sm font-bold transition-colors ${on ? "border-[var(--institutional)] bg-[var(--institutional)] text-white" : "border-slate-300 text-slate-600 hover:border-[var(--institutional)]"}`}
+                        >
+                          {on ? "✓ " : ""}{c} Media
+                        </button>
+                      );
+                    })}
+                  </>
+                )}
               </div>
             )}
           </div>
-          {nivel === "MEDIA" && (
+          {niveles.includes("MEDIA") && (
             <div className="sm:col-span-2">
               <p className="text-sm font-semibold text-slate-700">
                 ¿En qué bachiller(es) enseñás? <span className="text-red-600">*</span>

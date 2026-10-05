@@ -7,8 +7,9 @@ import { CI_RE, EMAIL_RE, normalizeUsername } from "@/lib/users";
 
 const EEB_GRADES = ["7.º", "8.º", "9.º"];
 const MEDIA_COURSES = ["1.º", "2.º", "3.º"];
+const SECCIONES = ["A", "B", "C", "D"];
 
-type Hijo = { nombre: string; nivel: string; curso: string; bachiller?: string | null };
+type Hijo = { nombre: string; nivel: string; curso: string; seccion: string; bachiller?: string | null };
 
 function bad(msg: string, status = 400) {
   return NextResponse.json({ error: msg }, { status });
@@ -65,6 +66,8 @@ export async function POST(request: Request) {
       const validCourses = h.nivel === "EEB" ? EEB_GRADES : MEDIA_COURSES;
       if (typeof h.curso !== "string" || !validCourses.includes(h.curso))
         return bad(`Hijo ${i + 1}: curso inválido para el nivel`);
+      const sec = typeof h.seccion === "string" ? h.seccion.trim().toUpperCase() : "";
+      if (!SECCIONES.includes(sec)) return bad(`Hijo ${i + 1}: sección inválida (A, B, C o D)`);
       let bachiller: string | null = null;
       if (h.nivel === "MEDIA") {
         if (typeof h.bachiller !== "string" || !h.bachiller.trim())
@@ -73,7 +76,7 @@ export async function POST(request: Request) {
         if (!found) return bad(`Hijo ${i + 1}: bachiller inexistente`);
         bachiller = found.code;
       }
-      clean.push({ nombre: (h.nombre as string).trim(), nivel: h.nivel as string, curso: h.curso as string, bachiller });
+      clean.push({ nombre: (h.nombre as string).trim(), nivel: h.nivel as string, curso: h.curso as string, seccion: sec, bachiller });
     }
     const created = await prisma.accountRequest.create({
       data: {
@@ -136,18 +139,21 @@ export async function POST(request: Request) {
     }
     if (materiaPrincipal && (otrasMaterias.includes(materiaPrincipal) || seen.has(materiaPrincipal)))
       return bad("La materia principal ya está en la lista");
-    // Asignación académica
-    if (body.nivel !== "EEB" && body.nivel !== "MEDIA") return bad("Nivel inválido");
-    const validCourses = body.nivel === "EEB" ? EEB_GRADES : MEDIA_COURSES;
+    // Asignación académica: uno o ambos niveles (EEB y/o MEDIA)
+    const rawNiveles = Array.isArray(body.niveles) ? body.niveles : [body.nivel];
+    const niveles = [...new Set(rawNiveles.filter((n) => n === "EEB" || n === "MEDIA"))];
+    if (niveles.length < 1) return bad("Elegí al menos un nivel (Básica y/o Media)");
+    const validByNivel: Record<string, string[]> = { EEB: EEB_GRADES, MEDIA: MEDIA_COURSES };
+    const allowed = [...new Set(niveles.flatMap((n) => validByNivel[n]))];
     const cursos = body.cursos;
     if (!Array.isArray(cursos) || cursos.length < 1 || cursos.length > 6)
       return bad("Elegí entre 1 y 6 cursos");
     for (const c of cursos) {
-      if (typeof c !== "string" || !validCourses.includes(c)) return bad(`Curso inválido: ${String(c)}`);
+      if (typeof c !== "string" || !allowed.includes(c)) return bad(`Curso inválido: ${String(c)}`);
     }
     const uniqCursos = [...new Set(cursos as string[])];
     let bachilleres: string[] = [];
-    if (body.nivel === "MEDIA") {
+    if (niveles.includes("MEDIA")) {
       const b = body.bachilleres;
       if (!Array.isArray(b) || b.length < 1 || b.length > 8)
         return bad("Indicá en qué bachiller(es) enseñás (Educación Media)");
@@ -172,7 +178,8 @@ export async function POST(request: Request) {
           materiaPrincipalOtra,
           otrasMaterias,
           otrasLibres,
-          nivel: body.nivel,
+          nivel: niveles.length === 1 ? niveles[0] : "AMBOS",
+          niveles,
           cursos: uniqCursos,
           bachilleres,
         },
@@ -350,7 +357,7 @@ export async function PATCH(request: Request) {
       ];
       // Cursos/bachilleres quedan registrados; la asignación a secciones
       // formales la completa Secretaría (aún no existen cursos formales).
-      result.cursosDeclarados = { nivel: p.nivel, cursos: p.cursos, bachilleres: p.bachilleres };
+      result.cursosDeclarados = { niveles: p.niveles ?? p.nivel, cursos: p.cursos, bachilleres: p.bachilleres };
     }
   }
 

@@ -11,45 +11,53 @@
 /* TEMA 2 — negro y blanco (elegante, alto contraste). Se activa con
    data-theme="oscuro" en <html>; la preferencia se guarda en localStorage. */
 [data-theme="oscuro"] {
-  --institutional: #161616;
-  --institutional-light: #2b2b2b;
-  --gold: #9ca3af;
-  --paper: #101010;
+  --institutional: #e8d5b5;
+  --institutional-light: #f5e8d3;
+  --gold: #c9a35c;
+  --paper: #0e0d0c;
   color-scheme: dark;
 }
 
 [data-theme="oscuro"] body {
-  background-color: #101010;
-  color: #e7e7e7;
+  background-color: #0e0d0c;
+  color: #ece5d8;
 }
 
-/* Superficies claras más usadas → oscuras (sin duplicar componentes) */
-[data-theme="oscuro"] .bg-white { background-color: #1b1b1b !important; }
-[data-theme="oscuro"] .bg-slate-50 { background-color: #1b1b1b !important; }
-[data-theme="oscuro"] .bg-slate-100 { background-color: #232323 !important; }
-[data-theme="oscuro"] .bg-amber-50 { background-color: #26200f !important; }
-[data-theme="oscuro"] .bg-emerald-50 { background-color: #0f241a !important; }
-[data-theme="oscuro"] .bg-red-50 { background-color: #2a1212 !important; }
-[data-theme="oscuro"] .bg-blue-50 { background-color: #101d2e !important; }
-[data-theme="oscuro"] .text-slate-900 { color: #f5f5f5 !important; }
-[data-theme="oscuro"] .text-slate-800 { color: #e7e7e7 !important; }
-[data-theme="oscuro"] .text-slate-700 { color: #d4d4d4 !important; }
-[data-theme="oscuro"] .text-slate-600 { color: #b5b5b5 !important; }
-[data-theme="oscuro"] .text-slate-500 { color: #9a9a9a !important; }
-[data-theme="oscuro"] .text-slate-400 { color: #8a8a8a !important; }
-[data-theme="oscuro"] .text-stone-700 { color: #d4d4d4 !important; }
-[data-theme="oscuro"] .text-stone-600 { color: #b5b5b5 !important; }
+[data-theme="oscuro"] header[class*="bg-[var(--institutional)]"] {
+  background-color: rgba(14, 13, 12, 0.96) !important;
+}
+
+/* Superficies claras más usadas → oscuras cálidas (no grises planos) */
+[data-theme="oscuro"] .bg-white { background-color: #1a1714 !important; }
+[data-theme="oscuro"] .bg-slate-50 { background-color: #1a1714 !important; }
+[data-theme="oscuro"] .bg-slate-100 { background-color: #242019 !important; }
+[data-theme="oscuro"] .bg-amber-50 { background-color: #241b0e !important; }
+[data-theme="oscuro"] .bg-emerald-50 { background-color: #0f221a !important; }
+[data-theme="oscuro"] .bg-red-50 { background-color: #2a1414 !important; }
+[data-theme="oscuro"] .bg-blue-50 { background-color: #12202e !important; }
+[data-theme="oscuro"] .bg-\[var\(--paper\)\] { background-color: #1a1714 !important; }
+[data-theme="oscuro"] .text-slate-900 { color: #f5efe2 !important; }
+[data-theme="oscuro"] .text-slate-800 { color: #e9e1d2 !important; }
+[data-theme="oscuro"] .text-slate-700 { color: #d6cdb8 !important; }
+[data-theme="oscuro"] .text-slate-600 { color: #b8ad94 !important; }
+[data-theme="oscuro"] .text-slate-500 { color: #9a8f78 !important; }
+[data-theme="oscuro"] .text-slate-400 { color: #847a64 !important; }
+[data-theme="oscuro"] .text-stone-700 { color: #d6cdb8 !important; }
+[data-theme="oscuro"] .text-stone-600 { color: #b8ad94 !important; }
+[data-theme="oscuro"] .text-\[var\(--institutional\)\] { color: #e8d5b5 !important; }
 [data-theme="oscuro"] .border-slate-200,
 [data-theme="oscuro"] .border-slate-300,
 [data-theme="oscuro"] .border-stone-200,
-[data-theme="oscuro"] .border-stone-100 { border-color: #2e2e2e !important; }
+[data-theme="oscuro"] .border-stone-100 { border-color: #33291d !important; }
+[data-theme="oscuro"] .shadow-sm, [data-theme="oscuro"] .shadow-md,
+[data-theme="oscuro"] .shadow-xl { --tw-shadow-color: rgba(0,0,0,.55); }
 [data-theme="oscuro"] input,
 [data-theme="oscuro"] select,
-[data-theme="oscuro"] textarea { background-color: #1b1b1b !important; color: #f0f0f0 !important; }
+[data-theme="oscuro"] textarea { background-color: #1a1714 !important; color: #f0e9d8 !important; border-color: #33291d !important; }
 [data-theme="oscuro"] input::placeholder,
-[data-theme="oscuro"] textarea::placeholder { color: #8a8a8a !important; }
+[data-theme="oscuro"] textarea::placeholder { color: #847a64 !important; }
 [data-theme="oscuro"] input:disabled,
-[data-theme="oscuro"] select:disabled { background-color: #242424 !important; }
+[data-theme="oscuro"] select:disabled { background-color: #242019 !important; }
 
 @layer base {
   html {

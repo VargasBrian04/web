@@ -8,6 +8,7 @@ export const inputCls =
 export type Catalog = {
   eebGrades: string[];
   mediaCourses: string[];
+  secciones: string[];
   bachilleratos: { code: string; shortName: string; name: string }[];
   subjects: { code: string; name: string; gradeYear: number; academicCode: string; academicShort: string }[];
 };

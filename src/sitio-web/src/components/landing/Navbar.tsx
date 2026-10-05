@@ -106,28 +106,44 @@ export default function Navbar() {
           </a>
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-1.5 xl:flex">
           <ThemeToggle />
           <a
             href="https://aprendizaje.mec.edu.py/aprendizaje/familia/documentos"
             target="_blank"
             rel="noopener noreferrer"
             title="Consultar calificaciones oficiales en el MEC"
-            className="rounded-lg border border-[var(--gold)] px-3 py-2 text-sm font-bold text-[var(--gold)] transition-all hover:-translate-y-px hover:bg-[var(--gold)] hover:text-white hover:shadow"
+            className="whitespace-nowrap rounded-lg border border-[var(--gold)] px-2.5 py-2 text-sm font-bold text-[var(--gold)] transition-all hover:-translate-y-px hover:bg-[var(--gold)] hover:text-white hover:shadow"
           >
             ✓ Calificaciones ↗
           </a>
           <Link
             href="/acceso"
-            className="rounded-lg px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+            className="whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
           >
-            🔑 Acceder
+            Acceder
           </Link>
           <Link
             href="/registro"
-            className="rounded-lg bg-[var(--gold)] px-3 py-2 text-sm font-bold text-white shadow transition-all hover:-translate-y-px hover:opacity-90 hover:shadow-md"
+            className="whitespace-nowrap rounded-lg bg-[var(--gold)] px-3 py-2 text-sm font-bold text-white shadow transition-all hover:-translate-y-px hover:opacity-90 hover:shadow-md"
           >
-            ✨ Registro
+            Registro
+          </Link>
+        </div>
+
+        <div className="hidden items-center gap-1 md:flex xl:hidden">
+          <ThemeToggle />
+          <Link
+            href="/acceso"
+            className="whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+          >
+            Acceder
+          </Link>
+          <Link
+            href="/registro"
+            className="whitespace-nowrap rounded-lg bg-[var(--gold)] px-3 py-2 text-sm font-bold text-white shadow"
+          >
+            Registro
           </Link>
         </div>
 
