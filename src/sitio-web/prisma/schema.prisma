@@ -103,6 +103,8 @@ model Teacher {
   user     User     @relation(fields: [userId], references: [id])
   ruc      String?  // RUC de la institución (campo administrativo)
   title    String?  // Título / grado académico
+  bio      String?  // Presentación pública (la escribe el docente)
+  schedule String?  // Horario de clases (texto libre, ej: "Lun–Vie 7:00–12:00")
   subjects TeacherSubject[]
   groups   ClassTeacher[]
   grades   Grade[]

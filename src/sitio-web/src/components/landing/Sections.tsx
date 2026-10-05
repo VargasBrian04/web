@@ -181,7 +181,7 @@ export function ContactSection() {
             <li>
               GPS: -25.46817°, -56.01172° ·{" "}
               <a
-                href="https://www.google.com/maps?q=-25.46817,-56.01172"
+                href="https://maps.app.goo.gl/jLyppMbyxBmu9eNn6"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-bold underline"

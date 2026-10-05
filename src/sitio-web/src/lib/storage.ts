@@ -1,4 +1,5 @@
 import { mkdir, writeFile, readFile, unlink } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 
@@ -24,6 +25,9 @@ export const NEWS_IMAGE_MIME: Record<string, string> = {
 };
 
 export function uploadsDir() {
+  // En Vercel el disco es de solo lectura salvo /tmp: allí van los uploads.
+  // (Fase siguiente: R2/Blob. Firma idéntica, solo cambia este archivo.)
+  if (process.env.VERCEL) return path.join(tmpdir(), "csl-uploads");
   // Raíz del proyecto sitio-web/uploads (gitignored, servido solo vía API con auth).
   return path.join(process.cwd(), "uploads");
 }
