@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type AcademicOption = {
   id: string;
@@ -29,6 +29,27 @@ const EEB_GRADES = ["7.º", "8.º", "9.º"];
 const MEDIA_COURSES = ["1.º", "2.º", "3.º"];
 const CONTACTOS = ["0975 493753", "0982 296194", "0971 884497"];
 
+/** Miniatura de imagen con URL estable (se libera al desmontar). */
+function DocThumb({ file, doc, onZoom }: { file: File; doc: string; onZoom: () => void }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    const u = URL.createObjectURL(file);
+    setUrl(u);
+    return () => URL.revokeObjectURL(u);
+  }, [file]);
+  if (!url) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={url}
+      alt={`Vista previa de ${doc}`}
+      title="Click para ampliar"
+      onClick={onZoom}
+      className="h-16 w-16 cursor-zoom-in rounded-lg border border-slate-200 object-cover"
+    />
+  );
+}
+
 export default function EnrollmentWizard({ academics }: { academics: AcademicOption[] }) {
   const [step, setStep] = useState(0);
   const [sending, setSending] = useState(false);
@@ -46,6 +67,18 @@ export default function EnrollmentWizard({ academics }: { academics: AcademicOpt
     academicId: ""
   });
   const [files, setFiles] = useState<Record<string, File | null>>({});
+  const [zoom, setZoom] = useState<{ name: string; url: string; isImage: boolean } | null>(null);
+
+  function openZoom(docName: string) {
+    const f = files[docName];
+    if (!f) return;
+    setZoom({ name: f.name, url: URL.createObjectURL(f), isImage: f.type.startsWith("image/") });
+  }
+
+  function closeZoom() {
+    if (zoom) URL.revokeObjectURL(zoom.url);
+    setZoom(null);
+  }
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -264,17 +297,36 @@ export default function EnrollmentWizard({ academics }: { academics: AcademicOpt
           <fieldset>
             <legend className="text-sm font-semibold text-slate-700">Documentos requeridos*</legend>
             <div className="mt-2 grid gap-3">
-              {REQUIRED_DOCS.map((doc) => (
-                <label key={doc} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-4 py-2.5 text-sm">
-                  <span className="text-slate-700">{doc}</span>
-                  <input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => setFiles((f) => ({ ...f, [doc]: e.target.files?.[0] ?? null }))}
-                    className="text-xs text-slate-500"
-                  />
-                </label>
-              ))}
+              {REQUIRED_DOCS.map((doc) => {
+                const f = files[doc];
+                const isImage = !!f && f.type.startsWith("image/");
+                return (
+                  <div key={doc} className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-slate-700">{doc}</span>
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => setFiles((prev) => ({ ...prev, [doc]: e.target.files?.[0] ?? null }))}
+                        className="text-xs text-slate-500"
+                      />
+                    </div>
+                    {f && (
+                      <div className="mt-2 flex items-center gap-3">
+                        {isImage && <DocThumb file={f} doc={doc} onZoom={() => openZoom(doc)} />}
+                        <button
+                          type="button"
+                          onClick={() => openZoom(doc)}
+                          className="rounded-full bg-[var(--institutional)] px-3 py-1 text-xs font-bold text-white hover:opacity-90"
+                        >
+                          {isImage ? "Ampliar" : "Ver archivo"}
+                        </button>
+                        <span className="truncate text-xs text-slate-500">{f.name}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <p className="mt-2 text-xs text-slate-500">PDF o imagen. La verificación final la hace Secretaría con los originales.</p>
           </fieldset>
@@ -304,6 +356,26 @@ export default function EnrollmentWizard({ academics }: { academics: AcademicOpt
           </button>
         )}
       </div>
+
+      {zoom && (
+        <div
+          className="nb-zoom"
+          onClick={(e) => { if (e.target === e.currentTarget) closeZoom(); }}
+        >
+          <div className="nb-sheet">
+            <button type="button" onClick={closeZoom} className="nb-x" aria-label="Cerrar">✕</button>
+            {zoom.isImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={zoom.url} alt={zoom.name} className="nb-img" />
+            ) : (
+              <p className="py-10 text-center text-sm text-slate-500">
+                Vista previa solo disponible para imágenes.<br />Archivo: {zoom.name}
+              </p>
+            )}
+            <p className="nb-cap">{zoom.name}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
