@@ -528,7 +528,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 </div>
 
 <!-- PASO 2: zona de ingreso por rol -->
-<div id="introNew" onclick="introGo()"><div class="logo-card"><img src="/images/logo-nuevo.png" alt="Escudo del colegio" onerror="this.onerror=null;this.src='/images/logo-colegio.png'"></div><h1>Mariscal Francisco Solano L&oacute;pez</h1><p>Caaguaz&uacute; &middot; Paraguay</p></div>
+<div id="introNew" onclick="introGo()"><div class="logo-card"><img src="/images/logo-nuevo.png" alt="Escudo del colegio" onerror="this.onerror=null;if(this.src.indexOf('logo-colegio.png')>=0){this.closest('.logo-card').style.display='none'}else{this.src='/images/logo-colegio.png'}"></div><h1>Mariscal Francisco Solano L&oacute;pez</h1><p>Caaguaz&uacute; &middot; Paraguay</p></div>
 <div id="roleGate">
 <div class="veil"></div>
 <div class="rg-box">
@@ -1272,6 +1272,6 @@ document.getElementById('nwZoom').addEventListener('click',function(e){if(e.targ
 document.getElementById('nwZoomX').addEventListener('click',function(){document.getElementById('nwZoom').classList.remove('open')});
 function nwZoom(e){if(e){e.preventDefault();e.stopPropagation()}var im=document.getElementById('nwPrev');if(!im||!im.src||im.style.display==='none')return;document.getElementById('nwZoomImg').src=im.src;var nm=document.getElementById('nwName');document.getElementById('nwZoomCap').textContent=nm?nm.textContent:'';document.getElementById('nwZoom').classList.add('open')}
 </script>
-<script>var introDone=false;function introGo(){if(introDone)return;introDone=true;var f=document.getElementById('introNew');var r=document.getElementById('roleGate');if(r)r.classList.add('enter');if(f){setTimeout(function(){f.classList.add('out');setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f)},700)},250)}}setTimeout(introGo,3800);</script>
+<script>var introDone=false;function introGo(){if(introDone)return;introDone=true;var f=document.getElementById('introNew');var r=document.getElementById('roleGate');if(r)r.classList.add('enter');if(f){setTimeout(function(){f.classList.add('out');setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f)},700)},250)}}setTimeout(introGo,2200);setTimeout(function(){var r=document.getElementById('roleGate');if(r)r.classList.add('enter')},2600);</script>
 </body>
 </html>
