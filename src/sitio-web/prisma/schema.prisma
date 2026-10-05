@@ -448,6 +448,36 @@ model AccountRequest {
 }
 
 // ============================================================================
+// CONTENIDO EDITABLE DEL SITIO (historia, misión, visión... lo edita Dirección
+// desde el panel sin tocar código; la portada usa esto con respaldo estático)
+// ============================================================================
+
+model SiteContent {
+  key       String   @id // ej: historia, mision, vision
+  title     String?  // título visible de la zona
+  body      String   // texto (admite varias líneas)
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("site_contents")
+}
+
+// Fotos de galería general y de cada orientación/curso (las sube Dirección).
+model GalleryItem {
+  id        String   @id @default(cuid())
+  slot      String   // GALERIA o id de orientación (btm, bts, cb, ...)
+  category  String?  // filtro de galería (Actos escolares, Deportes, ...)
+  caption   String?  // descripción corta
+  imageFile String   // archivo en uploads/
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  @@index([slot, createdAt])
+  @@map("gallery_items")
+}
+
+// ============================================================================
 // BLOG / NOTICIAS (administrado por Dirección; lo público solo ve PUBLICADA)
 // ============================================================================
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import TeacherProfile from "./TeacherProfile";
 
 type Subject = { id: string; code: string; name: string; gradeYear: number; academic?: { shortName: string; name: string } | null };
 type Period = { id: string; label: string; name: string };
@@ -209,6 +210,8 @@ export default function TeacherTools() {
       {msg && (
         <p className="rounded-lg bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900">{msg}</p>
       )}
+
+      <TeacherProfile />
 
       {/* Filtros */}
       <section className="rounded-2xl border border-slate-200 bg-white p-6">

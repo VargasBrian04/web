@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
-import IntroAnimation from "@/components/landing/IntroAnimation";
 
 export const metadata: Metadata = {
   title: {
