@@ -55,7 +55,7 @@ export default function Navbar() {
       <div className="container-c flex h-16 items-center justify-between gap-2">
         <Link href="/" className="flex min-w-0 items-center gap-3">
           <img
-            src="/images/logo-colegio.png"
+            src="/images/logo-nuevo.png"
             alt="Escudo del colegio"
             className="h-10 w-10 shrink-0 rounded-full bg-white object-contain p-0.5 shadow"
           />

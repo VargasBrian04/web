@@ -82,7 +82,7 @@ export default async function NoticiaPage({ params }: { params: Promise<{ slug: 
           <span className="pointer-events-none absolute inset-y-[-30%] left-[60%] w-6 skew-x-[-24deg] bg-[#c9a35c]" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/logo-colegio.png"
+            src="/images/logo-nuevo.png"
             alt="Escudo del colegio"
             className="h-14 w-14 shrink-0 rounded-full border-2 border-[#c9a35c] bg-white object-cover"
           />
