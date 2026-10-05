@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 /**
@@ -23,37 +24,19 @@ export default function LoginForm() {
     setError(null);
     setLoading(true);
     try {
-      // Flujo directo contra next-auth (sin cliente next-auth/react):
-      // 1) CSRF 2) POST credenciales 3) sesión creada o error visible.
-      const csrfRes = await fetch("/api/auth/csrf", { cache: "no-store" });
-      if (!csrfRes.ok) throw new Error("No se pudo iniciar la sesión (red).");
-      const { csrfToken } = (await csrfRes.json()) as { csrfToken?: string };
-      if (!csrfToken) throw new Error("No se pudo iniciar la sesión (csrf).");
-      const res = await fetch("/api/auth/callback/credentials", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          csrfToken,
-          identifier: identifier.trim(),
-          password,
-          redirect: "false",
-          json: "true",
-        }),
+      const res = await signIn("credentials", {
+        identifier: identifier.trim(),
+        password,
+        redirect: false,
       });
-      const json = (await res.json().catch(() => null)) as { error?: string; url?: string } | null;
-      if (!res.ok || !json || json.error || !json.url) {
+      if (!res || res.error) {
         setError("Usuario/correo o contraseña incorrectos, o cuenta inactiva.");
-        return;
-      }
-      const me = await fetch("/api/auth/session", { cache: "no-store" }).then((r) => r.json()).catch(() => null);
-      if (!me?.user) {
-        setError("Sesión no creada: revisá cookies del navegador.");
         return;
       }
       router.push(next);
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error de red al ingresar.");
+    } catch {
+      setError("Error de red al ingresar. Revisá tu conexión.");
     } finally {
       setLoading(false);
     }
