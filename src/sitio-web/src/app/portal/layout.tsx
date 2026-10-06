@@ -1,13 +1,14 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/lib/auth";
 import ThemeToggle from "@/components/landing/ThemeToggle";
 import PushButton from "@/components/portal/PushButton";
+import PortalLinks from "@/components/portal/PortalLinks";
 import CumplesHoy from "@/components/portal/CumplesHoy";
 
 /**
  * Layout del portal: exige sesión (el middleware ya filtra por rol),
- * muestra navegación según rol y salida segura con NextAuth.
+ * muestra navegación según rol y zona (Dirección en /portal/profesor
+ * solo ve panel docente + perfil) y salida segura con NextAuth.
  */
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -25,37 +26,6 @@ export default async function PortalLayout({ children }: { children: React.React
             ? "Dirección / Secretaría"
             : role;
 
-  const links =
-    role === "PARENT"
-      ? [
-          { href: "/portal/padre", label: "Mis hijos" },
-          { href: "/portal/perfil", label: "Mi perfil" },
-          { href: "/#galeria", label: "Galería" },
-        ]
-      : role === "STUDENT"
-        ? [
-            { href: "/portal/alumno", label: "Mis notas" },
-            { href: "/portal/alumno/carnet", label: "Mi carné" },
-            { href: "/portal/perfil", label: "Mi perfil" },
-            { href: "/inscripciones", label: "Inscripciones" },
-          ]
-        : role === "TEACHER"
-          ? [
-              { href: "/portal/profesor", label: "Mis cursos" },
-              { href: "/portal/profesor/noticias", label: "Gestionar noticias" },
-              { href: "/portal/profesor/inscripciones", label: "Inscripciones" },
-              { href: "/portal/perfil", label: "Mi perfil" },
-              { href: "/noticias", label: "Noticias" },
-            ]
-          : [
-              { href: "/portal/admin", label: "Administración" },
-              { href: "/portal/admin/noticias", label: "Blog / Noticias" },
-              { href: "/portal/perfil", label: "Mi perfil" },
-              { href: "/portal/profesor", label: "Ver como docente" },
-              { href: "/portal/alumno", label: "Ver como alumno" },
-              { href: "/inscripciones", label: "Inscripciones" },
-            ];
-
   return (
     <div className="container-c py-10">
       <div className="portal-head mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--institutional)] px-4 py-4 text-white sm:px-6">
@@ -70,11 +40,7 @@ export default async function PortalLayout({ children }: { children: React.React
           </p>
         </div>
         <div className="portal-links flex flex-wrap items-center gap-2">
-          {links.map((l) => (
-            <Link key={l.href} href={l.href} className="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/20">
-              {l.label}
-            </Link>
-          ))}
+          <PortalLinks role={role} />
           <ThemeToggle />
           <PushButton />
           <form
