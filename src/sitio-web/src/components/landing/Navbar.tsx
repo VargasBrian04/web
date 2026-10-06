@@ -56,7 +56,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--institutional)]/95 shadow-md backdrop-blur">
       <div className="container-c flex h-16 items-center justify-between gap-2">
-        <Link href="/inicio" className="flex min-w-0 items-center gap-3">
+        <Link href="/" className="flex min-w-0 items-center gap-3">
           <img
             src="/images/logo-nuevo.png"
             alt="Escudo del colegio"
