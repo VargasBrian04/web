@@ -181,6 +181,9 @@
   p, li, td, span, a {
     overflow-wrap: break-word;
   }
+  .grid > * {
+    min-width: 0;
+  }
   .portal-head {
     flex-direction: column;
     align-items: stretch;
