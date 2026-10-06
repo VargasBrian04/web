@@ -105,7 +105,7 @@ export const authConfig = {
               session.user.role = fresh.role;
               session.user.username = fresh.username;
               session.user.name = `${fresh.firstName} ${fresh.lastName}`;
-              session.user.email = fresh.email;
+              session.user.email = fresh.email ?? "";
             }
           } catch {
             /* sin DB: mantener token */
