@@ -58,7 +58,7 @@ export default async function PortalLayout({ children }: { children: React.React
 
   return (
     <div className="container-c py-10">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--institutional)] px-6 py-4 text-white">
+      <div className="portal-head mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--institutional)] px-4 py-4 text-white sm:px-6">
         <div>
           <p className="text-sm text-stone-300">
             Portal académico · {roleLabel}
@@ -69,7 +69,7 @@ export default async function PortalLayout({ children }: { children: React.React
             {session.user.email ? ` · ${session.user.email}` : " · sin correo vinculado"}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="portal-links flex flex-wrap items-center gap-2">
           {links.map((l) => (
             <Link key={l.href} href={l.href} className="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/20">
               {l.label}
