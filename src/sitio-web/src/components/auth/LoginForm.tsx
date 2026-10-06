@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 /**
@@ -19,22 +19,36 @@ export default function LoginForm() {
   const [error, setError] = useState<string | null>(params.get("error"));
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [activeUser, setActiveUser] = useState<{ name?: string; username?: string; role?: string } | null>(null);
+  const [leaving, setLeaving] = useState(false);
 
-  // Con sesión activa no se pide login otra vez: directo a la zona.
+  // Con sesión activa se ofrece seguir o salir: antes redirigía sin
+  // mostrar el formulario y era imposible cambiar de cuenta.
   useEffect(() => {
     fetch("/api/auth/session", { cache: "no-store" })
       .then((r) => r.json())
       .then((j) => {
-        if (j?.user) {
-          router.replace(next);
-          router.refresh();
-        } else {
-          setChecking(false);
-        }
+        if (j?.user) setActiveUser(j.user);
+        setChecking(false);
       })
       .catch(() => setChecking(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function switchAccount() {
+    setLeaving(true);
+    try {
+      await signOut({ redirect: false });
+    } catch {
+      /* igual se limpia el formulario local */
+    } finally {
+      setActiveUser(null);
+      setIdentifier("");
+      setPassword("");
+      setLeaving(false);
+      router.refresh();
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -66,6 +80,32 @@ export default function LoginForm() {
     >
       {checking ? (
         <p className="py-8 text-center text-sm text-slate-500">Verificando sesión…</p>
+      ) : activeUser ? (
+        <>
+          <h1 className="text-2xl font-extrabold text-[var(--institutional)]">
+            Ya hay sesión activa
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Estás ingresado como <strong>{activeUser.name || activeUser.username}</strong>
+            {activeUser.username ? ` (@${activeUser.username})` : ""}
+            {activeUser.role ? ` · rol ${activeUser.role}` : ""}. Cada cuenta ve solo su panel.
+          </p>
+          <button
+            type="button"
+            onClick={() => { router.push(next); router.refresh(); }}
+            className="btn-primary mt-6 w-full justify-center"
+          >
+            Continuar a mi panel
+          </button>
+          <button
+            type="button"
+            onClick={switchAccount}
+            disabled={leaving}
+            className="mt-3 w-full justify-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          >
+            {leaving ? "Cerrando…" : "Salir e ingresar con otra cuenta"}
+          </button>
+        </>
       ) : (
         <>
       <h1 className="text-2xl font-extrabold text-[var(--institutional)]">
