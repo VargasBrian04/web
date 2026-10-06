@@ -26,6 +26,14 @@ type Stats = {
   academics: { code: string; shortName: string; name: string; _count: { students: number } }[];
 };
 
+const ROLE_ES: Record<string, string> = {
+  ADMIN: "Dirección",
+  TEACHER: "Docentes",
+  PARENT: "Tutores",
+  STUDENT: "Alumnos",
+  ASPIRANT: "Aspirantes",
+};
+
 const inputCls =
   "rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--institutional)]";
 
@@ -98,7 +106,7 @@ export default function AdminBoard() {
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {stats.usersByRole.map((u) => (
               <div key={u.role} className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{u.role}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{ROLE_ES[u.role] ?? u.role}</p>
                 <p className="text-2xl font-extrabold text-slate-900">{u._count.role}</p>
               </div>
             ))}

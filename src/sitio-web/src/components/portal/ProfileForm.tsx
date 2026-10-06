@@ -87,7 +87,7 @@ export default function ProfileForm() {
         </div>
         <div>
           <p className="text-lg font-bold">{me.firstName} {me.lastName}</p>
-          <p className="text-sm text-stone-200">@{me.username} · CI {me.ci} · {me.role}</p>
+          <p className="text-sm text-stone-200">@{me.username} · CI {me.ci} · {{ TEACHER: "Docente", PARENT: "Tutor", ADMIN: "Dirección", STUDENT: "Alumno", ASPIRANT: "Aspirante" }[me.role] ?? me.role}</p>
         </div>
       </section>
 

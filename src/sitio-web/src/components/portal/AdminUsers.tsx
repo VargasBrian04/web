@@ -172,7 +172,7 @@ export default function AdminUsers() {
                 <tr key={u.id} className="border-b last:border-0">
                   <td className="py-2 pr-4 font-semibold">@{u.username}<span className="block text-xs font-normal text-slate-400">CI {u.ci}</span></td>
                   <td className="py-2 pr-4">{u.firstName} {u.lastName}</td>
-                  <td className="py-2 pr-4"><span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-bold">{u.role}</span></td>
+                  <td className="py-2 pr-4"><span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-bold">{{ TEACHER: "Docente", PARENT: "Tutor", ADMIN: "Dirección", STUDENT: "Alumno", ASPIRANT: "Aspirante" }[u.role] ?? u.role}</span></td>
                   <td className="py-2 pr-4 text-xs text-slate-500">{u.email ?? "sin correo"}{u.phone ? ` · ${u.phone}` : ""}</td>
                   <td className="py-2"><button onClick={() => toggleActive(u)} type="button" className={`rounded px-2 py-1 text-xs font-bold ${u.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{u.active ? "Activo" : "Inactivo"}</button></td>
                 </tr>
