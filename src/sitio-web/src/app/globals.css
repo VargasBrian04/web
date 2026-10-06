@@ -196,6 +196,9 @@
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
+  section.rounded-2xl h2 {
+    font-size: 1.05rem;
+  }
 }
 
 /* Animación de inicio: escudo con llama + ingreso por rol */

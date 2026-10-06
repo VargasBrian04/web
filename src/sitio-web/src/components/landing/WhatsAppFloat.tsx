@@ -12,7 +12,7 @@ const NUMS = [
 export default function WhatsAppFloat() {
   const [open, setOpen] = useState(false);
   return (
-    <div className="fixed bottom-5 left-5 z-40">
+    <div className="fixed bottom-20 left-4 z-40 sm:bottom-5 sm:left-5">
       {open && (
         <div className="mb-2 w-60 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-xl">
           <p className="bg-[var(--institutional)] px-4 py-2.5 text-sm font-bold text-white">
