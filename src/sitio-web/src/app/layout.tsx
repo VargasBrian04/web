@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
+import WhatsAppFloat from "@/components/landing/WhatsAppFloat";
 
 export const metadata: Metadata = {
   title: {
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
     template: "%s | Colegio Mariscal Solano López"
   },
   description:
-    "Institución educativa pública de Caaguazú, Paraguay. Inscripciones, oferta académica y portal para estudiantes, docentes y familias."
+    "Institución educativa pública de Caaguazú, Paraguay. Inscripciones, oferta académica y portal para estudiantes, docentes y familias.",
+  manifest: "/manifest.webmanifest",
+  themeColor: "#5d4037",
 };
 
 export default function RootLayout({
@@ -29,6 +32,12 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
         <Footer />
+        <WhatsAppFloat />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js").catch(function(){})}`,
+          }}
+        />
       </body>
     </html>
   );

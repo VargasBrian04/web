@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { avisarInscripcion } from "@/lib/mail";
 import { normalizeUsername, usernameFromEmail } from "@/lib/users";
+import { audit } from "@/lib/audit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EEB_GRADES = ["7.º", "8.º", "9.º"];
@@ -261,6 +262,7 @@ export async function PATCH(request: Request) {
       data: { role: "STUDENT" }
     });
   }
+  await audit(session.user, `INSCRIPCION_${status}`, updated.id);
 
   return NextResponse.json({ data: updated });
 }

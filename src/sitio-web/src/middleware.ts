@@ -13,7 +13,37 @@ const routeRoles: { prefix: string; roles: string[] }[] = [
   { prefix: "/portal/padre", roles: ["PARENT", "ADMIN"] }
 ];
 
+// Rate-limit básico de login (best-effort por instancia edge):
+// 20 intentos por IP cada 10 minutos en el callback de credenciales.
+const loginHits = new Map<string, { n: number; reset: number }>();
+
+function loginLimit(req: NextRequest): NextResponse | null {
+  if (!req.nextUrl.pathname.startsWith("/api/auth/callback/credentials")) return null;
+  if (req.method !== "POST") return null;
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "desconocida";
+  const now = Date.now();
+  const cur = loginHits.get(ip);
+  if (!cur || now > cur.reset) {
+    loginHits.set(ip, { n: 1, reset: now + 10 * 60 * 1000 });
+    return null;
+  }
+  cur.n += 1;
+  if (cur.n > 20) {
+    return NextResponse.json(
+      { error: "Demasiados intentos. Esperá 10 minutos." },
+      { status: 429 }
+    );
+  }
+  return null;
+}
+
 export async function middleware(req: NextRequest) {
+  const limited = loginLimit(req);
+  if (limited) return limited;
+
   const { pathname } = req.nextUrl;
   if (!pathname.startsWith("/portal")) return NextResponse.next();
 
@@ -53,4 +83,4 @@ export async function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/portal/:path*"] };
+export const config = { matcher: ["/portal/:path*", "/api/auth/callback/credentials"] };

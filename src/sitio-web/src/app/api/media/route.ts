@@ -25,7 +25,7 @@ export async function GET(request: Request) {
       take: 200,
     });
     return NextResponse.json({
-      data: data.map((g) => ({ ...g, url: `/api/media/${g.id}/image` })),
+      data: data.map((g: { id: string; slot: string; category: string | null; caption: string | null; createdAt: Date }) => ({ ...g, url: `/api/media/${g.id}/image` })),
     });
   } catch (e) {
     console.error("GET /api/media", e);

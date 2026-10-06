@@ -3,6 +3,11 @@ import AdminUsers from "@/components/portal/AdminUsers";
 import AccountRequests from "@/components/portal/AccountRequests";
 import ContentAdmin from "@/components/portal/ContentAdmin";
 import MediaAdmin from "@/components/portal/MediaAdmin";
+import CoursesAdmin from "@/components/portal/CoursesAdmin";
+import AuditAdmin from "@/components/portal/AuditAdmin";
+import ComunicadosAdmin from "@/components/portal/ComunicadosAdmin";
+import TimetablesAdmin from "@/components/portal/TimetablesAdmin";
+import { CalendarAdmin, PollsAdmin } from "@/components/portal/SchoolAdmin";
 
 export const metadata = { title: "Panel de Administración" };
 
@@ -26,6 +31,12 @@ export default function AdminPage() {
       <AdminUsers />
       <ContentAdmin />
       <MediaAdmin />
+      <CoursesAdmin />
+      <ComunicadosAdmin />
+      <TimetablesAdmin />
+      <CalendarAdmin />
+      <PollsAdmin />
+      <AuditAdmin />
     </div>
   );
 }

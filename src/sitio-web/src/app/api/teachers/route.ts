@@ -19,10 +19,14 @@ export async function GET() {
       orderBy: { user: { firstName: "asc" } },
     });
     return NextResponse.json({
-      data: teachers.map((t) => ({
+      data: teachers.map((t: {
+        user: { firstName: string; lastName: string };
+        title: string | null; bio: string | null; schedule: string | null;
+        subjects: { subject: { code: string; name: string } }[];
+      }) => ({
         nombre: `${t.user.firstName} ${t.user.lastName}`.trim(),
         titulo: t.title,
-        materias: t.subjects.map((s) => s.subject),
+        materias: t.subjects.map((s: { subject: { code: string; name: string } }) => s.subject),
         bio: t.bio,
         horario: t.schedule,
       })),

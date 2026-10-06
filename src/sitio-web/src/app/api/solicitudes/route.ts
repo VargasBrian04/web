@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { randomBytes } from "node:crypto";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { audit } from "@/lib/audit";
 import { CI_RE, EMAIL_RE, normalizeUsername } from "@/lib/users";
 
 const EEB_GRADES = ["7.º", "8.º", "9.º"];
@@ -381,5 +382,6 @@ export async function PATCH(request: Request) {
     },
   });
   void updated;
+  await audit(session.user, `SOLICITUD_${status}`, id);
   return NextResponse.json({ data: result });
 }

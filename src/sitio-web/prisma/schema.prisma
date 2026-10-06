@@ -478,6 +478,109 @@ model GalleryItem {
 }
 
 // ============================================================================
+// CURSOS/SECCIONES FORMALES, AUDITORÍA, COMUNICADOS, HORARIOS, CALENDARIO,
+// ENCUESTAS (todo administrable desde el panel)
+// ============================================================================
+
+model Course {
+  id         String   @id @default(cuid())
+  nombre     String   // ej: "7.º A — Mañana"
+  nivel      String   // EEB | MEDIA
+  curso      String   // 7.º, 8.º, 9.º | 1.º, 2.º, 3.º
+  seccion    String?  // A | B
+  turno      String   // MAÑANA | TARDE
+  academicId String?
+  academic   Academic? @relation(fields: [academicId], references: [id])
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("courses")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actorName String?
+  action    String   // ej: INSCRIPCION_APROBADA
+  detail    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  audience  String   @default("TODOS") // TODOS | TEACHER | PARENT | STUDENT
+  active    Boolean  @default(true)
+  createdBy String?
+  createdAt DateTime @default(now())
+  reads     AnnouncementRead[]
+
+  @@index([active, createdAt])
+  @@map("announcements")
+}
+
+model AnnouncementRead {
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  userId         String
+  readAt         DateTime @default(now())
+
+  @@id([announcementId, userId])
+  @@map("announcement_reads")
+}
+
+model Timetable {
+  id      String  @id @default(cuid())
+  curso   String  // ej: "1.º Media BTI"
+  turno   String  // MAÑANA | TARDE
+  detalle String  // texto libre con la grilla
+  active  Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("timetables")
+}
+
+model CalendarEvent {
+  id    String   @id @default(cuid())
+  date  DateTime
+  title String
+  body  String?
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("calendar_events")
+}
+
+model Poll {
+  id       String   @id @default(cuid())
+  question String
+  options  Json     // [..]
+  active   Boolean  @default(true)
+  createdBy String?
+  createdAt DateTime @default(now())
+  votes    Vote[]
+
+  @@map("polls")
+}
+
+model Vote {
+  pollId    String
+  poll      Poll     @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  userId    String
+  optionIdx Int
+  createdAt DateTime @default(now())
+
+  @@id([pollId, userId])
+  @@map("votes")
+}
+
+// ============================================================================
 // BLOG / NOTICIAS (administrado por Dirección; lo público solo ve PUBLICADA)
 // ============================================================================
 
