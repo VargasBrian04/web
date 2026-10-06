@@ -156,6 +156,21 @@ export default function TeacherTools() {
     else setMsg("No se pudo marcar asistencia.");
   }
 
+  async function deleteTask(id: string) {
+    if (!window.confirm("¿Eliminar esta tarea y sus entregas?")) return;
+    try {
+      const res = await fetch(`/api/assignments?id=${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) setMsg(json.error || "No se pudo eliminar");
+      else {
+        setMsg("Tarea eliminada.");
+        loadTasks();
+      }
+    } catch {
+      setMsg("Error de red al eliminar");
+    }
+  }
+
   async function submitTask(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null);
@@ -163,8 +178,8 @@ export default function TeacherTools() {
       setMsg("Elegí la materia y escribí el título de la tarea.");
       return;
     }
-    if (taskFile && (taskFile.type !== "application/pdf" || taskFile.size > 4 * 1024 * 1024)) {
-      setMsg("El adjunto debe ser PDF de máx 4 MB.");
+    if (taskFile && (!["application/pdf", "image/png", "image/jpeg", "image/webp"].includes(taskFile.type) || taskFile.size > 4 * 1024 * 1024)) {
+      setMsg("El adjunto debe ser PDF o foto de máx 4 MB.");
       return;
     }
     const fd = new FormData();
@@ -354,40 +369,57 @@ export default function TeacherTools() {
           <div className="mt-4 grid gap-3">
             {tasks.map((t) => {
               const pend = t.submissions.filter((s) => s.status === "PENDIENTE");
+              const isImg = !!t.fileData && t.fileData.startsWith("data:image");
               return (
-                <article key={t.id} className="rounded-xl border border-stone-200 p-4">
-                  <p className="font-bold text-slate-900">{t.title}</p>
-                  {t.description && <p className="mt-1 text-sm text-slate-600">{t.description}</p>}
-                  {t.notes && (
-                    <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                      📝 {t.notes}
-                    </p>
+                <article key={t.id} className="overflow-hidden rounded-xl border border-stone-200">
+                  {isImg && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={t.fileData as string} alt={t.title} className="max-h-64 w-full object-cover" loading="lazy" />
                   )}
-                  <p className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 font-bold">
-                      {pend.length} pendiente(s) / {t.submissions.length}
-                    </span>
-                    {t.dueDate && <span>Vence {new Date(t.dueDate).toLocaleDateString("es-PY")}</span>}
-                    {t.fileData && (
-                      <a
-                        href={t.fileData}
-                        download={`${t.title}.pdf`}
-                        className="font-bold text-[var(--institutional)] underline"
+                  <div className="p-4">
+                    <p className="flex flex-wrap items-center justify-between gap-2 font-bold text-slate-900">
+                      {t.title}
+                      <button
+                        type="button"
+                        onClick={() => deleteTask(t.id)}
+                        title="Eliminar tarea"
+                        className="rounded-lg bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700 hover:bg-red-200"
                       >
-                        📄 Ver PDF
-                      </a>
-                    )}
-                  </p>
-                  {pend.length > 0 && (
-                    <p className="mt-2 text-xs text-slate-500">
-                      Pendientes:{" "}
-                      {pend
-                        .slice(0, 12)
-                        .map((s) => nameById[s.studentId] ?? "—")
-                        .join(", ")}
-                      {pend.length > 12 ? ` (+${pend.length - 12})` : ""}
+                        Eliminar
+                      </button>
                     </p>
-                  )}
+                    {t.description && <p className="mt-1 text-sm text-slate-600">{t.description}</p>}
+                    {t.notes && (
+                      <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                        📝 {t.notes}
+                      </p>
+                    )}
+                    <p className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 font-bold">
+                        {pend.length} pendiente(s) / {t.submissions.length}
+                      </span>
+                      {t.dueDate && <span>Vence {new Date(t.dueDate).toLocaleDateString("es-PY")}</span>}
+                      {t.fileData && !isImg && (
+                        <a
+                          href={t.fileData}
+                          download={`${t.title}.pdf`}
+                          className="font-bold text-[var(--institutional)] underline"
+                        >
+                          📄 Ver PDF
+                        </a>
+                      )}
+                    </p>
+                    {pend.length > 0 && (
+                      <p className="mt-2 text-xs text-slate-500">
+                        Pendientes:{" "}
+                        {pend
+                          .slice(0, 12)
+                          .map((s) => nameById[s.studentId] ?? "—")
+                          .join(", ")}
+                        {pend.length > 12 ? ` (+${pend.length - 12})` : ""}
+                      </p>
+                    )}
+                  </div>
                 </article>
               );
             })}
@@ -397,51 +429,57 @@ export default function TeacherTools() {
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Lista de asistencias</h2>
-        <p className="mt-1 text-xs text-slate-400">Tocá una celda para cambiar el estado de hoy.</p>
         {filtered.length === 0 || dates.length === 0 ? (
           <p className="mt-3 text-sm text-slate-500">Sin registros recientes.</p>
         ) : (
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-slate-500">
-                  <th className="py-2 pr-4">Alumno</th>
-                  {dates.map((d) => (
-                    <th key={d} className="px-1 py-2 text-center text-xs">
-                      {d.slice(8, 10)}/{d.slice(5, 7)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.slice(0, 60).map((s) => (
-                  <tr key={s.id} className="border-b last:border-0">
-                    <td className="py-1.5 pr-4 font-semibold">
-                      {s.user.firstName} {s.user.lastName}
-                    </td>
-                    {dates.map((d) => {
-                      const a = attByStudentDate[`${s.id}|${d}`];
-                      const today = d === new Date().toISOString().slice(0, 10);
-                      return (
-                        <td key={d} className="px-1 py-1.5 text-center">
+          <div className="mt-4 grid gap-3">
+            {dates.map((d) => {
+              const day = atts.filter((a) => a.classDate.slice(0, 10) === d);
+              const pres = day.filter((a) => a.status === "PRESENTE" || a.status === "TARDE").length;
+              const notes = day.filter((a) => a.note);
+              const label = new Date(d + "T12:00:00").toLocaleDateString("es-PY", { weekday: "long", day: "2-digit", month: "2-digit" });
+              return (
+                <article key={d} className="overflow-hidden rounded-xl border border-stone-200">
+                  <div className="p-4">
+                    <p className="flex flex-wrap items-center justify-between gap-2 font-bold text-slate-900">
+                      <span className="capitalize">{label}</span>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">
+                        {pres} presente(s) / {day.length}
+                      </span>
+                    </p>
+                    <p className="mt-2 flex flex-wrap gap-1.5">
+                      {filtered.slice(0, 60).map((s) => {
+                        const a = attByStudentDate[`${s.id}|${d}`];
+                        const today = d === new Date().toISOString().slice(0, 10);
+                        return (
                           <button
+                            key={s.id}
                             type="button"
                             disabled={!today && !!a}
-                            title={a?.note || a?.status || (today ? "Marcar presente" : "")}
+                            title={`${s.user.firstName} ${s.user.lastName}${a?.note ? ` — ${a.note}` : ""}`}
                             onClick={() => cycleAttendance(s.id, a)}
-                            className={`inline-flex h-8 w-8 items-center justify-center rounded-lg font-extrabold ${
+                            className={`rounded-full px-2.5 py-1 text-xs font-bold ${
                               a ? ATT_CLS[a.status] ?? "bg-slate-100" : "bg-slate-100 text-slate-400"
-                            } ${!today && !!a ? "cursor-default opacity-70" : "hover:ring-2 hover:ring-[var(--gold)]"}`}
+                            } ${!today && !!a ? "" : "hover:ring-2 hover:ring-[var(--gold)]"}`}
                           >
-                            {a ? ATT_SHORT[a.status] ?? "·" : today ? "·" : ""}
+                            {s.user.firstName} {a ? ATT_SHORT[a.status] ?? "" : ""}
                           </button>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        );
+                      })}
+                    </p>
+                    {notes.length > 0 && (
+                      <div className="mt-2 grid gap-1">
+                        {notes.map((a) => (
+                          <p key={a.id} className="rounded-lg bg-amber-50 px-3 py-1.5 text-xs text-amber-900">
+                            📝 {nameById[a.student.id] ?? ""}: {a.note}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         )}
       </section>
@@ -461,8 +499,8 @@ export default function TeacherTools() {
             <textarea value={taskForm.description} onChange={(e) => setTaskForm((f) => ({ ...f, description: e.target.value }))} rows={3} className={inputCls} />
           </label>
           <label className="block text-sm font-semibold text-slate-700">
-            PDF adjunto (máx 4 MB)
-            <input type="file" accept=".pdf,application/pdf" onChange={(e) => setTaskFile(e.target.files?.[0] ?? null)} className={inputCls} />
+            Foto o PDF adjunto (máx 4 MB)
+            <input type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/*" onChange={(e) => setTaskFile(e.target.files?.[0] ?? null)} className={inputCls} />
           </label>
           <label className="block text-sm font-semibold text-slate-700">
             Vencimiento

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 
 const groups = [
@@ -45,6 +45,16 @@ const flatLinks = groups.flatMap((g) => g.links);
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const [me, setMe] = useState<{ name: string; role: string } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/session", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => {
+        if (j?.user) setMe({ name: j.user.name || j.user.username, role: j.user.role });
+      })
+      .catch(() => {});
+  }, []);
 
   const isActive = (href: string) =>
     href.startsWith("/#")
@@ -125,34 +135,57 @@ export default function Navbar() {
           >
             ✓ Calificaciones ↗
           </a>
-          <Link
-            href="/acceso"
-            className="whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-          >
-            Acceder
-          </Link>
-          <Link
-            href="/registro"
-            className="whitespace-nowrap rounded-lg bg-[var(--gold)] px-3 py-2 text-sm font-bold text-white shadow transition-all hover:-translate-y-px hover:opacity-90 hover:shadow-md"
-          >
-            Registro
-          </Link>
+          {me ? (
+            <Link
+              href="/portal"
+              title={`Ir a mi panel (${me.role})`}
+              className="max-w-[140px] truncate whitespace-nowrap rounded-lg bg-white/15 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-white/25"
+            >
+              👤 {me.name}
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/acceso"
+                className="whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                Acceder
+              </Link>
+              <Link
+                href="/registro"
+                className="whitespace-nowrap rounded-lg bg-[var(--gold)] px-3 py-2 text-sm font-bold text-white shadow transition-all hover:-translate-y-px hover:opacity-90 hover:shadow-md"
+              >
+                Registro
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="hidden items-center gap-1 md:flex xl:hidden">
           <ThemeToggle />
-          <Link
-            href="/acceso"
-            className="whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-          >
-            Acceder
-          </Link>
-          <Link
-            href="/registro"
-            className="whitespace-nowrap rounded-lg bg-[var(--gold)] px-3 py-2 text-sm font-bold text-white shadow"
-          >
-            Registro
-          </Link>
+          {me ? (
+            <Link
+              href="/portal"
+              className="max-w-[120px] truncate whitespace-nowrap rounded-lg bg-white/15 px-3 py-2 text-sm font-bold text-white"
+            >
+              👤 {me.name}
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/acceso"
+                className="whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                Acceder
+              </Link>
+              <Link
+                href="/registro"
+                className="whitespace-nowrap rounded-lg bg-[var(--gold)] px-3 py-2 text-sm font-bold text-white shadow"
+              >
+                Registro
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Móvil: hamburguesa */}
@@ -201,13 +234,23 @@ export default function Navbar() {
             🖼️ Galería
           </a>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <Link
-              href="/acceso"
-              onClick={() => setOpen(false)}
-              className="rounded-lg border border-white/30 px-3 py-2.5 text-center text-sm font-semibold text-white"
-            >
-              🔑 Acceder
-            </Link>
+            {me ? (
+              <Link
+                href="/portal"
+                onClick={() => setOpen(false)}
+                className="col-span-2 rounded-lg bg-white/15 px-3 py-2.5 text-center text-sm font-bold text-white"
+              >
+                👤 {me.name} → Mi panel
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/acceso"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg border border-white/30 px-3 py-2.5 text-center text-sm font-semibold text-white"
+                >
+                  🔑 Acceder
+                </Link>
             <Link
               href="/registro"
               onClick={() => setOpen(false)}
@@ -215,6 +258,8 @@ export default function Navbar() {
             >
               ✨ Registro
             </Link>
+              </>
+            )}
           </div>
         </nav>
       )}

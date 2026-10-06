@@ -119,12 +119,12 @@ export async function POST(request: Request) {
     notes = String(form.get("notes") || "").trim().slice(0, 2000) || undefined;
     const file = form.get("file");
     if (file instanceof File && file.size > 0) {
-      if (file.type !== "application/pdf")
-        return NextResponse.json({ error: "Solo PDF (máx 4 MB)" }, { status: 400 });
+      if (!["application/pdf", "image/png", "image/jpeg", "image/webp"].includes(file.type))
+        return NextResponse.json({ error: "Solo PDF o fotos (máx 4 MB)" }, { status: 400 });
       if (file.size > 4 * 1024 * 1024)
-        return NextResponse.json({ error: "PDF muy pesado (máx 4 MB)" }, { status: 400 });
+        return NextResponse.json({ error: "Archivo muy pesado (máx 4 MB)" }, { status: 400 });
       const buf = Buffer.from(await file.arrayBuffer());
-      fileData = `data:application/pdf;base64,${buf.toString("base64")}`;
+      fileData = `data:${file.type};base64,${buf.toString("base64")}`;
     }
   } else {
     const body = (await request.json().catch(() => null)) as {
@@ -171,4 +171,26 @@ export async function POST(request: Request) {
     },
   });
   return NextResponse.json({ data: created }, { status: 201 });
+}
+
+/** DELETE /api/assignments?id= — el docente borra las suyas; ADMIN cualquiera. */
+export async function DELETE(request: Request) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  if (session.user.role !== "TEACHER" && session.user.role !== "ADMIN")
+    return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
+  const id = new URL(request.url).searchParams.get("id") || "";
+  const found = await prisma.assignment.findUnique({
+    where: { id },
+    select: { teacherId: true },
+  });
+  if (!found) return NextResponse.json({ error: "Tarea inexistente" }, { status: 404 });
+  if (session.user.role === "TEACHER") {
+    const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
+    if (!teacher || found.teacherId !== teacher.id)
+      return NextResponse.json({ error: "No es tu tarea" }, { status: 403 });
+  }
+  await prisma.assignmentSubmission.deleteMany({ where: { assignmentId: id } });
+  await prisma.assignment.delete({ where: { id } });
+  return NextResponse.json({ data: { id } });
 }
