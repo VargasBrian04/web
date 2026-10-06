@@ -178,6 +178,7 @@ model Academic {
   classes      Class[]
   students     Student[]
   enrollments  Enrollment[]
+  courses      Course[]
 
   @@index([type])
   @@map("academics")
