@@ -172,6 +172,9 @@
     padding-left: 1rem;
     padding-right: 1rem;
   }
+  p, li, td, span, a {
+    overflow-wrap: break-word;
+  }
 }
 
 /* Animación de inicio: escudo con llama + ingreso por rol */

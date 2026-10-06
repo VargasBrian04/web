@@ -64,7 +64,7 @@ export default async function PortalLayout({ children }: { children: React.React
             Portal académico · {roleLabel}
           </p>
           <p className="text-lg font-bold">{session.user.name}</p>
-          <p className="text-xs text-stone-300">
+          <p className="text-xs text-stone-300 break-all">
             @{session.user.username}
             {session.user.email ? ` · ${session.user.email}` : " · sin correo vinculado"}
           </p>
