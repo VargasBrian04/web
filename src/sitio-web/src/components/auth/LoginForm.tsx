@@ -66,6 +66,7 @@ export default function LoginForm() {
       }
       // "/" es la portada estática (rewrite sin RSC): requiere carga completa.
       if (next === "/") {
+        try { sessionStorage.setItem("csl-just-logged", "1"); } catch { /* solo memoria */ }
         window.location.href = "/";
         return;
       }
