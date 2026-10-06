@@ -729,6 +729,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <h2 class="sec-title reveal">Repositorio de docentes</h2>
 <p class="muted reveal">Plantel por materia, nivel y área. Nómina completa en actualización por la Dirección.</p>
 <div class="filters" id="areaFilters"></div>
+<div style="max-width:1180px;margin:14px auto 0;padding:0 20px"><input id="teacherSearch" placeholder="Buscar por nombre o materia…" style="width:100%;padding:12px 16px;border:1.5px solid #d6c9bc;border-radius:12px;font-size:.9rem"></div>
 <div class="grid3" id="teacherGrid"></div>
 <p class="muted reveal" style="font-size:.82rem">Fotografía, cargo y perfil detallado por docente: <span class="pend">Información pendiente</span></p>
 </div></section>
@@ -1166,7 +1167,7 @@ h+='<div style="margin-top:14px"><a class="btn btn-gold" style="text-decoration:
 document.getElementById('tmBody').innerHTML=h;
 document.getElementById('teacherModal').classList.add('open')}
 
-areas.forEach(function(a){var b=document.createElement('button');b.textContent=a;if(a==='Todas')b.classList.add('on');b.onclick=function(){curA=a;af.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');paintTeachers()};af.appendChild(b)});
+document.getElementById('teacherSearch').addEventListener('input',function(){var q=this.value.toLowerCase();var list=(tg._list||[]);tg.innerHTML='';list.filter(function(t){return (t.nombre+' '+t.materia).toLowerCase().indexOf(q)>=0}).forEach(function(t){tg.appendChild(tCard(t))})});areas.forEach(function(a){var b=document.createElement('button');b.textContent=a;if(a==='Todas')b.classList.add('on');b.onclick=function(){curA=a;af.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');paintTeachers()};af.appendChild(b)});
 paintTeachers();
 /* galeria */
 var GAL=[
