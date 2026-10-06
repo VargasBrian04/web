@@ -64,6 +64,11 @@ export default function LoginForm() {
         setError("Usuario/correo o contraseña incorrectos, o cuenta inactiva.");
         return;
       }
+      // "/" es la portada estática (rewrite sin RSC): requiere carga completa.
+      if (next === "/") {
+        window.location.href = "/";
+        return;
+      }
       router.push(next);
       router.refresh();
     } catch {
