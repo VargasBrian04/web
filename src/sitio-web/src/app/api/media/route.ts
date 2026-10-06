@@ -77,6 +77,54 @@ export async function POST(request: Request) {
   }
 }
 
+/** PATCH /api/media — solo ADMIN. Cambia la foto (multipart: id*, image*),
+ *  o los datos (JSON: { id, category?, caption? }). */
+export async function PATCH(request: Request) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  if (session.user.role !== "ADMIN")
+    return NextResponse.json({ error: "Solo Dirección" }, { status: 403 });
+
+  const ctype = request.headers.get("content-type") || "";
+  if (ctype.includes("multipart/form-data")) {
+    const form = await request.formData().catch(() => null);
+    const id = String(form?.get("id") || "");
+    const file = form?.get("image");
+    if (!id) return NextResponse.json({ error: "Falta id" }, { status: 400 });
+    if (!(file instanceof File) || file.size === 0)
+      return NextResponse.json({ error: "Elegí la foto nueva" }, { status: 400 });
+    const found = await prisma.galleryItem.findUnique({ where: { id }, select: { imageFile: true } });
+    if (!found) return NextResponse.json({ error: "Foto inexistente" }, { status: 404 });
+    try {
+      const uri = imageToDataUri(
+        Buffer.from(await file.arrayBuffer()), file.type, NEWS_IMAGE_MIME, "PNG/JPG/WEBP"
+      );
+      const updated = await prisma.galleryItem.update({
+        where: { id },
+        data: { imageFile: uri },
+        select: { id: true, slot: true, category: true, caption: true, createdAt: true },
+      });
+      if (!found.imageFile.startsWith("data:")) await removeFile(found.imageFile);
+      return NextResponse.json({ data: { ...updated, url: `/api/media/${id}/image` } });
+    } catch (e) {
+      return NextResponse.json(
+        { error: e instanceof Error ? e.message : "Imagen inválida" },
+        { status: 400 }
+      );
+    }
+  }
+
+  const body = ((await request.json().catch(() => null)) ?? {}) as {
+    id?: string; category?: string; caption?: string;
+  };
+  if (!body.id) return NextResponse.json({ error: "Falta id" }, { status: 400 });
+  const data: Record<string, unknown> = {};
+  if (typeof body.category === "string") data.category = body.category.trim().slice(0, 60) || null;
+  if (typeof body.caption === "string") data.caption = body.caption.trim().slice(0, 160) || null;
+  const updated = await prisma.galleryItem.update({ where: { id: body.id }, data });
+  return NextResponse.json({ data: { id: updated.id } });
+}
+
 /** DELETE /api/media?id= — solo ADMIN (borra registro y archivo). */
 export async function DELETE(request: Request) {
   const session = await auth();

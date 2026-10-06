@@ -9,7 +9,8 @@ import { audit } from "@/lib/audit";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EEB_GRADES = ["7.º", "8.º", "9.º"];
 const MEDIA_COURSES = ["1.º", "2.º", "3.º"];
-const SECCIONES = ["A", "B"];
+const EEB_SECCIONES = ["A", "B", "C", "D"];
+const CCB_SECCIONES = ["A", "B"];
 const TURNOS = ["MAÑANA", "TARDE"];
 
 /**
@@ -68,12 +69,12 @@ export async function POST(request: Request) {
     if (!academic || !academic.active)
       return NextResponse.json({ error: "Bachillerato no disponible" }, { status: 400 });
   }
-  // Sección solo para Escolar Básica y Ciencias Básicas (CCB, tienen A y B)
-  const necesitaSeccion = nivel === "EEB" || academic?.code === "CCB";
+  // Sección: Escolar Básica A–D; Ciencias Básicas (CCB) A–B.
+  const validSec = nivel === "EEB" ? EEB_SECCIONES : academic?.code === "CCB" ? CCB_SECCIONES : [];
   let sec: string | null = null;
-  if (necesitaSeccion) {
-    if (!seccion || !SECCIONES.includes(seccion))
-      return NextResponse.json({ error: "Elegí la sección (A o B)" }, { status: 400 });
+  if (validSec.length > 0) {
+    if (!seccion || !validSec.includes(seccion))
+      return NextResponse.json({ error: `Elegí la sección (${validSec.join(" o ")})` }, { status: 400 });
     sec = seccion;
   }
   if (!Array.isArray(documents) || documents.length === 0)

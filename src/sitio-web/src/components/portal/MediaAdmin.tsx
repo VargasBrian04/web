@@ -44,6 +44,7 @@ export default function MediaAdmin() {
   const [caption, setCaption] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [replacing, setReplacing] = useState<string | null>(null);
 
   async function load(f: string) {
     try {
@@ -91,6 +92,32 @@ export default function MediaAdmin() {
       setMsg("Error de red al subir");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function replace(id: string, f: File | null) {
+    if (!f) return;
+    if (f.size > 4 * 1024 * 1024) {
+      setMsg("Imagen muy pesada (máx 4 MB).");
+      return;
+    }
+    setReplacing(id);
+    setMsg(null);
+    try {
+      const fd = new FormData();
+      fd.set("id", id);
+      fd.set("image", f);
+      const res = await fetch("/api/media", { method: "PATCH", body: fd });
+      const json = await res.json();
+      if (!res.ok) setMsg(json.error || "No se pudo cambiar");
+      else {
+        setMsg("Foto actualizada.");
+        load(filter);
+      }
+    } catch {
+      setMsg("Error de red al cambiar");
+    } finally {
+      setReplacing(null);
     }
   }
 
@@ -178,14 +205,35 @@ export default function MediaAdmin() {
             <div key={g.id} className="relative overflow-hidden rounded-xl border border-stone-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={g.url} alt={g.caption ?? ""} className="h-28 w-full object-cover" loading="lazy" />
-              <button
-                type="button"
-                onClick={() => remove(g.id)}
-                title="Eliminar foto"
-                className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
-              >
-                ✕
-              </button>
+              <div className="absolute right-1 top-1 flex gap-1">
+                <label
+                  title="Cambiar foto"
+                  className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                >
+                  🔄
+                  <input
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.webp"
+                    className="hidden"
+                    disabled={replacing === g.id}
+                    onChange={(e) => {
+                      replace(g.id, e.target.files?.[0] ?? null);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => remove(g.id)}
+                  title="Eliminar foto"
+                  className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                >
+                  ✕
+                </button>
+              </div>
+              {replacing === g.id && (
+                <p className="px-2 py-1 text-xs font-bold text-slate-500">Cambiando…</p>
+              )}
               {g.caption && <p className="truncate px-2 py-1 text-xs text-slate-500">{g.caption}</p>}
             </div>
           ))}

@@ -194,16 +194,18 @@
     text-overflow: ellipsis;
   }
   .portal-links {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
   }
   .portal-links a,
-  .portal-links button {
-    white-space: nowrap;
-    font-size: 0.78rem;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+  .portal-links button,
+  .portal-links form {
+    white-space: normal;
+    font-size: 0.8rem;
+    padding: 0.65rem 0.5rem;
+    text-align: center;
+    justify-content: center;
   }
   section.rounded-2xl h2 {
     font-size: 1.05rem;

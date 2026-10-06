@@ -55,8 +55,12 @@ export default function TutorForm() {
       const valid = h.nivel === "EEB" ? cat?.eebGrades : h.nivel === "MEDIA" ? cat?.mediaCourses : [];
       if (!h.curso || !valid?.includes(h.curso)) e.curso = "Elegí el curso";
       if (!["MAÑANA", "TARDE"].includes(h.turno)) e.turno = "Elegí el turno";
-      if (necesitaSeccion(h.nivel, h.bachiller) && !(cat?.secciones ?? ["A", "B"]).includes(h.seccion))
-        e.seccion = "Elegí la sección";
+      if (necesitaSeccion(h.nivel, h.bachiller)) {
+        const validSec = h.nivel === "EEB"
+          ? (cat?.secciones ?? ["A", "B", "C", "D"])
+          : (cat?.seccionesCCB ?? ["A", "B"]);
+        if (!validSec.includes(h.seccion)) e.seccion = "Elegí la sección";
+      }
       if (h.nivel === "MEDIA" && !h.bachiller) e.bachiller = "Elegí el bachiller";
       return e;
     });
@@ -230,7 +234,10 @@ export default function TutorForm() {
                         className={`${inputCls} ${e.seccion ? "!border-red-500" : ""}`}
                       >
                         <option value="">{h.nivel ? "Seleccionar…" : "Primero elegí el nivel"}</option>
-                        {(cat?.secciones ?? ["A", "B"]).map((s) => (
+                        {(h.nivel === "EEB"
+                          ? (cat?.secciones ?? ["A", "B", "C", "D"])
+                          : (cat?.seccionesCCB ?? ["A", "B"])
+                        ).map((s) => (
                           <option key={s} value={s}>{s}</option>
                         ))}
                       </select>

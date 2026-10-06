@@ -87,6 +87,7 @@ export default function EnrollmentWizard({ academics }: { academics: AcademicOpt
     nivel === "EEB" ||
     (nivel === "MEDIA" &&
       (academics.find((a) => a.id === form.academicId)?.code === "CCB"));
+  const secciones = nivel === "EEB" ? ["A", "B", "C", "D"] : ["A", "B"];
   const cursos = nivel === "EEB" ? EEB_GRADES : nivel === "MEDIA" ? MEDIA_COURSES : [];
 
   function validStep(): string | null {
@@ -94,8 +95,8 @@ export default function EnrollmentWizard({ academics }: { academics: AcademicOpt
       if (!nivel) return "Elegí el nivel (Escolar Básica o Media).";
       if (!curso) return "Elegí el curso.";
       if (turno !== "MAÑANA" && turno !== "TARDE") return "Elegí el turno.";
-      if (necesitaSeccion && seccion !== "A" && seccion !== "B")
-        return "Elegí la sección (A o B).";
+      if (necesitaSeccion && !secciones.includes(seccion))
+        return "Elegí la sección.";
       if (nivel === "MEDIA" && !form.academicId) return "Seleccioná un bachillerato.";
     }
     if (step === 1) {
@@ -236,11 +237,12 @@ export default function EnrollmentWizard({ academics }: { academics: AcademicOpt
             </select>
           </label>
           {necesitaSeccion ? (
-            <label className="text-sm font-semibold text-slate-700">Sección* (A o B)
+            <label className="text-sm font-semibold text-slate-700">Sección*
               <select value={seccion} onChange={(e) => setSeccion(e.target.value)} disabled={!nivel} className={inputCls}>
                 <option value="">— Seleccioná —</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
+                {secciones.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
               </select>
             </label>
           ) : (

@@ -33,7 +33,8 @@ export async function GET() {
         ],
         eebGrades: ["7.º", "8.º", "9.º"],
         mediaCourses: ["1.º", "2.º", "3.º"],
-        secciones: ["A", "B"],
+        secciones: ["A", "B", "C", "D"],
+        seccionesCCB: ["A", "B"],
         turnos: ["MAÑANA", "TARDE"],
         seccionBachiller: "CCB",
         bachilleratos: (academics as any[]).map((a: any) => ({

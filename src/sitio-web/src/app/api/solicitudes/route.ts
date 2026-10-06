@@ -8,7 +8,8 @@ import { CI_RE, EMAIL_RE, normalizeUsername } from "@/lib/users";
 
 const EEB_GRADES = ["7.º", "8.º", "9.º"];
 const MEDIA_COURSES = ["1.º", "2.º", "3.º"];
-const SECCIONES = ["A", "B"];
+const EEB_SECCIONES = ["A", "B", "C", "D"];
+const CCB_SECCIONES = ["A", "B"];
 const TURNOS = ["MAÑANA", "TARDE"];
 const CCB = "CCB"; // Ciencias Básicas: único bachillerato con secciones A/B
 
@@ -79,12 +80,12 @@ export async function POST(request: Request) {
         if (!found) return bad(`Hijo ${i + 1}: bachiller inexistente`);
         bachiller = found.code;
       }
-      // Sección solo para Escolar Básica y Ciencias Básicas (tienen A y B).
-      const necesitaSeccion = h.nivel === "EEB" || bachiller === CCB;
+      // Sección: Escolar Básica A–D; Ciencias Básicas A–B.
+      const validSec = h.nivel === "EEB" ? EEB_SECCIONES : bachiller === CCB ? CCB_SECCIONES : [];
       const secRaw = typeof h.seccion === "string" ? h.seccion.trim().toUpperCase() : "";
       let seccion: string | null = null;
-      if (necesitaSeccion) {
-        if (!SECCIONES.includes(secRaw)) return bad(`Hijo ${i + 1}: sección inválida (A o B)`);
+      if (validSec.length > 0) {
+        if (!validSec.includes(secRaw)) return bad(`Hijo ${i + 1}: sección inválida (${validSec.join(" o ")})`);
         seccion = secRaw;
       }
       clean.push({ nombre: (h.nombre as string).trim(), nivel: h.nivel as string, curso: h.curso as string, seccion, turno, bachiller });
