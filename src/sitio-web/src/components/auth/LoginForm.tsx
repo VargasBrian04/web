@@ -11,7 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") || "/portal";
+  const next = params.get("next") || "/";
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -92,7 +92,7 @@ export default function LoginForm() {
           </p>
           <button
             type="button"
-            onClick={() => { router.push(next); router.refresh(); }}
+            onClick={() => { router.push("/portal"); router.refresh(); }}
             className="btn-primary mt-6 w-full justify-center"
           >
             Continuar a mi panel
