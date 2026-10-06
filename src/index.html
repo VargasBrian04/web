@@ -950,12 +950,11 @@ function backToRoles(){closeLogin();closeDash();showRoles()}
 /* LOGIN estilo MEC por rol */
 var loginRole='docente';
 var roleNames={alumno:['🎒','Acceso del Alumno','Panel del Alumno'],docente:['👨‍🏫','Acceso del Docente','Panel del Docente'],padre:['👨‍👩‍👧','Acceso de Padre / Tutor','Panel de Padre / Tutor']};
-function openLogin(role){loginRole=role||'docente';document.getElementById('liIcon').textContent=roleNames[loginRole][0];document.getElementById('liTitle').textContent=roleNames[loginRole][1];document.getElementById('liErr').style.display='none';document.getElementById('liUser').value='';document.getElementById('liPass').value='';document.getElementById('loginModal').classList.add('open');setTimeout(function(){document.getElementById('liUser').focus()},100)}
+function openLogin(role){try{location.href='/login?next=/portal'}catch(e){}return false}
 function closeLogin(){document.getElementById('loginModal').classList.remove('open')}
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2600)}
-function doLogin(e){if(e)e.preventDefault();var u=document.getElementById('liUser').value.trim(),p=document.getElementById('liPass').value;if(!u||!p){document.getElementById('liErr').style.display='block';return false}
-closeLogin();setSession(u,loginRole);hideRoles();var d=document.getElementById('dashModal');if(d)d.classList.remove('open');toast('Bienvenido/a, '+displayName());if(typeof sfx==='function')sfx('ok');setTimeout(function(){scrollTo({top:0,behavior:'smooth'})},150);return false}
-function fillDemo(email){document.getElementById('liUser').value=email;document.getElementById('liErr').style.display='none'}
+function doLogin(e){if(e)e.preventDefault();try{location.href='/login?next=/portal'}catch(_){}return false}
+function fillDemo(email){try{location.href='/login?next=/portal'}catch(_){}}
 /* Solicitudes reales a la base de datos (POST /api/solicitudes + catálogo). */
 var REG_CAT=null,REG_TAB='tutor',REG_SENDING=false;
 function openReg(tab){closeLogin();regTab(tab||'tutor');if(!rtHijos.length)rtAddHijo();document.getElementById('regTopErr').style.display='none';document.getElementById('regModal').classList.add('open');loadRegCat()}
