@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { NEWS_IMAGE_MIME, saveBuffer, removeFile } from "@/lib/storage";
+import { NEWS_IMAGE_MIME, imageToDataUri, parseDataUri, readBuffer, removeFile } from "@/lib/storage";
 
 /** Slots válidos: galería general + orientaciones de la portada. */
 const SLOTS = [
@@ -57,11 +57,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Elegí una imagen" }, { status: 400 });
 
   try {
-    const saved = await saveBuffer(
+    // Data URI en DB: sobrevive al disco efímero de Vercel.
+    const uri = imageToDataUri(
       Buffer.from(await file.arrayBuffer()), file.type, NEWS_IMAGE_MIME, "PNG/JPG/WEBP"
     );
     const created = await prisma.galleryItem.create({
-      data: { slot, category, caption, imageFile: saved.fileName, createdBy: session.user.id },
+      data: { slot, category, caption, imageFile: uri, createdBy: session.user.id },
       select: { id: true, slot: true, category: true, caption: true, createdAt: true },
     });
     return NextResponse.json(
@@ -87,6 +88,6 @@ export async function DELETE(request: Request) {
   const found = await prisma.galleryItem.findUnique({ where: { id }, select: { imageFile: true } });
   if (!found) return NextResponse.json({ error: "Foto inexistente" }, { status: 404 });
   await prisma.galleryItem.delete({ where: { id } });
-  await removeFile(found.imageFile);
+  if (!found.imageFile.startsWith("data:")) await removeFile(found.imageFile);
   return NextResponse.json({ data: { id } });
 }

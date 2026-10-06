@@ -159,6 +159,21 @@
   cursor: pointer;
 }
 
+/* Panel y portal en móvil: tablas con scroll, tarjetas compactas */
+@media (max-width: 640px) {
+  .overflow-x-auto table {
+    min-width: 620px;
+  }
+  section.rounded-2xl {
+    padding: 1rem !important;
+  }
+  .btn-primary,
+  .btn-gold {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
 /* Animación de inicio: escudo con llama + ingreso por rol */
 .csl-flame,
 .csl-roles,

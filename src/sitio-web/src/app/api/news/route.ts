@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { NEWS_IMAGE_MIME, saveBuffer } from "@/lib/storage";
+import { NEWS_IMAGE_MIME, imageToDataUri } from "@/lib/storage";
 import {
   NEWS_CATEGORIES,
   isNewsCategory,
@@ -116,13 +116,13 @@ export async function POST(request: Request) {
   let imageFile: string | null = null;
   if (file instanceof File && file.size > 0) {
     try {
-      const saved = await saveBuffer(
+      // Data URI en DB: sobrevive al disco efímero de Vercel.
+      imageFile = imageToDataUri(
         Buffer.from(await file.arrayBuffer()),
         file.type,
         NEWS_IMAGE_MIME,
         "PNG/JPG/WEBP"
       );
-      imageFile = saved.fileName;
     } catch (e) {
       return NextResponse.json(
         { error: e instanceof Error ? e.message : "Imagen inválida" },

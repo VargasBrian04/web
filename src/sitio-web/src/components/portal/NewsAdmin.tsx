@@ -102,8 +102,8 @@ export default function NewsAdmin() {
       setMsg("Formato no permitido (solo PNG, JPG o WEBP)");
       return;
     }
-    if (f.size > 10 * 1024 * 1024) {
-      setMsg("Imagen muy pesada (máx 10 MB)");
+    if (f.size > 4 * 1024 * 1024) {
+      setMsg("Imagen muy pesada (máx 4 MB)");
       return;
     }
     if (preview) URL.revokeObjectURL(preview);
@@ -377,7 +377,7 @@ export default function NewsAdmin() {
                 <div onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={(e) => { e.preventDefault(); setDragOver(false); pickFile(e.dataTransfer.files?.[0] ?? null); }} onClick={() => fileRef.current?.click()} className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors ${dragOver ? "border-[var(--institutional)] bg-[var(--paper)]" : "border-[#c9a35c]"}`}>
                   <span className="text-4xl">🖼️</span>
                   <p className="mt-3 text-sm font-bold text-[var(--institutional)]">Arrastra una imagen o selecciona un archivo</p>
-                  <p className="mt-1 text-xs text-slate-500">JPG, JPEG, PNG, WEBP · Máx. 10 MB</p>
+                  <p className="mt-1 text-xs text-slate-500">JPG, JPEG, PNG, WEBP · Máx. 4 MB</p>
                   <span className="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700">Seleccionar archivo</span>
                   <input ref={fileRef} type="file" accept=".png,.jpg,.jpeg,.webp" className="hidden" onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
                 </div>

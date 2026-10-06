@@ -66,8 +66,8 @@ export default function MediaAdmin() {
       setMsg("Elegí una imagen.");
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      setMsg("Imagen muy pesada (máx 10 MB).");
+    if (file.size > 4 * 1024 * 1024) {
+      setMsg("Imagen muy pesada (máx 4 MB).");
       return;
     }
     setBusy(true);
@@ -129,7 +129,7 @@ export default function MediaAdmin() {
           </select>
         </label>
         <label className="block text-sm font-semibold text-slate-700">
-          Foto (PNG/JPG/WEBP · máx 10 MB)
+          Foto (PNG/JPG/WEBP · máx 4 MB)
           <input
             type="file"
             accept=".png,.jpg,.jpeg,.webp"

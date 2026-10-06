@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { NEWS_IMAGE_MIME, removeFile, saveBuffer } from "@/lib/storage";
+import { NEWS_IMAGE_MIME, imageToDataUri, removeFile } from "@/lib/storage";
 import {
   NEWS_CATEGORIES,
   isNewsCategory,
@@ -111,14 +111,14 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
   const upload = newImage as File | null;
   if (upload) {
     try {
-      const saved = await saveBuffer(
+      const uri = imageToDataUri(
         Buffer.from(await upload.arrayBuffer()),
         upload.type,
         NEWS_IMAGE_MIME,
         "PNG/JPG/WEBP"
       );
-      if (post.imageFile) await removeFile(post.imageFile);
-      data.imageFile = saved.fileName;
+      if (post.imageFile && !post.imageFile.startsWith("data:")) await removeFile(post.imageFile);
+      data.imageFile = uri;
     } catch (e) {
       return NextResponse.json(
         { error: e instanceof Error ? e.message : "Imagen inválida" },
@@ -126,7 +126,7 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
       );
     }
   } else if (f.removeImage === "1" || f.removeImage === true) {
-    if (post.imageFile) await removeFile(post.imageFile);
+    if (post.imageFile && !post.imageFile.startsWith("data:")) await removeFile(post.imageFile);
     data.imageFile = null;
   }
   if (!Object.keys(data).length)
@@ -153,6 +153,6 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   if (!post) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
 
   await prisma.newsPost.delete({ where: { id } });
-  if (post.imageFile) await removeFile(post.imageFile);
+  if (post.imageFile && !post.imageFile.startsWith("data:")) await removeFile(post.imageFile);
   return NextResponse.json({ data: { ok: true } });
 }

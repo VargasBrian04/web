@@ -24,6 +24,35 @@ export const NEWS_IMAGE_MIME: Record<string, string> = {
   "image/webp": ".webp",
 };
 
+export const MAX_IMAGE_DB_BYTES = 4 * 1024 * 1024; // 4 MB (base64 en DB)
+
+/**
+ * Guarda una imagen como data URI en la base de datos (no depende del
+ * disco efímero de Vercel). Lanza Error si el tipo o el tamaño no valen.
+ */
+export function imageToDataUri(
+  buf: Buffer,
+  mime: string,
+  allowed: Record<string, string> = NEWS_IMAGE_MIME,
+  label = "PNG/JPG/WEBP"
+): string {
+  if (!(mime in allowed))
+    throw new Error(`Tipo de archivo no permitido (solo ${label})`);
+  if (buf.length > MAX_IMAGE_DB_BYTES)
+    throw new Error("Imagen muy pesada (máx 4 MB: se guarda en la base de datos)");
+  if (buf.length === 0) throw new Error("Archivo vacío");
+  return `data:${mime};base64,${buf.toString("base64")}`;
+}
+
+/** Decodifica un data URI (o null si no lo es). */
+export function parseDataUri(
+  uri: string
+): { mime: string; buf: Buffer } | null {
+  const m = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/.exec(uri);
+  if (!m) return null;
+  return { mime: m[1], buf: Buffer.from(m[2], "base64") };
+}
+
 export function uploadsDir() {
   // En Vercel el disco es de solo lectura salvo /tmp: allí van los uploads.
   // (Fase siguiente: R2/Blob. Firma idéntica, solo cambia este archivo.)

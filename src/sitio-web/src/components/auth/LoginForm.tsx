@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -18,6 +18,23 @@ export default function LoginForm() {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState<string | null>(params.get("error"));
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  // Con sesión activa no se pide login otra vez: directo a la zona.
+  useEffect(() => {
+    fetch("/api/auth/session", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => {
+        if (j?.user) {
+          router.replace(next);
+          router.refresh();
+        } else {
+          setChecking(false);
+        }
+      })
+      .catch(() => setChecking(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,6 +64,10 @@ export default function LoginForm() {
       onSubmit={onSubmit}
       className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-md"
     >
+      {checking ? (
+        <p className="py-8 text-center text-sm text-slate-500">Verificando sesión…</p>
+      ) : (
+        <>
       <h1 className="text-2xl font-extrabold text-[var(--institutional)]">
         Acceso al portal
       </h1>
@@ -106,6 +127,8 @@ export default function LoginForm() {
           Inscribite aquí
         </a>
       </p>
+        </>
+      )}
     </form>
   );
 }
