@@ -25,7 +25,7 @@ const selectFull = {
   updatedAt: true,
 };
 
-/** GET /api/news/:id — pública si PUBLICADA; borrador solo ADMIN. */
+/** GET /api/news/:id — pública si PUBLICADA; borrador solo ADMIN y TEACHER. */
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
   const post = await prisma.newsPost.findFirst({
@@ -35,14 +35,14 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   if (!post) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
   if (post.status !== "PUBLICADA") {
     const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN")
+    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "TEACHER"))
       return NextResponse.json({ error: "No encontrada" }, { status: 404 });
   }
   return NextResponse.json({ data: post });
 }
 
 /**
- * PATCH /api/news/:id — solo ADMIN. Acepta JSON o multipart:
+ * PATCH /api/news/:id — ADMIN y TEACHER. Acepta JSON o multipart:
  *  title?, category?, publishDate?, status?, content?, removeImage?,
  *  image? (reemplaza). El slug NO cambia (URLs estables, sin duplicados).
  */
@@ -50,8 +50,8 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
   const session = await auth();
   if (!session?.user)
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (session.user.role !== "ADMIN")
-    return NextResponse.json({ error: "Solo Dirección" }, { status: 403 });
+  if (session.user.role !== "ADMIN" && session.user.role !== "TEACHER")
+    return NextResponse.json({ error: "Solo Dirección y Docentes" }, { status: 403 });
 
   const { id } = await ctx.params;
   const post = await prisma.newsPost.findUnique({ where: { id } });
@@ -140,13 +140,13 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
   return NextResponse.json({ data: updated });
 }
 
-/** DELETE /api/news/:id — solo ADMIN. Borra registro + imagen subida. */
+/** DELETE /api/news/:id — ADMIN y TEACHER. Borra registro + imagen subida. */
 export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user)
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (session.user.role !== "ADMIN")
-    return NextResponse.json({ error: "Solo Dirección" }, { status: 403 });
+  if (session.user.role !== "ADMIN" && session.user.role !== "TEACHER")
+    return NextResponse.json({ error: "Solo Dirección y Docentes" }, { status: 403 });
 
   const { id } = await ctx.params;
   const post = await prisma.newsPost.findUnique({ where: { id } });

@@ -6,11 +6,13 @@ import AdminUsers from "@/components/portal/AdminUsers";
 import AccountRequests from "@/components/portal/AccountRequests";
 import ContentAdmin from "@/components/portal/ContentAdmin";
 import MediaAdmin from "@/components/portal/MediaAdmin";
+import TeacherTools from "@/components/portal/TeacherTools";
 import { PollsAdmin } from "@/components/portal/SchoolAdmin";
 
 const TABS = [
   { id: "insc", label: "📝 Inscripciones" },
   { id: "cuentas", label: "👥 Cuentas" },
+  { id: "docente", label: "👨‍🏫 Docente" },
   { id: "contenido", label: "🖼️ Contenido" },
   { id: "encuestas", label: "📊 Encuestas" },
 ] as const;
@@ -47,6 +49,14 @@ export default function AdminTabs() {
         <div className="grid gap-6">
           <AccountRequests />
           <AdminUsers />
+        </div>
+      )}
+      {tab === "docente" && (
+        <div className="grid gap-6">
+          <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Vista docente (nómina, bitácora de fotos y crear tarea). Lo mismo que ve un docente en /portal/profesor.
+          </p>
+          <TeacherTools />
         </div>
       )}
       {tab === "contenido" && (
