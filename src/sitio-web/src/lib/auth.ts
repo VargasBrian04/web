@@ -64,19 +64,53 @@ export const authConfig = {
     })
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = (user as { id: string }).id;
         token.username = (user as { username: string }).username;
         token.role = (user as { role: UserRole }).role;
+        return token;
+      }
+      // Refrescar rol desde la DB: cambios de rol y baneos aplican sin re-login.
+      if (typeof token?.id === "string") {
+        try {
+          const fresh = await prisma.user.findUnique({
+            where: { id: token.id },
+            select: { role: true, active: true, username: true },
+          });
+          if (!fresh || !fresh.active) return { ...token, role: "ASPIRANT" as UserRole, username: "" };
+          token.role = fresh.role;
+          token.username = fresh.username;
+        } catch {
+          /* sin DB: mantener token */
+        }
       }
       return token;
     },
-    session({ session, token }) {
+    async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.username = (token.username as string) ?? "";
         session.user.role = token.role as UserRole;
+        // Doble verificación en cada uso de auth(): rol y estado frescos.
+        if (typeof token?.id === "string") {
+          try {
+            const fresh = await prisma.user.findUnique({
+              where: { id: token.id as string },
+              select: { role: true, active: true, username: true, firstName: true, lastName: true, email: true },
+            });
+            if (!fresh || !fresh.active) {
+              session.user.role = "ASPIRANT";
+            } else {
+              session.user.role = fresh.role;
+              session.user.username = fresh.username;
+              session.user.name = `${fresh.firstName} ${fresh.lastName}`;
+              session.user.email = fresh.email;
+            }
+          } catch {
+            /* sin DB: mantener token */
+          }
+        }
       }
       return session;
     }

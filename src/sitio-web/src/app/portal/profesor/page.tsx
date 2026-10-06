@@ -18,7 +18,7 @@ export default async function ProfesorPage() {
       {isAdminView && (
         <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
           Estás viendo el panel docente como Dirección ({session?.user?.username ?? "admin"}).
-          Para entrar como docente, salí y accedé con su cuenta (ej: docente.prueba1).
+          Para entrar como docente, salí y accedé con su cuenta (ej: brianlucianovargascrista).
         </p>
       )}
       <section className="rounded-2xl bg-[var(--institutional)] p-6 text-white">
