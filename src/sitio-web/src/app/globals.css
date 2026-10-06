@@ -179,6 +179,11 @@
     flex-direction: column;
     align-items: stretch;
   }
+  .portal-user p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .portal-links {
     flex-wrap: nowrap;
     overflow-x: auto;

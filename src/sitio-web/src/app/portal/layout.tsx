@@ -59,12 +59,12 @@ export default async function PortalLayout({ children }: { children: React.React
   return (
     <div className="container-c py-10">
       <div className="portal-head mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--institutional)] px-4 py-4 text-white sm:px-6">
-        <div>
+        <div className="portal-user min-w-0">
           <p className="text-sm text-stone-300">
             Portal académico · {roleLabel}
           </p>
-          <p className="text-lg font-bold">{session.user.name}</p>
-          <p className="text-xs text-stone-300 break-all">
+          <p className="truncate text-lg font-bold">{session.user.name}</p>
+          <p className="hidden text-xs text-stone-300 break-all sm:block">
             @{session.user.username}
             {session.user.email ? ` · ${session.user.email}` : " · sin correo vinculado"}
           </p>
