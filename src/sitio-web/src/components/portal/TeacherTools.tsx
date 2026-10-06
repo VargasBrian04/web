@@ -11,39 +11,9 @@ type Student = {
   user: { firstName: string; lastName: string; ci: string; email: string };
   grades: { id: string; score: number; note?: string | null; subject: { code: string; name: string }; period: { label: string; name: string } }[];
 };
-type Task = {
-  id: string; title: string; description: string | null; fileData: string | null;
-  notes: string | null; dueDate: string | null; createdAt: string;
-  subject: { code: string; name: string };
-  submissions: { id: string; studentId: string; status: string; submittedAt: string | null; feedback: string | null; student?: { user?: { firstName: string; lastName: string } } }[];
-};
-type Att = {
-  id: string; classDate: string; status: string; note: string | null;
-  student: { id: string; user: { firstName: string; lastName: string } };
-  subject: { code: string; name: string } | null;
-};
 
 const inputCls =
   "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--institutional)]";
-
-const ATT_NEXT: Record<string, string> = {
-  PRESENTE: "TARDE",
-  TARDE: "AUSENTE",
-  AUSENTE: "JUSTIFICADO",
-  JUSTIFICADO: "PRESENTE",
-};
-const ATT_SHORT: Record<string, string> = {
-  PRESENTE: "P",
-  TARDE: "T",
-  AUSENTE: "A",
-  JUSTIFICADO: "J",
-};
-const ATT_CLS: Record<string, string> = {
-  PRESENTE: "bg-emerald-100 text-emerald-800",
-  TARDE: "bg-amber-100 text-amber-800",
-  AUSENTE: "bg-red-100 text-red-800",
-  JUSTIFICADO: "bg-blue-100 text-blue-800",
-};
 
 /** Panel del docente: nómina, registro de tareas, lista de asistencias y crear tareas con PDF. */
 export default function TeacherTools() {
@@ -56,9 +26,66 @@ export default function TeacherTools() {
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [atts, setAtts] = useState<Att[]>([]);
   const [quickGrade, setQuickGrade] = useState<Record<string, string>>({});
+  const [logs, setLogs] = useState<PhotoLog[]>([]);
+  const [logFile, setLogFile] = useState<File | null>(null);
+  const [logCaption, setLogCaption] = useState("");
+  const [logDate, setLogDate] = useState(new Date().toISOString().slice(0, 10));
+
+  type PhotoLog = {
+    id: string; kind: string; photoData: string; caption: string | null;
+    logDate: string;
+    subject: { code: string; name: string } | null;
+    teacher: { user: { firstName: string; lastName: string } } | null;
+  };
+
+  async function loadLogs() {
+    try {
+      const qs = new URLSearchParams();
+      if (subject) qs.set("subject", subject);
+      const res = await fetch(`/api/fotolog?${qs.toString()}`);
+      const json = await res.json();
+      if (res.ok) setLogs(json.data ?? []);
+    } catch { /* opcional */ }
+  }
+
+  async function submitLog(kind: "ASISTENCIA" | "TAREA") {
+    setMsg(null);
+    if (!logFile) {
+      setMsg("Sacá o elegí la foto de la lista.");
+      return;
+    }
+    if (logFile.size > 4 * 1024 * 1024) {
+      setMsg("Foto muy pesada (máx 4 MB).");
+      return;
+    }
+    const fd = new FormData();
+    fd.set("photo", logFile);
+    fd.set("kind", kind);
+    fd.set("logDate", logDate);
+    fd.set("caption", logCaption.trim());
+    if (subject) fd.set("subjectCode", subject);
+    const res = await fetch("/api/fotolog", { method: "POST", body: fd });
+    const json = await res.json();
+    if (!res.ok) setMsg(json.error || "No se pudo subir");
+    else {
+      setMsg(kind === "ASISTENCIA" ? "Lista guardada." : "Planilla guardada.");
+      setLogFile(null);
+      setLogCaption("");
+      loadLogs();
+    }
+  }
+
+  async function deleteLog(id: string) {
+    if (!window.confirm("¿Eliminar esta foto?")) return;
+    try {
+      const res = await fetch(`/api/fotolog?id=${id}`, { method: "DELETE" });
+      if (res.ok) loadLogs();
+      else setMsg("No se pudo eliminar");
+    } catch {
+      setMsg("Error de red al eliminar");
+    }
+  }
 
   const [taskForm, setTaskForm] = useState({ title: "", description: "", dueDate: "", notes: "" });
   const [taskFile, setTaskFile] = useState<File | null>(null);
@@ -86,32 +113,9 @@ export default function TeacherTools() {
     }
   }
 
-  async function loadTasks() {
-    try {
-      const qs = new URLSearchParams();
-      if (subject) qs.set("subject", subject);
-      const res = await fetch(`/api/assignments?${qs.toString()}`);
-      const json = await res.json();
-      if (res.ok) setTasks(json.data ?? []);
-    } catch { /* opcional */ }
-  }
-
-  async function loadAtts() {
-    try {
-      const from = new Date();
-      from.setDate(from.getDate() - 30);
-      const qs = new URLSearchParams({ from: from.toISOString().slice(0, 10) });
-      if (subject) qs.set("subject", subject);
-      const res = await fetch(`/api/attendance?${qs.toString()}`);
-      const json = await res.json();
-      if (res.ok) setAtts(json.data ?? []);
-    } catch { /* opcional */ }
-  }
-
   useEffect(() => {
     load();
-    loadTasks();
-    loadAtts();
+    loadLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subject, period]);
 
@@ -137,37 +141,6 @@ export default function TeacherTools() {
       setMsg(`Nota ${score.toFixed(1)} guardada.`);
       setQuickGrade((q) => ({ ...q, [studentId]: "" }));
       load();
-    }
-  }
-
-  async function cycleAttendance(studentId: string, current: Att | undefined) {
-    const next = current ? ATT_NEXT[current.status] ?? "PRESENTE" : "PRESENTE";
-    const res = await fetch("/api/attendance", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        studentId,
-        subjectCode: subject || undefined,
-        classDate: new Date().toISOString(),
-        status: next,
-      }),
-    });
-    if (res.ok) loadAtts();
-    else setMsg("No se pudo marcar asistencia.");
-  }
-
-  async function deleteTask(id: string) {
-    if (!window.confirm("¿Eliminar esta tarea y sus entregas?")) return;
-    try {
-      const res = await fetch(`/api/assignments?id=${id}`, { method: "DELETE" });
-      const json = await res.json();
-      if (!res.ok) setMsg(json.error || "No se pudo eliminar");
-      else {
-        setMsg("Tarea eliminada.");
-        loadTasks();
-      }
-    } catch {
-      setMsg("Error de red al eliminar");
     }
   }
 
@@ -363,125 +336,122 @@ export default function TeacherTools() {
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Registro de tareas</h2>
-        {tasks.length === 0 ? (
-          <p className="mt-3 text-sm text-slate-500">Sin tareas en esta materia.</p>
-        ) : (
-          <div className="mt-4 grid gap-3">
-            {tasks.map((t) => {
-              const pend = t.submissions.filter((s) => s.status === "PENDIENTE");
-              const isImg = !!t.fileData && t.fileData.startsWith("data:image");
-              return (
-                <article key={t.id} className="overflow-hidden rounded-xl border border-stone-200">
-                  {isImg && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={t.fileData as string} alt={t.title} className="max-h-64 w-full object-cover" loading="lazy" />
-                  )}
-                  <div className="p-4">
-                    <p className="flex flex-wrap items-center justify-between gap-2 font-bold text-slate-900">
-                      {t.title}
-                      <button
-                        type="button"
-                        onClick={() => deleteTask(t.id)}
-                        title="Eliminar tarea"
-                        className="rounded-lg bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700 hover:bg-red-200"
-                      >
-                        Eliminar
-                      </button>
+        <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+          <label className="block text-sm font-semibold text-slate-700">
+            Foto de la planilla
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={(e) => setLogFile(e.target.files?.[0] ?? null)}
+              className={inputCls}
+            />
+          </label>
+          <label className="block text-sm font-semibold text-slate-700">
+            Fecha
+            <input type="date" value={logDate} onChange={(e) => setLogDate(e.target.value)} className={inputCls} />
+          </label>
+        </div>
+        <label className="mt-3 block text-sm font-semibold text-slate-700">
+          Observación
+          <input
+            value={logCaption}
+            onChange={(e) => setLogCaption(e.target.value)}
+            maxLength={500}
+            placeholder="Ej: Ana Gómez no pasa la materia"
+            className={inputCls}
+          />
+        </label>
+        <button type="button" onClick={() => submitLog("TAREA")} className="btn-gold mt-3">
+          Subir planilla
+        </button>
+        <div className="mt-4 grid gap-3">
+          {logs.filter((l) => l.kind === "TAREA").length === 0 ? (
+            <p className="text-sm text-slate-500">Sin planillas todavía.</p>
+          ) : (
+            logs
+              .filter((l) => l.kind === "TAREA")
+              .map((l) => (
+                <article key={l.id} className="overflow-hidden rounded-xl border border-stone-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={l.photoData} alt="Planilla" className="max-h-96 w-full object-contain bg-stone-100" loading="lazy" />
+                  <div className="flex flex-wrap items-center justify-between gap-2 p-4">
+                    <p className="text-sm text-slate-600">
+                      {new Date(l.logDate).toLocaleDateString("es-PY")}
+                      {l.caption ? ` — ${l.caption}` : ""}
                     </p>
-                    {t.description && <p className="mt-1 text-sm text-slate-600">{t.description}</p>}
-                    {t.notes && (
-                      <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                        📝 {t.notes}
-                      </p>
-                    )}
-                    <p className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 font-bold">
-                        {pend.length} pendiente(s) / {t.submissions.length}
-                      </span>
-                      {t.dueDate && <span>Vence {new Date(t.dueDate).toLocaleDateString("es-PY")}</span>}
-                      {t.fileData && !isImg && (
-                        <a
-                          href={t.fileData}
-                          download={`${t.title}.pdf`}
-                          className="font-bold text-[var(--institutional)] underline"
-                        >
-                          📄 Ver PDF
-                        </a>
-                      )}
-                    </p>
-                    {pend.length > 0 && (
-                      <p className="mt-2 text-xs text-slate-500">
-                        Pendientes:{" "}
-                        {pend
-                          .slice(0, 12)
-                          .map((s) => nameById[s.studentId] ?? "—")
-                          .join(", ")}
-                        {pend.length > 12 ? ` (+${pend.length - 12})` : ""}
-                      </p>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => deleteLog(l.id)}
+                      className="rounded-lg bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700 hover:bg-red-200"
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </article>
-              );
-            })}
-          </div>
-        )}
+              ))
+          )}
+        </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Lista de asistencias</h2>
-        {filtered.length === 0 || dates.length === 0 ? (
-          <p className="mt-3 text-sm text-slate-500">Sin registros recientes.</p>
-        ) : (
-          <div className="mt-4 grid gap-3">
-            {dates.map((d) => {
-              const day = atts.filter((a) => a.classDate.slice(0, 10) === d);
-              const pres = day.filter((a) => a.status === "PRESENTE" || a.status === "TARDE").length;
-              const notes = day.filter((a) => a.note);
-              const label = new Date(d + "T12:00:00").toLocaleDateString("es-PY", { weekday: "long", day: "2-digit", month: "2-digit" });
-              return (
-                <article key={d} className="overflow-hidden rounded-xl border border-stone-200">
-                  <div className="p-4">
-                    <p className="flex flex-wrap items-center justify-between gap-2 font-bold text-slate-900">
-                      <span className="capitalize">{label}</span>
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">
-                        {pres} presente(s) / {day.length}
-                      </span>
+        <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+          <label className="block text-sm font-semibold text-slate-700">
+            Foto de la lista (con fecha de hoy)
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={(e) => setLogFile(e.target.files?.[0] ?? null)}
+              className={inputCls}
+            />
+          </label>
+          <label className="block text-sm font-semibold text-slate-700">
+            Fecha
+            <input type="date" value={logDate} onChange={(e) => setLogDate(e.target.value)} className={inputCls} />
+          </label>
+        </div>
+        <label className="mt-3 block text-sm font-semibold text-slate-700">
+          Observación
+          <input
+            value={logCaption}
+            onChange={(e) => setLogCaption(e.target.value)}
+            maxLength={500}
+            placeholder="Ej: Pedro falta demasiado"
+            className={inputCls}
+          />
+        </label>
+        <button type="button" onClick={() => submitLog("ASISTENCIA")} className="btn-gold mt-3">
+          Subir lista
+        </button>
+        <div className="mt-4 grid gap-3">
+          {logs.filter((l) => l.kind === "ASISTENCIA").length === 0 ? (
+            <p className="text-sm text-slate-500">Sin listas todavía.</p>
+          ) : (
+            logs
+              .filter((l) => l.kind === "ASISTENCIA")
+              .map((l) => (
+                <article key={l.id} className="overflow-hidden rounded-xl border border-stone-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={l.photoData} alt="Lista" className="max-h-96 w-full object-contain bg-stone-100" loading="lazy" />
+                  <div className="flex flex-wrap items-center justify-between gap-2 p-4">
+                    <p className="text-sm text-slate-600">
+                      {new Date(l.logDate).toLocaleDateString("es-PY")}
+                      {l.caption ? ` — ${l.caption}` : ""}
                     </p>
-                    <p className="mt-2 flex flex-wrap gap-1.5">
-                      {filtered.slice(0, 60).map((s) => {
-                        const a = attByStudentDate[`${s.id}|${d}`];
-                        const today = d === new Date().toISOString().slice(0, 10);
-                        return (
-                          <button
-                            key={s.id}
-                            type="button"
-                            disabled={!today && !!a}
-                            title={`${s.user.firstName} ${s.user.lastName}${a?.note ? ` — ${a.note}` : ""}`}
-                            onClick={() => cycleAttendance(s.id, a)}
-                            className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-                              a ? ATT_CLS[a.status] ?? "bg-slate-100" : "bg-slate-100 text-slate-400"
-                            } ${!today && !!a ? "" : "hover:ring-2 hover:ring-[var(--gold)]"}`}
-                          >
-                            {s.user.firstName} {a ? ATT_SHORT[a.status] ?? "" : ""}
-                          </button>
-                        );
-                      })}
-                    </p>
-                    {notes.length > 0 && (
-                      <div className="mt-2 grid gap-1">
-                        {notes.map((a) => (
-                          <p key={a.id} className="rounded-lg bg-amber-50 px-3 py-1.5 text-xs text-amber-900">
-                            📝 {nameById[a.student.id] ?? ""}: {a.note}
-                          </p>
-                        ))}
-                      </div>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => deleteLog(l.id)}
+                      className="rounded-lg bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700 hover:bg-red-200"
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </article>
-              );
-            })}
-          </div>
-        )}
+              ))
+          )}
+        </div>
       </section>
 
       <form

@@ -584,6 +584,25 @@ model Vote {
   @@map("votes")
 }
 
+// Bitácora de fotos del docente: listas de asistencia y planillas de tareas.
+// Independiente de "Crear tarea": el profe sube la foto del papel con fecha
+// y observación (ej: "Alumno fulano no pasa la materia").
+model PhotoLog {
+  id         String   @id @default(cuid())
+  kind       String   // ASISTENCIA | TAREA
+  photoData  String   // foto (data URI, máx 4 MB)
+  caption    String?  // observación (ej: alumno que no pasa)
+  logDate    DateTime
+  subjectId  String?
+  subject    Subject? @relation(fields: [subjectId], references: [id])
+  teacherId  String?
+  teacher    Teacher? @relation(fields: [teacherId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([kind, logDate])
+  @@map("photo_logs")
+}
+
 // Suscripciones push (navegador) para avisar comunicados y noticias.
 model PushSubscription {
   id        String   @id @default(cuid())

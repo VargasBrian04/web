@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import MecLinksCenter from "@/components/portal/MecLinksCenter";
+import PhotoLogView from "@/components/portal/PhotoLogView";
 
 export const metadata = { title: "Portal del Alumno" };
 
@@ -219,6 +220,17 @@ export default async function AlumnoPage() {
           </ul>
         </section>
       )}
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-lg font-extrabold text-[var(--institutional)]">Fotos de listas</h2>
+          <PhotoLogView kind="ASISTENCIA" />
+        </section>
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-lg font-extrabold text-[var(--institutional)]">Fotos de planillas</h2>
+          <PhotoLogView kind="TAREA" />
+        </section>
+      </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
         <section className="rounded-2xl border border-slate-200 bg-white p-6">
