@@ -198,14 +198,13 @@ export async function POST(request: Request) {
 
 /**
  * GET /api/enrollments — ADMIN ve solicitudes (filtros ?status=&academicId=);
- * TEACHER ve solicitudes en solo lectura; STUDENT ve las propias.
- * PARENT/ASPIRANT sin acceso (PII de menores).
+ * STUDENT ve las propias. TEACHER/PARENT/ASPIRANT sin acceso (PII de menores).
  */
 export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   const role = session.user.role;
-  if (role !== "ADMIN" && role !== "STUDENT" && role !== "TEACHER")
+  if (role !== "ADMIN" && role !== "STUDENT")
     return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
 
   const { searchParams } = new URL(request.url);

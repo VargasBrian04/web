@@ -7,7 +7,6 @@ export const metadata = { title: "Panel docente" };
  * Panel docente: nómina, carga de notas (1-5), bitácora de fotos y tareas.
  * Los datos se leen de /api/teacher/roster y se escriben en
  * POST /api/grades, /api/fotolog y /api/assignments.
- * Noticias en /portal/profesor/noticias, inscripciones en /portal/profesor/inscripciones.
  * ADMIN puede verlo (Ver como docente), pero su cuenta sigue siendo Dirección.
  */
 export default async function ProfesorPage() {
@@ -32,14 +31,6 @@ export default async function ProfesorPage() {
           <li>Cargá la nota del alumno (se crea o actualiza).</li>
           <li>Subí la foto de la lista o planilla y publicá la tarea digital con PDF/foto.</li>
         </ol>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <a href="/portal/profesor/noticias" className="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/20">
-            Gestionar noticias
-          </a>
-          <a href="/portal/profesor/inscripciones" className="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/20">
-            Ver inscripciones
-          </a>
-        </div>
       </section>
       <TeacherTools />
     </div>

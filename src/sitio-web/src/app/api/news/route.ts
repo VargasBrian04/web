@@ -41,7 +41,7 @@ export async function GET(request: Request) {
   let where: Record<string, unknown> = { status: "PUBLICADA" };
   if (wantAll) {
     const session = await auth();
-    if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "TEACHER"))
+    if (!session?.user || session.user.role !== "ADMIN")
       return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
     where = {};
   }
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
 }
 
 /**
- * POST /api/news — ADMIN y TEACHER. multipart/form-data:
+ * POST /api/news — solo ADMIN. multipart/form-data:
  *  title*, category*, publishDate (yyyy-mm-dd)*, status (BORRADOR|PUBLICADA),
  *  content (HTML)*, image? (PNG/JPG/WEBP ≤10MB).
  */
@@ -83,8 +83,8 @@ export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user)
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (session.user.role !== "ADMIN" && session.user.role !== "TEACHER")
-    return NextResponse.json({ error: "Solo Dirección y Docentes" }, { status: 403 });
+  if (session.user.role !== "ADMIN")
+    return NextResponse.json({ error: "Solo Dirección" }, { status: 403 });
 
   let form: FormData;
   try {
@@ -116,8 +116,6 @@ export async function POST(request: Request) {
 
   let imageFile: string | null = null;
   if (file instanceof File && file.size > 0) {
-    if (session.user.role !== "ADMIN")
-      return NextResponse.json({ error: "Los docentes no pueden subir imágenes (solo texto)" }, { status: 403 });
     try {
       // Data URI en DB: sobrevive al disco efímero de Vercel.
       imageFile = imageToDataUri(

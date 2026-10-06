@@ -963,9 +963,13 @@ var err='red';try{err=x.data&&x.data.url?new URL(x.data.url,location.origin).sea
 return{error:err,url:x.data&&x.data.url};
 });
 }
+function panelFor(r){if(r==='ADMIN')return'/portal/admin';if(r==='TEACHER')return'/portal/profesor';if(r==='STUDENT')return'/portal/alumno';if(r==='PARENT')return'/portal/padre';return'/portal'}
 function doLogin(e){if(e)e.preventDefault();var u=document.getElementById('liUser').value.trim(),p=document.getElementById('liPass').value;var errBox=document.getElementById('liErr');if(!u||!p){errBox.textContent='Completá usuario y contraseña para ingresar.';errBox.style.display='block';return false}
 errBox.style.display='none';var btn=document.querySelector('#loginModal button[type="submit"]');if(btn){btn.disabled=true;btn.textContent='Verificando…'}
-realLogin(u,p).then(function(r){if(btn){btn.disabled=false;btn.textContent='Ingresar →'}if(r.error){errBox.textContent=(r.error==='CredentialsSignin')?'Usuario/correo o contraseña incorrectos, o cuenta inactiva.':'No se pudo ingresar. Probá en /login.';errBox.style.display='block';return}closeLogin();hideRoles();location.href='/portal'}).catch(function(){if(btn){btn.disabled=false;btn.textContent='Ingresar →'}errBox.textContent='Error de red. Probá en /login.';errBox.style.display='block'});return false}
+var done=false;function fail(m){if(done)return;done=true;if(btn){btn.disabled=false;btn.textContent='Ingresar →'}errBox.textContent=m;errBox.style.display='block'}
+var timer=setTimeout(function(){fail('Tardó demasiado (servidor frío). Probá en /login.')},25000);
+realLogin(u,p).then(function(r){if(done)return;if(r.error){done=true;clearTimeout(timer);fail((r.error==='CredentialsSignin')?'Usuario/correo o contraseña incorrectos, o cuenta inactiva.':'No se pudo ingresar. Probá en /login.');return}
+fetch('/api/auth/session',{credentials:'same-origin'}).then(function(s){return s.json()}).then(function(j){done=true;clearTimeout(timer);closeLogin();hideRoles();location.href=panelFor(j&&j.user&&j.user.role)}).catch(function(){done=true;clearTimeout(timer);closeLogin();hideRoles();location.href='/portal'})}).catch(function(){fail('Error de red. Probá en /login.')});return false}
 function fillDemo(email){document.getElementById('liUser').value=email;document.getElementById('liErr').style.display='none'}
 /* Solicitudes reales a la base de datos (POST /api/solicitudes + catálogo). */
 var REG_CAT=null,REG_TAB='tutor',REG_SENDING=false;

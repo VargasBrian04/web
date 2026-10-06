@@ -34,10 +34,7 @@ export default function PortalLinks({ role }: { role: string }) {
           : role === "TEACHER"
             ? [
                 { href: "/portal/profesor", label: "Mis cursos" },
-                { href: "/portal/profesor/noticias", label: "Gestionar noticias" },
-                { href: "/portal/profesor/inscripciones", label: "Inscripciones" },
                 { href: "/portal/perfil", label: "Mi perfil" },
-                { href: "/noticias", label: "Noticias" },
               ]
             : [
                 { href: "/portal/admin", label: "Administración" },
