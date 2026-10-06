@@ -157,8 +157,8 @@ export default function AdminUsers() {
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-extrabold text-[var(--institutional)]">Cuentas</h2>
-          <div className="flex gap-2">
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar usuario, CI…" className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--institutional)]" />
+          <div className="flex flex-wrap gap-2">
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar usuario, CI…" className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--institutional)]" />
             <button onClick={loadUsers} className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700" type="button">Buscar</button>
           </div>
         </div>

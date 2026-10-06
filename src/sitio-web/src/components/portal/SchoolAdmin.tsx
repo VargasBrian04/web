@@ -128,7 +128,7 @@ export function PollsAdmin() {
           />
         ))}
       </div>
-      <div className="mt-3 flex gap-2">
+      <div className="mt-3 flex flex-wrap gap-2">
         {opts.length < 8 && (
           <button type="button" onClick={() => setOpts((l) => [...l, ""])} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-600">
             + Opción

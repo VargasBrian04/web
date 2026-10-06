@@ -64,6 +64,12 @@
     scroll-behavior: smooth;
   }
 
+  html,
+  body {
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
   body {
     @apply bg-[var(--paper)] text-slate-800 antialiased;
   }
