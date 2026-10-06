@@ -1,20 +1,10 @@
-import AdminBoard from "@/components/portal/AdminBoard";
-import AdminUsers from "@/components/portal/AdminUsers";
-import AccountRequests from "@/components/portal/AccountRequests";
-import ContentAdmin from "@/components/portal/ContentAdmin";
-import MediaAdmin from "@/components/portal/MediaAdmin";
-import CoursesAdmin from "@/components/portal/CoursesAdmin";
-import AuditAdmin from "@/components/portal/AuditAdmin";
-import ComunicadosAdmin from "@/components/portal/ComunicadosAdmin";
-import TimetablesAdmin from "@/components/portal/TimetablesAdmin";
-import { CalendarAdmin, PollsAdmin } from "@/components/portal/SchoolAdmin";
+import AdminTabs from "@/components/portal/AdminTabs";
 
 export const metadata = { title: "Panel de Administración" };
 
 /**
- * Panel de Dirección/Secretaría: estadísticas y bandeja de inscripciones.
- * Lee GET /api/admin/stats + GET /api/enrollments y aprueba con PATCH.
- * Más abajo: registro de usuarios con rol (solo Admin crea cuentas).
+ * Panel de Dirección/Secretaría ordenado por pestañas:
+ * inscripciones, cuentas, contenido, académico y auditoría.
  */
 export default function AdminPage() {
   return (
@@ -26,17 +16,7 @@ export default function AdminPage() {
           registrá docentes y tutores, y vinculá tutores con alumnos.
         </p>
       </section>
-      <AdminBoard />
-      <AccountRequests />
-      <AdminUsers />
-      <ContentAdmin />
-      <MediaAdmin />
-      <CoursesAdmin />
-      <ComunicadosAdmin />
-      <TimetablesAdmin />
-      <CalendarAdmin />
-      <PollsAdmin />
-      <AuditAdmin />
+      <AdminTabs />
     </div>
   );
 }
