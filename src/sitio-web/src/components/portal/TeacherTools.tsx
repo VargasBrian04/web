@@ -268,41 +268,54 @@ export default function TeacherTools() {
           </button>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-slate-500">
-                <th className="py-2 pr-4">Alumno</th>
-                <th className="py-2 pr-4">C.I.</th>
-                <th className="py-2 pr-4">Bachillerato</th>
-                <th className="py-2 pr-4">Nota actual</th>
-                <th className="py-2">Cargar</th>
+        <div className="mt-4 overflow-x-auto rounded-xl border border-stone-200">
+          <table className="w-full min-w-[640px] text-sm">
+            <thead className="sticky top-0">
+              <tr className="bg-[var(--institutional)] text-left text-white">
+                <th className="px-4 py-3 font-bold">Alumno</th>
+                <th className="px-4 py-3 font-bold">Bachillerato</th>
+                <th className="px-4 py-3 text-center font-bold">Nota</th>
+                <th className="px-4 py-3 text-center font-bold">Cargar</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="py-4 text-slate-500">Cargando nómina…</td></tr>
+                <tr><td colSpan={4} className="px-4 py-6 text-center text-slate-500">Cargando nómina…</td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={5} className="py-4 text-slate-500">Sin alumnos.</td></tr>
+                <tr><td colSpan={4} className="px-4 py-6 text-center text-slate-500">Sin alumnos.</td></tr>
               ) : (
-                filtered.slice(0, 80).map((s) => {
+                filtered.slice(0, 80).map((s, idx) => {
                   const g = s.grades[0];
+                  const initials = `${s.user.firstName[0] ?? ""}${s.user.lastName[0] ?? ""}`.toUpperCase();
                   return (
-                    <tr key={s.id} className="border-b last:border-0">
-                      <td className="py-2 pr-4 font-semibold">{s.user.firstName} {s.user.lastName}</td>
-                      <td className="py-2 pr-4 text-slate-500">{s.user.ci}</td>
-                      <td className="py-2 pr-4 text-slate-500">{s.academic?.shortName ?? "—"}</td>
-                      <td className="py-2 pr-4">
+                    <tr key={s.id} className={`border-b last:border-0 transition-colors hover:bg-amber-50/60 ${idx % 2 ? "bg-stone-50/60" : ""}`}>
+                      <td className="px-4 py-2.5">
+                        <span className="flex items-center gap-3">
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--institutional)] text-sm font-extrabold text-white">
+                            {initials}
+                          </span>
+                          <span>
+                            <span className="block font-bold text-slate-900">{s.user.firstName} {s.user.lastName}</span>
+                            <span className="block text-xs text-slate-400">CI {s.user.ci}</span>
+                          </span>
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">
+                          {s.academic?.shortName ?? "—"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-center">
                         {g ? (
-                          <span className={`rounded px-2 py-0.5 font-bold ${g.score >= 4 ? "bg-emerald-100 text-emerald-800" : g.score >= 3 ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-800"}`}>
+                          <span className={`inline-block min-w-12 rounded-lg px-2.5 py-1 font-extrabold ${g.score >= 4 ? "bg-emerald-100 text-emerald-800" : g.score >= 3 ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-800"}`}>
                             {g.score.toFixed(1)}
                           </span>
                         ) : (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-slate-300">—</span>
                         )}
                       </td>
-                      <td className="py-2">
-                        <span className="flex items-center gap-1">
+                      <td className="px-4 py-2.5">
+                        <span className="flex items-center justify-center gap-1.5">
                           <input
                             type="number"
                             min={1}
@@ -311,13 +324,14 @@ export default function TeacherTools() {
                             placeholder="1–5"
                             value={quickGrade[s.id] ?? ""}
                             onChange={(e) => setQuickGrade((q) => ({ ...q, [s.id]: e.target.value }))}
-                            className="w-16 rounded-lg border border-slate-300 px-2 py-1 text-sm outline-none focus:border-[var(--institutional)]"
+                            onKeyDown={(e) => { if (e.key === "Enter") saveQuickGrade(s.id); }}
+                            className="w-[70px] rounded-lg border border-slate-300 px-2 py-1.5 text-center text-sm font-bold outline-none focus:border-[var(--institutional)]"
                           />
                           <button
                             type="button"
                             onClick={() => saveQuickGrade(s.id)}
                             title="Guardar nota"
-                            className="rounded-lg bg-[var(--institutional)] px-2.5 py-1 text-sm font-bold text-white hover:opacity-90"
+                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--gold)] text-base font-bold text-white shadow hover:opacity-90"
                           >
                             ✓
                           </button>
