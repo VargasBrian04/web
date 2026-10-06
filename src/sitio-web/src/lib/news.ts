@@ -8,6 +8,7 @@ export const NEWS_CATEGORIES = [
   "Inscripciones",
   "Académico",
   "Institucional",
+  "Avisos",
 ] as const;
 
 export type NewsCategory = (typeof NEWS_CATEGORIES)[number];

@@ -6,18 +6,13 @@ import AdminUsers from "@/components/portal/AdminUsers";
 import AccountRequests from "@/components/portal/AccountRequests";
 import ContentAdmin from "@/components/portal/ContentAdmin";
 import MediaAdmin from "@/components/portal/MediaAdmin";
-import CoursesAdmin from "@/components/portal/CoursesAdmin";
-import ComunicadosAdmin from "@/components/portal/ComunicadosAdmin";
-import TimetablesAdmin from "@/components/portal/TimetablesAdmin";
-import { CalendarAdmin, PollsAdmin } from "@/components/portal/SchoolAdmin";
-import AuditAdmin from "@/components/portal/AuditAdmin";
+import { PollsAdmin } from "@/components/portal/SchoolAdmin";
 
 const TABS = [
-  { id: "insc", label: "Inscripciones" },
-  { id: "cuentas", label: "Cuentas" },
-  { id: "contenido", label: "Contenido" },
-  { id: "acad", label: "Académico" },
-  { id: "auditoria", label: "Auditoría" },
+  { id: "insc", label: "📝 Inscripciones" },
+  { id: "cuentas", label: "👥 Cuentas" },
+  { id: "contenido", label: "🖼️ Contenido" },
+  { id: "encuestas", label: "📊 Encuestas" },
 ] as const;
 
 /** Panel de Dirección ordenado por pestañas (una zona a la vez). */
@@ -25,17 +20,17 @@ export default function AdminTabs() {
   const [tab, setTab] = useState<string>("insc");
   return (
     <div className="grid gap-4">
-      <nav className="sticky top-16 z-30 -mx-1 flex gap-2 overflow-x-auto bg-[var(--paper)] px-1 py-2">
+      <nav className="sticky top-16 z-30 -mx-1 flex gap-2 overflow-x-auto rounded-2xl border border-stone-200 bg-white p-2 shadow-sm">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
             aria-selected={tab === t.id}
-            className={`whitespace-nowrap rounded-full border-2 px-4 py-2 text-sm font-bold transition-colors ${
+            className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-extrabold transition-all ${
               tab === t.id
-                ? "border-[var(--institutional)] bg-[var(--institutional)] text-white"
-                : "border-slate-300 bg-white text-slate-600"
+                ? "bg-[var(--institutional)] text-white shadow-md"
+                : "text-slate-600 hover:bg-[var(--paper)]"
             }`}
           >
             {t.label}
@@ -60,18 +55,9 @@ export default function AdminTabs() {
           <MediaAdmin />
         </div>
       )}
-      {tab === "acad" && (
+      {tab === "encuestas" && (
         <div className="grid gap-6">
-          <CoursesAdmin />
-          <ComunicadosAdmin />
-          <TimetablesAdmin />
-          <CalendarAdmin />
           <PollsAdmin />
-        </div>
-      )}
-      {tab === "auditoria" && (
-        <div className="grid gap-6">
-          <AuditAdmin />
         </div>
       )}
     </div>

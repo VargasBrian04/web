@@ -14,6 +14,7 @@ export async function GET() {
         title: true,
         bio: true,
         schedule: true,
+        photo: true,
         subjects: { select: { subject: { select: { code: true, name: true } } } },
       },
       orderBy: { user: { firstName: "asc" } },
@@ -21,7 +22,7 @@ export async function GET() {
     return NextResponse.json({
       data: teachers.map((t: {
         user: { firstName: string; lastName: string };
-        title: string | null; bio: string | null; schedule: string | null;
+        title: string | null; bio: string | null; schedule: string | null; photo: string | null;
         subjects: { subject: { code: string; name: string } }[];
       }) => ({
         nombre: `${t.user.firstName} ${t.user.lastName}`.trim(),
@@ -29,6 +30,7 @@ export async function GET() {
         materias: t.subjects.map((s: { subject: { code: string; name: string } }) => s.subject),
         bio: t.bio,
         horario: t.schedule,
+        foto: t.photo,
       })),
     });
   } catch (e) {

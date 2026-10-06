@@ -45,7 +45,10 @@ export default async function BuscarPage({
         }),
       ]);
       news = n;
-      teachers = t.map((x) => ({
+      teachers = t.map((x: {
+        user: { firstName: string; lastName: string };
+        subjects: { subject: { name: string } }[];
+      }) => ({
         nombre: `${x.user.firstName} ${x.user.lastName}`,
         materia: x.subjects[0]?.subject.name ?? "Docente",
       }));

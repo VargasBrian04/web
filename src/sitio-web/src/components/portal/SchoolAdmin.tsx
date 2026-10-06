@@ -5,71 +5,7 @@ import { useState } from "react";
 const inputCls =
   "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--institutional)]";
 
-/** Calendario (solo Dirección) + Encuestas (solo Dirección). */
-export function CalendarAdmin() {
-  const [date, setDate] = useState("");
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [msg, setMsg] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  async function create() {
-    if (saving) return;
-    if (!date || !title.trim()) {
-      setMsg("Fecha y título obligatorios.");
-      return;
-    }
-    setSaving(true);
-    setMsg(null);
-    try {
-      const res = await fetch("/api/calendario", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, title: title.trim(), body: body.trim() }),
-      });
-      const json = await res.json();
-      if (!res.ok) setMsg(json.error || "No se pudo crear");
-      else {
-        setMsg("Fecha agregada al calendario.");
-        setDate("");
-        setTitle("");
-        setBody("");
-      }
-    } catch {
-      setMsg("Error de red al crear");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-extrabold text-[var(--institutional)]">Calendario</h2>
-      <p className="mt-1 text-sm text-slate-500">Fechas del ciclo lectivo (página /calendario).</p>
-      {msg && (
-        <p className="mt-3 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-900">{msg}</p>
-      )}
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <label className="block text-sm font-semibold text-slate-700">
-          Fecha
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputCls} />
-        </label>
-        <label className="block text-sm font-semibold text-slate-700">
-          Título
-          <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={160} className={inputCls} />
-        </label>
-        <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
-          Detalle
-          <input value={body} onChange={(e) => setBody(e.target.value)} maxLength={2000} className={inputCls} />
-        </label>
-      </div>
-      <button type="button" onClick={create} disabled={saving} className="btn-gold mt-3 disabled:opacity-50">
-        {saving ? "Agregando…" : "Agregar fecha"}
-      </button>
-    </section>
-  );
-}
-
+/** Encuestas (solo Dirección). */
 export function PollsAdmin() {
   const [question, setQuestion] = useState("");
   const [opts, setOpts] = useState(["", ""]);

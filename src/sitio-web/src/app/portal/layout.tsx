@@ -29,7 +29,6 @@ export default async function PortalLayout({ children }: { children: React.React
     role === "PARENT"
       ? [
           { href: "/portal/padre", label: "Mis hijos" },
-          { href: "/portal/avisos", label: "Avisos" },
           { href: "/portal/perfil", label: "Mi perfil" },
           { href: "/#galeria", label: "Galería" },
         ]
@@ -37,21 +36,18 @@ export default async function PortalLayout({ children }: { children: React.React
         ? [
             { href: "/portal/alumno", label: "Mis notas" },
             { href: "/portal/alumno/carnet", label: "Mi carné" },
-            { href: "/portal/avisos", label: "Avisos" },
             { href: "/portal/perfil", label: "Mi perfil" },
             { href: "/inscripciones", label: "Inscripciones" },
           ]
         : role === "TEACHER"
           ? [
               { href: "/portal/profesor", label: "Mis cursos" },
-              { href: "/portal/avisos", label: "Avisos" },
               { href: "/portal/perfil", label: "Mi perfil" },
               { href: "/noticias", label: "Noticias" },
             ]
           : [
               { href: "/portal/admin", label: "Administración" },
               { href: "/portal/admin/noticias", label: "Blog / Noticias" },
-              { href: "/portal/avisos", label: "Avisos" },
               { href: "/portal/perfil", label: "Mi perfil" },
               { href: "/portal/profesor", label: "Ver como docente" },
               { href: "/portal/alumno", label: "Ver como alumno" },

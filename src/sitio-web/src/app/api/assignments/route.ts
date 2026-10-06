@@ -100,13 +100,45 @@ export async function POST(request: Request) {
   // Nota: la entrega del alumno vive en /api/assignments/submit (submit/route.ts).
   // Se eliminó la rama muerta pathname.endsWith("/submit") que nunca era true aquí.
 
-  const { subjectCode, title, description, dueDate, periodLabel } = (await request.json()) as {
-    subjectCode?: string;
-    title?: string;
-    description?: string;
-    dueDate?: string;
-    periodLabel?: string;
-  };
+  const ctype = request.headers.get("content-type") || "";
+  let subjectCode: string | undefined;
+  let title: string | undefined;
+  let description: string | undefined;
+  let dueDate: string | undefined;
+  let periodLabel: string | undefined;
+  let notes: string | undefined;
+  let fileData: string | null = null;
+  if (ctype.includes("multipart/form-data")) {
+    const form = await request.formData().catch(() => null);
+    if (!form) return NextResponse.json({ error: "Formulario inválido" }, { status: 400 });
+    subjectCode = String(form.get("subjectCode") || "") || undefined;
+    title = String(form.get("title") || "") || undefined;
+    description = String(form.get("description") || "") || undefined;
+    dueDate = String(form.get("dueDate") || "") || undefined;
+    periodLabel = String(form.get("periodLabel") || "") || undefined;
+    notes = String(form.get("notes") || "").trim().slice(0, 2000) || undefined;
+    const file = form.get("file");
+    if (file instanceof File && file.size > 0) {
+      if (file.type !== "application/pdf")
+        return NextResponse.json({ error: "Solo PDF (máx 4 MB)" }, { status: 400 });
+      if (file.size > 4 * 1024 * 1024)
+        return NextResponse.json({ error: "PDF muy pesado (máx 4 MB)" }, { status: 400 });
+      const buf = Buffer.from(await file.arrayBuffer());
+      fileData = `data:application/pdf;base64,${buf.toString("base64")}`;
+    }
+  } else {
+    const body = (await request.json().catch(() => null)) as {
+      subjectCode?: string;
+      title?: string;
+      description?: string;
+      dueDate?: string;
+      periodLabel?: string;
+      notes?: string;
+    } | null;
+    if (!body) return NextResponse.json({ error: "Cuerpo inválido" }, { status: 400 });
+    ({ subjectCode, title, description, dueDate, periodLabel } = body);
+    notes = body.notes?.trim().slice(0, 2000) || undefined;
+  }
   if (!subjectCode || !title?.trim())
     return NextResponse.json({ error: "Materia y título obligatorios" }, { status: 400 });
 
@@ -133,6 +165,8 @@ export async function POST(request: Request) {
       periodId,
       title: title.trim(),
       description: description?.trim() || null,
+      fileData,
+      notes,
       dueDate: dueDate ? new Date(dueDate) : null,
     },
   });

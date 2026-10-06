@@ -164,17 +164,18 @@ export default function AdminUsers() {
         </div>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
-            <thead><tr className="border-b text-left text-slate-500"><th className="py-2 pr-4">Usuario</th><th className="py-2 pr-4">Nombre</th><th className="py-2 pr-4">Rol</th><th className="py-2 pr-4">Contacto</th><th className="py-2">Estado</th></tr></thead>
+            <thead><tr className="border-b text-left text-slate-500"><th className="py-2 pr-4">Usuario</th><th className="py-2 pr-4">Nombre</th><th className="py-2 pr-4">Rol</th><th className="py-2 pr-4">Contacto</th><th className="py-2 pr-4">Estado</th><th className="py-2">Cuenta</th></tr></thead>
             <tbody>
               {users.length === 0 ? (
-                <tr><td colSpan={5} className="py-4 text-slate-500">Sin resultados.</td></tr>
+                <tr><td colSpan={6} className="py-4 text-slate-500">Sin resultados.</td></tr>
               ) : users.map((u) => (
                 <tr key={u.id} className="border-b last:border-0">
                   <td className="py-2 pr-4 font-semibold">@{u.username}<span className="block text-xs font-normal text-slate-400">CI {u.ci}</span></td>
                   <td className="py-2 pr-4">{u.firstName} {u.lastName}</td>
                   <td className="py-2 pr-4"><span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-bold">{{ TEACHER: "Docente", PARENT: "Tutor", ADMIN: "Dirección", STUDENT: "Alumno", ASPIRANT: "Aspirante" }[u.role] ?? u.role}</span></td>
                   <td className="py-2 pr-4 text-xs text-slate-500">{u.email ?? "sin correo"}{u.phone ? ` · ${u.phone}` : ""}</td>
-                  <td className="py-2"><button onClick={() => toggleActive(u)} type="button" className={`rounded px-2 py-1 text-xs font-bold ${u.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{u.active ? "Activo" : "Inactivo"}</button></td>
+                  <td className="py-2 pr-4"><span className={`rounded px-2 py-1 text-xs font-bold ${u.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{u.active ? "Activo" : "Baneado"}</span></td>
+                  <td className="py-2"><button onClick={() => { if (window.confirm(u.active ? `¿Banear a @${u.username}? No podrá ingresar.` : `¿Reactivar a @${u.username}?`)) toggleActive(u); }} type="button" className={`rounded px-2 py-1 text-xs font-bold ${u.active ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-800"}`}>{u.active ? "Banear" : "Reactivar"}</button></td>
                 </tr>
               ))}
             </tbody>

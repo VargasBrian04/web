@@ -15,6 +15,33 @@ export default function TeacherProfile() {
   const [schedule, setSchedule] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  async function uploadPhoto(f: File | null) {
+    if (!f) return;
+    if (!["image/png", "image/jpeg", "image/webp"].includes(f.type) || f.size > 4 * 1024 * 1024) {
+      setMsg("Foto PNG/JPG/WEBP de máx 4 MB.");
+      return;
+    }
+    setUploading(true);
+    setMsg(null);
+    try {
+      const fd = new FormData();
+      fd.set("photo", f);
+      const res = await fetch("/api/teacher/photo", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) setMsg(json.error || "No se pudo subir la foto");
+      else {
+        setMsg("Foto actualizada.");
+        const r = await fetch("/api/teachers", { cache: "no-store" }).then((x) => x.json()).catch(() => null);
+        void r;
+      }
+    } catch {
+      setMsg("Error de red al subir la foto");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function save() {
     if (saving) return;
@@ -43,6 +70,20 @@ export default function TeacherProfile() {
         Esto se muestra en el repositorio de docentes junto a tu nombre y materias.
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <label className="block text-sm font-semibold text-slate-700">
+          Foto de perfil
+          <input
+            type="file"
+            accept=".png,.jpg,.jpeg,.webp"
+            disabled={uploading}
+            onChange={(e) => {
+              uploadPhoto(e.target.files?.[0] ?? null);
+              e.target.value = "";
+            }}
+            className={inputCls}
+          />
+          {uploading && <span className="text-xs text-slate-500">Subiendo…</span>}
+        </label>
         <label className="block text-sm font-semibold text-slate-700">
           Título
           <input

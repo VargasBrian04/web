@@ -366,7 +366,7 @@ export default function DocenteForm() {
           {sending ? "Enviando…" : "Enviar solicitud"}
         </button>
         <p className="mt-2 text-xs text-slate-500">
-          Dirección revisará tu solicitud y te contactará. Los campos con * son obligatorios.
+          Los campos con * son obligatorios.
         </p>
       </div>
     </form>

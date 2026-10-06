@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NEWS_IMAGE_MIME, imageToDataUri } from "@/lib/storage";
+import { enviarCorreo } from "@/lib/mail";
 import {
   NEWS_CATEGORIES,
   isNewsCategory,
@@ -154,5 +155,23 @@ export async function POST(request: Request) {
     },
     select: selectNews,
   });
-  return NextResponse.json({ data: created }, { status: 201 });
+  // Avisos publicados: correo a cada cuenta registrada con email.
+  let avisados = 0;
+  if (category === "Avisos" && statusRaw === "PUBLICADA") {
+    try {
+      const users = await prisma.user.findMany({
+        where: { active: true, email: { not: null } },
+        select: { email: true },
+        take: 400,
+      });
+      avisados = await enviarCorreo(
+        users.map((u: { email: string | null }) => u.email as string),
+        `Aviso: ${title.slice(0, 120)}`,
+        `${title}\n\n${plainText(content, 500)}\n\n— Dirección`
+      );
+    } catch (e) {
+      console.error("MAIL avisos", e);
+    }
+  }
+  return NextResponse.json({ data: { ...created, avisados } }, { status: 201 });
 }
