@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/lib/auth";
 import ThemeToggle from "@/components/landing/ThemeToggle";
+import PushButton from "@/components/portal/PushButton";
+import CumplesHoy from "@/components/portal/CumplesHoy";
 
 /**
  * Layout del portal: exige sesión (el middleware ya filtra por rol),
@@ -76,6 +78,7 @@ export default async function PortalLayout({ children }: { children: React.React
             </Link>
           ))}
           <ThemeToggle />
+          <PushButton />
           <form
             action={async () => {
               "use server";
@@ -89,6 +92,9 @@ export default async function PortalLayout({ children }: { children: React.React
         </div>
       </div>
       {children}
+      <div className="mt-6">
+        <CumplesHoy />
+      </div>
     </div>
   );
 }

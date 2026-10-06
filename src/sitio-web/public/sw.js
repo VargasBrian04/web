@@ -31,6 +31,26 @@ function isStatic(url) {
   );
 }
 
+self.addEventListener("push", (e) => {
+  let data = { title: "Colegio", body: "", url: "/portal/avisos" };
+  try {
+    data = Object.assign(data, e.data ? e.data.json() : {});
+  } catch (_) {}
+  e.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/images/logo-nuevo.png",
+      data: { url: data.url },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || "/portal/avisos";
+  e.waitUntil(self.clients.openWindow(url));
+});
+
 self.addEventListener("fetch", (e) => {
   const { request } = e;
   if (request.method !== "GET") return;

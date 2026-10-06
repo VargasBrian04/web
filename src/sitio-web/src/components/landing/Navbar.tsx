@@ -111,6 +111,13 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-1.5 xl:flex">
           <ThemeToggle />
+          <Link
+            href="/buscar"
+            title="Buscar en el sitio"
+            className="rounded-lg px-2.5 py-2 text-base transition-colors hover:bg-white/10"
+          >
+            🔍
+          </Link>
           <a
             href="https://aprendizaje.mec.edu.py/aprendizaje/familia/documentos"
             target="_blank"

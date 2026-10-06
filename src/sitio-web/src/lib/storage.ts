@@ -2,6 +2,30 @@ import { mkdir, writeFile, readFile, unlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+
+/**
+ * Almacenamiento de documentos académicos (PDF/JPG/PNG).
+ * - Con R2_* configurado (cuenta Cloudflare): bucket R2.
+ * - Sin R2: disco local (uploads/ o /tmp en Vercel).
+ * - Las imágenes de noticias/galería van en DB (data URI), no usan esto.
+ */
+
+function r2(): S3Client | null {
+  const account = process.env.R2_ACCOUNT_ID;
+  const key = process.env.R2_ACCESS_KEY;
+  const secret = process.env.R2_SECRET_KEY;
+  if (!account || !key || !secret) return null;
+  return new S3Client({
+    region: "auto",
+    endpoint: `https://${account}.r2.cloudflarestorage.com`,
+    credentials: { accessKeyId: key, secretAccessKey: secret },
+  });
+}
+
+function r2Bucket(): string {
+  return process.env.R2_BUCKET || "colegio";
+}
 
 /**
  * Almacenamiento local de documentos académicos (PDF/JPG/PNG).
@@ -77,6 +101,13 @@ export async function saveBuffer(
   if (buf.length === 0) throw new Error("Archivo vacío");
   const ext = allowed[mime];
   const fileName = `${randomUUID()}${ext}`;
+  const client = r2();
+  if (client) {
+    await client.send(
+      new PutObjectCommand({ Bucket: r2Bucket(), Key: fileName, Body: buf, ContentType: mime })
+    );
+    return { fileName, size: buf.length };
+  }
   await mkdir(uploadsDir(), { recursive: true });
   await writeFile(path.join(uploadsDir(), fileName), buf);
   return { fileName, size: buf.length };
@@ -84,11 +115,24 @@ export async function saveBuffer(
 
 export async function readBuffer(fileName: string): Promise<Buffer> {
   const safe = path.basename(fileName);
+  const client = r2();
+  if (client) {
+    const out = await client.send(new GetObjectCommand({ Bucket: r2Bucket(), Key: safe }));
+    const chunks: Uint8Array[] = [];
+    const body = out.Body as unknown as AsyncIterable<Uint8Array>;
+    for await (const c of body) chunks.push(c);
+    return Buffer.concat(chunks);
+  }
   return readFile(path.join(uploadsDir(), safe));
 }
 
 export async function removeFile(fileName: string): Promise<void> {
   try {
+    const client = r2();
+    if (client) {
+      await client.send(new DeleteObjectCommand({ Bucket: r2Bucket(), Key: path.basename(fileName) }));
+      return;
+    }
     await unlink(path.join(uploadsDir(), path.basename(fileName)));
   } catch {
     // ya eliminado: no es error

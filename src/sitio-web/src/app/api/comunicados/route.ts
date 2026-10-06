@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { audit } from "@/lib/audit";
+import { enviarPush, limpiarPush } from "@/lib/push";
 
 const AUDIENCES = ["TODOS", "TEACHER", "PARENT", "STUDENT"] as const;
 type Role = "ADMIN" | "TEACHER" | "PARENT" | "STUDENT" | "ASPIRANT";
@@ -59,6 +60,17 @@ export async function POST(request: Request) {
     data: { title: title.slice(0, 160), body: content.slice(0, 5000), audience, createdBy: session.user.id },
   });
   await audit(session.user, "COMUNICADO", title);
+  // Push a suscriptores del público objetivo (no bloquea)
+  try {
+    const subs = await prisma.pushSubscription.findMany({
+      select: { endpoint: true, p256dh: true, auth: true },
+      take: 500,
+    });
+    const { fallidas } = await enviarPush(subs, title, content.slice(0, 120));
+    await limpiarPush(prisma, fallidas);
+  } catch (e) {
+    console.error("PUSH comunicado", e);
+  }
   return NextResponse.json({ data: created }, { status: 201 });
 }
 

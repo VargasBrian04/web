@@ -247,6 +247,39 @@ export default function TeacherTools() {
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nombre o C.I." className={inputCls} />
           </label>
         </div>
+        <div className="mt-3">
+          <button
+            type="button"
+            disabled={filtered.length === 0}
+            onClick={() => {
+              const rows = [
+                ["Alumno", "CI", "Bachillerato", "Nota", "Materia"],
+                ...filtered.map((s) => {
+                  const g = s.grades[0];
+                  return [
+                    `${s.user.firstName} ${s.user.lastName}`,
+                    s.user.ci,
+                    s.academic?.shortName ?? "",
+                    g ? String(g.score) : "",
+                    g ? g.subject.code : "",
+                  ];
+                }),
+              ];
+              const csv = rows
+                .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";"))
+                .join("\n");
+              const url = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `planilla-${subject || "todas"}-${period || "todos"}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+          >
+            ⬇ Exportar planilla (Excel/CSV)
+          </button>
+        </div>
 
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">

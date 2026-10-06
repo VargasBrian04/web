@@ -581,6 +581,19 @@ model Vote {
   @@map("votes")
 }
 
+// Suscripciones push (navegador) para avisar comunicados y noticias.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
 // ============================================================================
 // BLOG / NOTICIAS (administrado por Dirección; lo público solo ve PUBLICADA)
 // ============================================================================

@@ -20,6 +20,15 @@ export default function Footer() {
           </div>
         </div>
         <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm">
+          <Link href="/buscar" className="hover:text-white">
+            Buscar
+          </Link>
+          <Link href="/galeria" className="hover:text-white">
+            Galería
+          </Link>
+          <Link href="/preguntas" className="hover:text-white">
+            Ayuda
+          </Link>
           <Link href="/login" className="hover:text-white">
             Acceder
           </Link>

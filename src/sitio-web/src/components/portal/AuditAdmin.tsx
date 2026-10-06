@@ -21,6 +21,12 @@ export default function AuditAdmin() {
     <section className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
       <h2 className="text-lg font-extrabold text-[var(--institutional)]">Auditoría</h2>
       <p className="mt-1 text-sm text-slate-500">Últimas acciones registradas.</p>
+      <a
+        href="/api/admin/backup"
+        className="mt-3 inline-block rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50"
+      >
+        ⬇ Descargar respaldo (JSON)
+      </a>
       {rows.length === 0 ? (
         <p className="mt-3 text-sm text-slate-500">Sin registros todavía.</p>
       ) : (
