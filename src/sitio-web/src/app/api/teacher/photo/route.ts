@@ -23,6 +23,14 @@ export async function POST(request: Request) {
   const file = form.get("photo");
   if (!(file instanceof File) || file.size === 0)
     return NextResponse.json({ error: "Elegí una foto" }, { status: 400 });
+  const existing = await prisma.teacher.findUnique({ where: { userId: targetUserId }, select: { id: true } });
+  if (!existing) {
+    if (session.user.role === "TEACHER" && targetUserId === session.user.id) {
+      await prisma.teacher.create({ data: { userId: targetUserId } });
+    } else {
+      return NextResponse.json({ error: "Tu cuenta es de Dirección, sin ficha docente" }, { status: 400 });
+    }
+  }
   try {
     const uri = imageToDataUri(
       Buffer.from(await file.arrayBuffer()), file.type, NEWS_IMAGE_MIME, "PNG/JPG/WEBP"

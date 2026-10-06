@@ -116,6 +116,8 @@ export async function POST(request: Request) {
 
   let imageFile: string | null = null;
   if (file instanceof File && file.size > 0) {
+    if (session.user.role !== "ADMIN")
+      return NextResponse.json({ error: "Los docentes no pueden subir imágenes (solo texto)" }, { status: 403 });
     try {
       // Data URI en DB: sobrevive al disco efímero de Vercel.
       imageFile = imageToDataUri(

@@ -110,6 +110,8 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
   }
   const upload = newImage as File | null;
   if (upload) {
+    if (session.user.role !== "ADMIN")
+      return NextResponse.json({ error: "Los docentes no pueden subir imágenes (solo texto)" }, { status: 403 });
     try {
       const uri = imageToDataUri(
         Buffer.from(await upload.arrayBuffer()),
@@ -126,6 +128,8 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
       );
     }
   } else if (f.removeImage === "1" || f.removeImage === true) {
+    if (session.user.role !== "ADMIN")
+      return NextResponse.json({ error: "Los docentes no pueden quitar imágenes" }, { status: 403 });
     if (post.imageFile && !post.imageFile.startsWith("data:")) await removeFile(post.imageFile);
     data.imageFile = null;
   }
@@ -140,13 +144,13 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
   return NextResponse.json({ data: updated });
 }
 
-/** DELETE /api/news/:id — ADMIN y TEACHER. Borra registro + imagen subida. */
+/** DELETE /api/news/:id — solo ADMIN. Borra registro + imagen subida. */
 export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user)
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
-  if (session.user.role !== "ADMIN" && session.user.role !== "TEACHER")
-    return NextResponse.json({ error: "Solo Dirección y Docentes" }, { status: 403 });
+  if (session.user.role !== "ADMIN")
+    return NextResponse.json({ error: "Solo Dirección" }, { status: 403 });
 
   const { id } = await ctx.params;
   const post = await prisma.newsPost.findUnique({ where: { id } });

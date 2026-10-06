@@ -29,6 +29,14 @@ export async function PATCH(request: Request) {
   const schedule = typeof body.schedule === "string" ? body.schedule.trim().slice(0, 300) : undefined;
 
   try {
+    const target = await prisma.teacher.findUnique({ where: { userId: targetUserId }, select: { id: true } });
+    if (!target) {
+      if (session.user.role === "TEACHER" && targetUserId === session.user.id) {
+        await prisma.teacher.create({ data: { userId: targetUserId } });
+      } else {
+        return NextResponse.json({ error: "Tu cuenta es de Dirección, sin ficha docente" }, { status: 400 });
+      }
+    }
     const updated = await prisma.teacher.update({
       where: { userId: targetUserId },
       data: {

@@ -40,7 +40,7 @@ function fmtDate(iso: string | null | undefined): string {
   return d.toLocaleDateString("es-PY", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-export default function NewsAdmin() {
+export default function NewsAdmin({ allowImage = true, allowDelete = true }: { allowImage?: boolean; allowDelete?: boolean }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -183,7 +183,7 @@ export default function NewsAdmin() {
     try {
       let res: Response;
       if (editingId) {
-        const hasImageChange = !!file || removeImage;
+        const hasImageChange = allowImage && (!!file || removeImage);
         if (hasImageChange) {
           const fd = new FormData();
           fd.set("title", title.trim());
@@ -208,7 +208,7 @@ export default function NewsAdmin() {
         fd.set("publishDate", publishDate);
         fd.set("status", wantStatus);
         fd.set("content", content);
-        if (file) fd.set("image", file);
+        if (file && allowImage) fd.set("image", file);
         res = await fetch("/api/news", { method: "POST", body: fd });
       }
       const json = await res.json();
@@ -301,9 +301,11 @@ export default function NewsAdmin() {
                       <button type="button" onClick={() => startEdit(p)} className="rounded-lg bg-[var(--institutional)] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90">
                         Editar
                       </button>
-                      <button type="button" onClick={() => setDeleting(p)} title="Eliminar noticia" className="rounded-lg bg-red-100 px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-200">
-                        Eliminar
-                      </button>
+                      {allowDelete && (
+                        <button type="button" onClick={() => setDeleting(p)} title="Eliminar noticia" className="rounded-lg bg-red-100 px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-200">
+                          Eliminar
+                        </button>
+                      )}
                     </div>
                   </div>
                 </article>
@@ -373,6 +375,7 @@ export default function NewsAdmin() {
                 </div>
               </div>
 
+              {allowImage && (
               <div className="grid gap-5 md:grid-cols-2">
                 <div onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={(e) => { e.preventDefault(); setDragOver(false); pickFile(e.dataTransfer.files?.[0] ?? null); }} onClick={() => fileRef.current?.click()} className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors ${dragOver ? "border-[var(--institutional)] bg-[var(--paper)]" : "border-[#c9a35c]"}`}>
                   <span className="text-4xl">🖼️</span>
@@ -397,6 +400,7 @@ export default function NewsAdmin() {
                   )}
                 </div>
               </div>
+              )}
 
               <div className="flex flex-col items-stretch justify-end gap-2 border-t border-stone-100 pt-5 sm:flex-row">
                 <button type="button" onClick={() => submit("BORRADOR")} disabled={saving} className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50">
