@@ -170,19 +170,8 @@ export default function TeacherTools() {
       setMsg("Tarea publicada.");
       setTaskForm({ title: "", description: "", dueDate: "", notes: "" });
       setTaskFile(null);
-      loadTasks();
     }
   }
-
-  const dates = [...new Set(atts.map((a) => a.classDate.slice(0, 10)))].sort().reverse().slice(0, 8);
-  const attByStudentDate: Record<string, Att> = {};
-  atts.forEach((a) => {
-    attByStudentDate[`${a.student.id}|${a.classDate.slice(0, 10)}`] = a;
-  });
-  const nameById: Record<string, string> = {};
-  students.forEach((s) => {
-    nameById[s.id] = `${s.user.firstName} ${s.user.lastName}`;
-  });
 
   return (
     <div className="grid gap-6">
