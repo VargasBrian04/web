@@ -1224,14 +1224,14 @@ var curGalList=[];
 var galCustom={photos:[],albums:[]};try{var _gc=JSON.parse(localStorage.getItem('csl_gal')||'null');if(_gc&&(_gc.photos||_gc.albums))galCustom={photos:_gc.photos||[],albums:_gc.albums||[]}}catch(e){}
 function persistGal(){try{localStorage.setItem('csl_gal',JSON.stringify(galCustom).slice(0,1500000))}catch(e){toast('Fotos muy pesadas para la demo')}}
 function albumCard(title,cat,photos){var cov=photos[0];var af=document.createElement('figure');af.className='gal-album';af.style.position='relative';var cap=photos[0][1]||title;af.innerHTML='<img src="'+cov[0]+'" alt="'+title+'" loading="lazy" onerror="this.parentElement.style.background=\'linear-gradient(135deg,#5d4037,#a67c52)\'"><span class="album-badge">📁 Álbum · '+photos.length+' fotos</span><figcaption><span class="pill">'+cat+'</span><br>'+title+'</figcaption>';af.onclick=function(){openLb(photos.map(function(p){return [p[0],p[1]||title]}),0)};return af}
-function paintGal(){var dbGal=(window.__galServer||[]);var list=dbGal.length?[]:GAL.filter(function(g){return curC==='Todas'||g[1]===curC});curGalList=list;gg.innerHTML='';
+function paintGal(){var dbGal=(window.__galServer||[]);var srvAll=dbGal;var srvLiz=srvAll.filter(function(g){return (g[2]||'').indexOf('Despedida a Liz Sosa')===0&&(curC==='Todas'||g[1]===curC)});var srv=srvAll.filter(function(g){return (g[2]||'').indexOf('Despedida a Liz Sosa')!==0&&(curC==='Todas'||g[1]===curC)});var list=dbGal.length?[]:GAL.filter(function(g){return curC==='Todas'||g[1]===curC});curGalList=list;gg.innerHTML='';
 var singles=galCustom.photos.filter(function(g){return curC==='Todas'||g[1]===curC});
 var albums=galCustom.albums.filter(function(a){return a.photos&&a.photos.length&&(curC==='Todas'||a.cat===curC)});
 var liz=list.filter(function(g){return (g[2]||'').indexOf('Despedida a Liz Sosa')===0});
 var rest=list.filter(function(g){return (g[2]||'').indexOf('Despedida a Liz Sosa')!==0});
 if(liz.length>1){gg.appendChild(albumCard('Despedida a Liz Sosa',liz[0][1],liz))}if(srvLiz.length>1){gg.appendChild(albumCard('Despedida a Liz Sosa',srvLiz[0][1],srvLiz))}
 albums.forEach(function(a){gg.appendChild(albumCard(a.title,a.cat,a.photos))});
-var srvAll=(window.__galServer||[]);var srvLiz=srvAll.filter(function(g){return (g[2]||'').indexOf('Despedida a Liz Sosa')===0&&(curC==='Todas'||g[1]===curC)});var srv=srvAll.filter(function(g){return (g[2]||'').indexOf('Despedida a Liz Sosa')!==0&&(curC==='Todas'||g[1]===curC)});var flat=rest.concat(srv).concat(singles);
+var flat=rest.concat(srv).concat(singles);
 flat.forEach(function(g){var ix=flat.indexOf(g);var f=document.createElement('figure');f.innerHTML='<img src="'+g[0]+'" alt="'+(g[2]||'')+'" loading="lazy" onerror="this.parentElement.style.background=\'linear-gradient(135deg,#5d4037,#a67c52)\'"><figcaption><span class="pill">'+g[1]+'</span><br>'+(g[2]||'')+'</figcaption>';f.onclick=function(){openLb(flat,ix)};gg.appendChild(f)});
 if(!gg.children.length){gg.innerHTML='<p class="muted">Aún no hay fotos en esta categoría. Información pendiente.</p>'}}
 cats.forEach(function(c){var b=document.createElement('button');b.textContent=c;if(c==='Todas')b.classList.add('on');b.onclick=function(){curC=c;gf.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');paintGal()};gf.appendChild(b)});
