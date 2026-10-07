@@ -56,7 +56,7 @@ export default function LoginForm() {
     setLoading(true);
     try {
       const res = await signIn("credentials", {
-        identifier: identifier.trim(),
+        identifier: identifier.trim().replace(/^@/, ""),
         password,
         redirect: false,
       });

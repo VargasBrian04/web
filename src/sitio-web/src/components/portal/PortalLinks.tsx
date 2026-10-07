@@ -21,6 +21,7 @@ export default function PortalLinks({ role }: { role: string }) {
       : role === "PARENT"
         ? [
             { href: "/portal/padre", label: "Mis hijos" },
+            { href: "/portal/padre/docentes", label: "Docentes" },
             { href: "/portal/perfil", label: "Mi perfil" },
             { href: "/#galeria", label: "Galería" },
           ]

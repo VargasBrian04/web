@@ -76,12 +76,16 @@ export default function TeacherTools() {
     }
   }
 
-  async function deleteLog(id: string) {
-    if (!window.confirm("¿Eliminar esta foto?")) return;
+  async function confirmDeleteLog() {
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
+    if (!id) return;
     try {
       const res = await fetch(`/api/fotolog?id=${id}`, { method: "DELETE" });
-      if (res.ok) loadLogs();
-      else setMsg("No se pudo eliminar");
+      if (res.ok) {
+        setMsg("Foto eliminada.");
+        loadLogs();
+      } else setMsg("No se pudo eliminar");
     } catch {
       setMsg("Error de red al eliminar");
     }
@@ -89,6 +93,8 @@ export default function TeacherTools() {
 
   const [taskForm, setTaskForm] = useState({ title: "", description: "", dueDate: "", notes: "" });
   const [taskFile, setTaskFile] = useState<File | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const logToDelete = logs.find((l) => l.id === confirmDeleteId) ?? null;
 
   async function load() {
     setLoading(true);
@@ -371,7 +377,7 @@ export default function TeacherTools() {
                     </p>
                     <button
                       type="button"
-                      onClick={() => deleteLog(l.id)}
+                      onClick={() => setConfirmDeleteId(l.id)}
                       className="rounded-lg bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700 hover:bg-red-200"
                     >
                       Eliminar
@@ -431,7 +437,7 @@ export default function TeacherTools() {
                     </p>
                     <button
                       type="button"
-                      onClick={() => deleteLog(l.id)}
+                      onClick={() => setConfirmDeleteId(l.id)}
                       className="rounded-lg bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700 hover:bg-red-200"
                     >
                       Eliminar
@@ -479,6 +485,39 @@ export default function TeacherTools() {
         </div>
         <button className="btn-gold mt-4 w-full justify-center sm:w-auto" type="submit">Publicar tarea</button>
       </form>
+
+      {logToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setConfirmDeleteId(null)}>
+          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-[var(--institutional)] p-5 text-white">
+              <h3 className="text-lg font-extrabold">Eliminar foto</h3>
+              <p className="mt-1 text-sm text-stone-200">
+                {logToDelete.kind === "ASISTENCIA" ? "Lista de asistencia" : "Planilla de tareas"}
+                {" · "}
+                {new Date(logToDelete.logDate).toLocaleDateString("es-PY")}
+                {logToDelete.caption ? ` — ${logToDelete.caption}` : ""}
+              </p>
+            </div>
+            <p className="px-5 pt-4 text-sm text-slate-600">Esta acción no se puede deshacer.</p>
+            <div className="flex justify-end gap-2 p-5">
+              <button
+                type="button"
+                onClick={() => setConfirmDeleteId(null)}
+                className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteLog}
+                className="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-800"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
