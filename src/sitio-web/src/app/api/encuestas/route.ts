@@ -18,12 +18,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
     try {
       const polls = await prisma.poll.findMany({
-        select: { id: true, question: true, options: true, active: true, createdAt: true, votes: { select: { id: true } } },
+        select: { id: true, question: true, options: true, active: true, createdAt: true, votes: { select: { userId: true } } },
         orderBy: { createdAt: "desc" },
         take: 50,
       });
       return NextResponse.json({
-        data: polls.map((p: { id: string; question: string; options: unknown; active: boolean; createdAt: Date; votes: { id: string }[] }) => ({
+        data: polls.map((p: { id: string; question: string; options: unknown; active: boolean; createdAt: Date; votes: { userId: string }[] }) => ({
           id: p.id,
           question: p.question,
           options: p.options as string[],
