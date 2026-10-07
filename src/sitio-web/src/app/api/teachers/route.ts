@@ -10,6 +10,7 @@ export async function GET() {
     const teachers = await prisma.teacher.findMany({
       where: { user: { active: true, role: "TEACHER" } },
       select: {
+        id: true,
         user: { select: { firstName: true, lastName: true } },
         title: true,
         bio: true,
@@ -21,10 +22,12 @@ export async function GET() {
     });
     return NextResponse.json({
       data: teachers.map((t: {
+        id: string;
         user: { firstName: string; lastName: string };
         title: string | null; bio: string | null; schedule: string | null; photo: string | null;
         subjects: { subject: { code: string; name: string } }[];
       }) => ({
+        id: t.id,
         nombre: `${t.user.firstName} ${t.user.lastName}`.trim(),
         titulo: t.title,
         materias: t.subjects.map((s: { subject: { code: string; name: string } }) => s.subject),

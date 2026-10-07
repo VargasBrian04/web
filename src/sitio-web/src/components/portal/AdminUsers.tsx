@@ -94,6 +94,32 @@ export default function AdminUsers() {
     }
   }
 
+  const [deleting, setDeleting] = useState<AdminUser | null>(null);
+  const [deletingBusy, setDeletingBusy] = useState(false);
+
+  async function confirmDelete() {
+    if (!deleting || deletingBusy) return;
+    setDeletingBusy(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: deleting.id }),
+      });
+      const json = await res.json();
+      if (!res.ok) setMsg(json.error || "No se pudo eliminar");
+      else {
+        setMsg(`Cuenta @${deleting.username} eliminada definitivamente.`);
+        loadUsers();
+      }
+    } catch {
+      setMsg("Error de red al eliminar");
+    } finally {
+      setDeletingBusy(false);
+      setDeleting(null);
+    }
+  }
+
   async function linkTutor(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null);
@@ -175,7 +201,12 @@ export default function AdminUsers() {
                   <td className="py-2 pr-4"><span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-bold">{{ TEACHER: "Docente", PARENT: "Tutor", ADMIN: "Dirección", STUDENT: "Alumno", ASPIRANT: "Aspirante" }[u.role] ?? u.role}</span></td>
                   <td className="py-2 pr-4 text-xs text-slate-500">{u.email ?? "sin correo"}{u.phone ? ` · ${u.phone}` : ""}</td>
                   <td className="py-2 pr-4"><span className={`rounded px-2 py-1 text-xs font-bold ${u.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{u.active ? "Activo" : "Baneado"}</span></td>
-                  <td className="py-2"><button onClick={() => { if (window.confirm(u.active ? `¿Banear a @${u.username}? No podrá ingresar.` : `¿Reactivar a @${u.username}?`)) toggleActive(u); }} type="button" className={`rounded px-2 py-1 text-xs font-bold ${u.active ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-800"}`}>{u.active ? "Banear" : "Reactivar"}</button></td>
+                  <td className="py-2">
+                    <div className="flex flex-wrap gap-1">
+                      <button onClick={() => { if (window.confirm(u.active ? `¿Banear a @${u.username}? No podrá ingresar.` : `¿Reactivar a @${u.username}?`)) toggleActive(u); }} type="button" className={`rounded px-2 py-1 text-xs font-bold ${u.active ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-800"}`}>{u.active ? "Banear" : "Reactivar"}</button>
+                      <button onClick={() => setDeleting(u)} type="button" title="Eliminar cuenta definitivamente" className="rounded border border-red-200 px-2 py-1 text-xs font-bold text-red-700 hover:bg-red-50">Eliminar</button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -200,6 +231,30 @@ export default function AdminUsers() {
           <button className="btn-gold mt-4 w-full justify-center" type="submit">Asignar</button>
         </form>
       </div>
+
+      {deleting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setDeleting(null)}>
+          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-[var(--institutional)] p-5 text-white">
+              <h3 className="text-lg font-extrabold">Eliminar cuenta</h3>
+              <p className="mt-1 text-sm text-stone-200">
+                @{deleting.username} · {deleting.firstName} {deleting.lastName} ({deleting.ci})
+              </p>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-slate-600">
+                Borrado <strong>definitivo</strong>, no se puede deshacer. No podés eliminarte a vos mismo
+                ni al único admin activo. Si la cuenta tiene historial vinculado (materias, notas,
+                inscripciones, hijos), se rechaza: en ese caso baneala.
+              </p>
+              <div className="mt-5 flex justify-end gap-2">
+                <button type="button" onClick={() => setDeleting(null)} disabled={deletingBusy} className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50">Cancelar</button>
+                <button type="button" onClick={confirmDelete} disabled={deletingBusy} className="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-800 disabled:opacity-50">{deletingBusy ? "Eliminando…" : "Eliminar definitiva"}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

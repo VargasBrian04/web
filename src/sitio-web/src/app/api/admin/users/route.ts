@@ -240,3 +240,115 @@ export async function PATCH(request: Request) {
   });
   return NextResponse.json({ data: updated });
 }
+
+/**
+ * DELETE /api/admin/users — Solo ADMIN. { id }.
+ * Borrado definitivo (no es banear). Protecciones:
+ *  - no borrarse a uno mismo ni al último admin activo;
+ *  - si la cuenta tiene historial vinculado (materias, fotos, tareas,
+ *    notas, inscripciones, hijos vinculados) se rechaza con 409:
+ *    en ese caso hay que banear, no borrar.
+ *  Las fichas vacías (sin datos) se eliminan en la misma transacción.
+ */
+export async function DELETE(request: Request) {
+  const session = await auth();
+  if (!session?.user)
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  if (session.user.role !== "ADMIN")
+    return NextResponse.json(
+      { error: "Solo Secretaría/Dirección" },
+      { status: 403 }
+    );
+
+  const body = (await request.json().catch(() => null)) as { id?: string } | null;
+  if (!body?.id)
+    return NextResponse.json({ error: "Falta id" }, { status: 400 });
+  const target = await prisma.user.findUnique({
+    where: { id: body.id },
+    select: { id: true, username: true, role: true, active: true },
+  });
+  if (!target)
+    return NextResponse.json({ error: "Usuario inexistente" }, { status: 404 });
+  if (target.id === session.user.id)
+    return NextResponse.json({ error: "No podés eliminar tu propia cuenta" }, { status: 400 });
+  if (target.role === "ADMIN") {
+    const others = await prisma.user.count({
+      where: { role: "ADMIN", active: true, id: { not: target.id } },
+    });
+    if (others === 0)
+      return NextResponse.json(
+        { error: "No podés eliminar al único admin activo" },
+        { status: 400 }
+      );
+  }
+
+  const linked: string[] = [];
+  const teacher = await prisma.teacher.findUnique({
+    where: { userId: target.id },
+    select: { id: true },
+  });
+  if (teacher) {
+    const [subs, logs, tasks, grades, atts, groups, docs, obs] = await Promise.all([
+      prisma.teacherSubject.count({ where: { teacherId: teacher.id } }),
+      prisma.photoLog.count({ where: { teacherId: teacher.id } }),
+      prisma.assignment.count({ where: { teacherId: teacher.id } }),
+      prisma.grade.count({ where: { teacherId: teacher.id } }),
+      prisma.attendance.count({ where: { teacherId: teacher.id } }),
+      prisma.classTeacher.count({ where: { teacherId: teacher.id } }),
+      prisma.document.count({ where: { teacherId: teacher.id } }),
+      prisma.observation.count({ where: { teacherId: teacher.id } }),
+    ]);
+    if (subs + logs + tasks + grades + atts + groups + docs + obs > 0)
+      linked.push("actividad docente (materias, fotos, tareas o notas)");
+  }
+  const student = await prisma.student.findUnique({
+    where: { userId: target.id },
+    select: { id: true },
+  });
+  if (student) {
+    const [links, enrolls, grades, atts, subs, docs, obs] = await Promise.all([
+      prisma.studentGuardian.count({ where: { studentId: student.id } }),
+      prisma.enrollment.count({ where: { studentId: student.id } }),
+      prisma.grade.count({ where: { studentId: student.id } }),
+      prisma.attendance.count({ where: { studentId: student.id } }),
+      prisma.assignmentSubmission.count({ where: { studentId: student.id } }),
+      prisma.document.count({ where: { studentId: student.id } }),
+      prisma.observation.count({ where: { studentId: student.id } }),
+    ]);
+    if (links + enrolls + grades + atts + subs + docs + obs > 0)
+      linked.push("historial de alumno (inscripciones, notas o vínculos)");
+  }
+  const guardian = await prisma.guardian.findUnique({
+    where: { userId: target.id },
+    select: { id: true },
+  });
+  if (guardian) {
+    const links = await prisma.studentGuardian.count({ where: { guardianId: guardian.id } });
+    if (links > 0) linked.push("hijos vinculados como tutor");
+  }
+  const news = await prisma.newsPost.count({ where: { authorId: target.id } });
+  if (news > 0) linked.push("noticias publicadas");
+  if (linked.length > 0)
+    return NextResponse.json(
+      { error: `No se puede eliminar: tiene ${linked.join(" y ")}. Baneá la cuenta en vez de borrarla.` },
+      { status: 409 }
+    );
+
+  try {
+    await prisma.$transaction(async (tx: any) => {
+      if (teacher) {
+        await tx.teacherSubject.deleteMany({ where: { teacherId: teacher.id } });
+        await tx.teacher.delete({ where: { id: teacher.id } });
+      }
+      if (student) await tx.student.delete({ where: { id: student.id } });
+      if (guardian) await tx.guardian.delete({ where: { id: guardian.id } });
+      await tx.user.delete({ where: { id: target.id } });
+    });
+  } catch {
+    return NextResponse.json(
+      { error: "No se pudo eliminar: tiene datos vinculados. Baneá la cuenta." },
+      { status: 409 }
+    );
+  }
+  return NextResponse.json({ data: { id: target.id, username: target.username } });
+}
