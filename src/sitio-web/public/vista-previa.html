@@ -1020,7 +1020,7 @@ function regShowOk(){document.getElementById('regFormT').style.display='none';do
 /* ¿Es cuenta de Dirección? (no carga notas: gestiona) */
 function isDirector(){if(realRole==='ADMIN')return true;return /luis|direccion|director|admin/i.test(lastUser||'')||/luis|direccion|director|admin/i.test((typeof profile!=='undefined'&&profile.name)||'')}
 function portalHome(){if(realRole==='ADMIN')return '/portal/admin';if(realRole==='TEACHER')return '/portal/profesor';if(realRole==='STUDENT')return '/portal/alumno';if(realRole==='PARENT')return '/portal/padre';if(userRole==='padre')return '/portal/padre';if(userRole==='alumno')return '/portal/alumno';return '/portal/profesor'}
-function goMyPanel(){var m=document.getElementById('chipMenu');if(m)m.style.display='none';try{if(location.protocol.indexOf('http')===0){fetch('/api/auth/session',{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j&&j.user&&j.user.role){realRole=j.user.role;location.href=portalHome();return}openDash(lastUser||'Usuario')}).catch(function(){openDash(lastUser||'Usuario')});return}}catch(e){}openDash(lastUser||'Usuario')}
+function goMyPanel(){var m=document.getElementById('chipMenu');if(m)m.style.display='none';try{if(location.protocol.indexOf('http')===0){fetch('/api/auth/session',{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j&&j.user&&j.user.role){realRole=j.user.role;location.href=portalHome();return}location.href='/'}).catch(function(){location.href='/'});return}}catch(e){}location.href='/'}
 var demoSolicitudes=[
 {id:1,nombre:'María Ayala',perfil:'Docente · Matemática',ci:'5123456'},
 {id:2,nombre:'Juan Pérez',perfil:'Tutor · 2 hijos',ci:'4789012'},

@@ -107,10 +107,9 @@ export async function POST(request: Request) {
     if (!subject) return NextResponse.json({ error: "Materia inválida" }, { status: 400 });
     subjectId = subject.id;
   }
-  const teacher =
-    session.user.role === "TEACHER"
-      ? await prisma.teacher.findUnique({ where: { userId: session.user.id } })
-      : null;
+  // La foto queda atribuida a la ficha docente del que sube (también
+  // Dirección, si enseña): así aparece en su zona del directorio.
+  const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
 
   try {
     const uri = imageToDataUri(
