@@ -27,6 +27,7 @@ export default function TeacherTools() {
   const [loading, setLoading] = useState(true);
 
   const [quickGrade, setQuickGrade] = useState<Record<string, string>>({});
+  const [loadError, setLoadError] = useState(false);
   const [logs, setLogs] = useState<PhotoLog[]>([]);
   const [logFile, setLogFile] = useState<File | null>(null);
   const [logCaption, setLogCaption] = useState("");
@@ -43,10 +44,19 @@ export default function TeacherTools() {
     try {
       const qs = new URLSearchParams();
       if (subject) qs.set("subject", subject);
-      const res = await fetch(`/api/fotolog?${qs.toString()}`);
+      const res = await fetch(`/api/fotolog?${qs.toString()}`, { signal: AbortSignal.timeout(20000) });
       const json = await res.json();
-      if (res.ok) setLogs(json.data ?? []);
-    } catch { /* opcional */ }
+      if (res.ok) {
+        setLogs(json.data ?? []);
+        setLoadError(false);
+      } else {
+        setMsg(json.error || "No se pudo cargar la bitácora");
+        setLoadError(true);
+      }
+    } catch {
+      setMsg("Tardó demasiado o falló la red al cargar la bitácora");
+      setLoadError(true);
+    }
   }
 
   async function submitLog(kind: "ASISTENCIA" | "TAREA") {
@@ -98,11 +108,12 @@ export default function TeacherTools() {
 
   async function load() {
     setLoading(true);
+    setLoadError(false);
     try {
       const qs = new URLSearchParams();
       if (subject) qs.set("subject", subject);
       if (period) qs.set("period", period);
-      const res = await fetch(`/api/teacher/roster?${qs.toString()}`);
+      const res = await fetch(`/api/teacher/roster?${qs.toString()}`, { signal: AbortSignal.timeout(20000) });
       const json = await res.json();
       if (res.ok) {
         setSubjects(json.data.subjects?.length ? json.data.subjects : json.data.allSubjects ?? []);
@@ -111,12 +122,21 @@ export default function TeacherTools() {
         if (!period && json.data.periods?.[0]) setPeriod(json.data.periods[0].label);
       } else {
         setMsg(json.error || "No se pudo cargar la nómina");
+        setLoadError(true);
       }
     } catch {
-      setMsg("Error de red al cargar la nómina");
+      setMsg("Tardó demasiado o falló la red al cargar la nómina");
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
+  }
+
+  function retryLoad() {
+    setMsg(null);
+    setLoadError(false);
+    load();
+    loadLogs();
   }
 
   useEffect(() => {
@@ -183,6 +203,15 @@ export default function TeacherTools() {
     <div className="grid gap-6">
       {msg && (
         <p className="rounded-lg bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900">{msg}</p>
+      )}
+      {loadError && (
+        <button
+          type="button"
+          onClick={retryLoad}
+          className="w-fit rounded-lg bg-[var(--institutional)] px-4 py-2 text-sm font-bold text-white hover:opacity-90"
+        >
+          Reintentar carga
+        </button>
       )}
 
       <TeacherProfile />
