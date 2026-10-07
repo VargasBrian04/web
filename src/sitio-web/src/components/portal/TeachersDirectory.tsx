@@ -154,6 +154,33 @@ export default function TeachersDirectory() {
     return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-PY");
   }
 
+  async function openPdf(dataUri: string, title: string) {
+    try {
+      const res = await fetch(dataUri);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+      window.open(url, "_blank", "noopener");
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch {
+      setMsg("No se pudo abrir el PDF");
+    }
+  }
+
+  async function downloadPdf(dataUri: string, title: string) {
+    try {
+      const res = await fetch(dataUri);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${title.slice(0, 60) || "tarea"}.pdf`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch {
+      setMsg("No se pudo descargar el PDF");
+    }
+  }
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -309,34 +336,43 @@ export default function TeachersDirectory() {
                                 {detail.tasks.length === 0 ? (
                                   <p className="mt-1 text-sm text-slate-500">Sin tareas publicadas en este curso y materia.</p>
                                 ) : (
-                                  <ul className="mt-2 grid gap-2">
+                                  <ul className="mt-2 grid gap-3">
                                     {detail.tasks.map((a) => {
                                       const isPdf = (a.fileData ?? "").startsWith("data:application/pdf");
                                       const isImg = (a.fileData ?? "").startsWith("data:image/");
                                       const isOpen = openTask === a.id;
                                       return (
-                                        <li key={a.id} className="overflow-hidden rounded-lg border border-stone-200 bg-white">
+                                        <li key={a.id} className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
                                           <button
                                             type="button"
                                             onClick={() => setOpenTask(isOpen ? null : a.id)}
-                                            title="Click para ver el detalle"
-                                            className="block w-full px-3 py-2 text-left hover:bg-stone-50"
+                                            title="Click para ver la tarea completa"
+                                            className="block w-full bg-gradient-to-r from-[var(--paper)] to-white px-4 py-3 text-left hover:brightness-[0.98]"
                                           >
-                                            <p className="text-sm font-bold text-slate-900">
-                                              {a.title} <span className="font-normal text-slate-400">{isOpen ? "▾" : "▸"}</span>
-                                            </p>
-                                            <p className="mt-0.5 text-xs text-slate-400">
-                                              Vence: {fmtDate(a.dueDate)}
-                                              {a.fileData ? (isPdf ? " · 📄 PDF adjunto" : " · 🖼️ Foto adjunta") : ""}
-                                            </p>
+                                            <span className="flex flex-wrap items-center gap-2">
+                                              <span className="rounded-full bg-[var(--institutional)] px-2.5 py-0.5 text-[11px] font-extrabold text-white">
+                                                {a.subject?.name ?? "Tarea"}
+                                              </span>
+                                              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-500">
+                                                Vence: {fmtDate(a.dueDate)}
+                                              </span>
+                                              {a.fileData && (
+                                                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-500">
+                                                  {isPdf ? "📄 PDF adjunto" : "🖼️ Foto adjunta"}
+                                                </span>
+                                              )}
+                                            </span>
+                                            <span className="mt-1 block text-base font-extrabold text-slate-900">
+                                              {a.title} <span className="text-sm font-normal text-slate-400">{isOpen ? "▾" : "▸"}</span>
+                                            </span>
+                                            {a.description && !isOpen && (
+                                              <span className="mt-0.5 block truncate text-sm text-slate-500">{a.description}</span>
+                                            )}
                                           </button>
                                           {isOpen && (
-                                            <div className="grid gap-2 border-t border-stone-100 px-3 py-2">
-                                              {a.description && <p className="text-sm text-slate-600">{a.description}</p>}
-                                              {a.notes && (
-                                                <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                                                  <span className="font-bold">Observaciones: </span>{a.notes}
-                                                </p>
+                                            <div className="grid gap-3 border-t border-dashed border-stone-200 px-4 py-3">
+                                              {a.description && (
+                                                <p className="text-sm leading-relaxed text-slate-700">{a.description}</p>
                                               )}
                                               {isImg && a.fileData && (
                                                 <button
@@ -346,18 +382,33 @@ export default function TeachersDirectory() {
                                                   className="block w-fit cursor-zoom-in"
                                                 >
                                                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                  <img src={a.fileData} alt={a.title} className="max-h-48 rounded-lg border border-stone-200 object-contain" loading="lazy" />
+                                                  <img src={a.fileData} alt={a.title} className="max-h-56 rounded-lg border border-stone-200 object-contain shadow-sm transition-transform hover:scale-[1.01]" loading="lazy" />
                                                 </button>
                                               )}
                                               {isPdf && a.fileData && (
-                                                <a
-                                                  href={a.fileData}
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                  className="w-fit rounded-lg bg-[var(--institutional)] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90"
-                                                >
-                                                  Abrir PDF adjunto ↗
-                                                </a>
+                                                <div className="flex flex-wrap gap-2">
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => openPdf(a.fileData as string, a.title)}
+                                                    className="rounded-lg bg-[var(--institutional)] px-4 py-2 text-xs font-bold text-white hover:opacity-90"
+                                                  >
+                                                    Ver PDF ↗
+                                                  </button>
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => downloadPdf(a.fileData as string, a.title)}
+                                                    className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                                                  >
+                                                    Descargar
+                                                  </button>
+                                                </div>
+                                              )}
+                                              {a.notes ? (
+                                                <p className="rounded-lg border-l-4 border-[var(--gold)] bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                                                  <span className="font-extrabold">Observaciones: </span>{a.notes}
+                                                </p>
+                                              ) : (
+                                                <p className="text-xs italic text-slate-400">Sin observaciones del docente.</p>
                                               )}
                                             </div>
                                           )}
