@@ -16,7 +16,7 @@ export async function GET() {
         bio: true,
         schedule: true,
         photo: true,
-        subjects: { select: { subject: { select: { code: true, name: true } } } },
+        subjects: { select: { subject: { select: { code: true, name: true, gradeYear: true, academic: { select: { shortName: true, name: true } } } } } },
       },
       orderBy: { user: { firstName: "asc" } },
     });
@@ -25,12 +25,12 @@ export async function GET() {
         id: string;
         user: { firstName: string; lastName: string };
         title: string | null; bio: string | null; schedule: string | null; photo: string | null;
-        subjects: { subject: { code: string; name: string } }[];
+        subjects: { subject: { code: string; name: string; gradeYear: number; academic: { shortName: string; name: string } | null } }[];
       }) => ({
         id: t.id,
         nombre: `${t.user.firstName} ${t.user.lastName}`.trim(),
         titulo: t.title,
-        materias: t.subjects.map((s: { subject: { code: string; name: string } }) => s.subject),
+        materias: t.subjects.map((s: { subject: { code: string; name: string; gradeYear: number; academic: { shortName: string; name: string } | null } }) => s.subject),
         bio: t.bio,
         horario: t.schedule,
         foto: t.photo,

@@ -2,11 +2,18 @@
 
 import { useEffect, useState } from "react";
 
+type Materia = {
+  code: string;
+  name: string;
+  gradeYear: number;
+  academic: { shortName: string; name: string } | null;
+};
+
 type Teacher = {
   id: string;
   nombre: string;
   titulo: string | null;
-  materias: { code: string; name: string }[];
+  materias: Materia[];
   bio: string | null;
   horario: string | null;
   foto: string | null;
@@ -36,14 +43,20 @@ type Detail = {
   tasks: TaskItem[];
 };
 
-/** Directorio de docentes con detalle por curso (planillas, listas y tareas). */
+function cursoLabel(m: Materia): string {
+  const bach = m.academic?.shortName ?? "Curso";
+  return `${m.gradeYear}.º ${bach}`;
+}
+
+/** Directorio de docentes: cursos que enseña → materias → planillas y tareas. */
 export default function TeachersDirectory() {
   const [items, setItems] = useState<Teacher[]>([]);
   const [q, setQ] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [selSubject, setSelSubject] = useState<Record<string, string>>({});
+  const [selCurso, setSelCurso] = useState<Record<string, string>>({});
+  const [selMateria, setSelMateria] = useState<Record<string, string>>({});
   const [details, setDetails] = useState<Record<string, Detail>>({});
 
   useEffect(() => {
@@ -62,6 +75,17 @@ export default function TeachersDirectory() {
       .toLowerCase()
       .includes(q.trim().toLowerCase())
   );
+
+  function cursosDe(t: Teacher): { label: string; materias: Materia[] }[] {
+    const map = new Map<string, { label: string; materias: Materia[] }>();
+    for (const m of t.materias ?? []) {
+      const label = cursoLabel(m);
+      const g = map.get(label) ?? { label, materias: [] };
+      g.materias.push(m);
+      map.set(label, g);
+    }
+    return [...map.values()];
+  }
 
   async function loadDetail(teacherId: string, subjectCode: string) {
     const key = `${teacherId}|${subjectCode}`;
@@ -83,9 +107,31 @@ export default function TeachersDirectory() {
     }
   }
 
-  function pickSubject(teacherId: string, code: string) {
-    setSelSubject((s) => ({ ...s, [teacherId]: code }));
-    loadDetail(teacherId, code);
+  function openTeacher(t: Teacher) {
+    setExpanded(t.id);
+    const cursos = cursosDe(t);
+    const curso = selCurso[t.id] ?? cursos[0]?.label;
+    const mat = selMateria[`${t.id}|${curso}`] ?? cursos.find((c) => c.label === curso)?.materias[0]?.code;
+    if (curso) setSelCurso((s) => ({ ...s, [t.id]: curso }));
+    if (curso && mat) {
+      setSelMateria((s) => ({ ...s, [`${t.id}|${curso}`]: mat }));
+      loadDetail(t.id, mat);
+    }
+  }
+
+  function pickCurso(t: Teacher, label: string) {
+    setSelCurso((s) => ({ ...s, [t.id]: label }));
+    const cursos = cursosDe(t);
+    const mat = selMateria[`${t.id}|${label}`] ?? cursos.find((c) => c.label === label)?.materias[0]?.code;
+    if (mat) {
+      setSelMateria((s) => ({ ...s, [`${t.id}|${label}`]: mat }));
+      loadDetail(t.id, mat);
+    }
+  }
+
+  function pickMateria(t: Teacher, curso: string, code: string) {
+    setSelMateria((s) => ({ ...s, [`${t.id}|${curso}`]: code }));
+    loadDetail(t.id, code);
   }
 
   function fmtDate(iso: string | null): string {
@@ -118,8 +164,11 @@ export default function TeachersDirectory() {
           {filtered.map((t) => {
             const initials = t.nombre.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
             const isOpen = expanded === t.id;
-            const activeCode = selSubject[t.id] ?? t.materias[0]?.code ?? "";
-            const detail = details[`${t.id}|${activeCode}`];
+            const cursos = cursosDe(t);
+            const cursoActivo = selCurso[t.id] ?? cursos[0]?.label ?? "";
+            const materiasCurso = cursos.find((c) => c.label === cursoActivo)?.materias ?? [];
+            const materiaActiva = selMateria[`${t.id}|${cursoActivo}`] ?? materiasCurso[0]?.code ?? "";
+            const detail = details[`${t.id}|${materiaActiva}`];
             return (
               <article key={t.id} className="overflow-hidden rounded-xl border border-stone-200">
                 <div className="flex gap-4 p-4">
@@ -134,28 +183,16 @@ export default function TeachersDirectory() {
                   <div className="min-w-0 flex-1">
                     <h3 className="font-bold text-slate-900">{t.nombre}</h3>
                     {t.titulo && <p className="text-sm font-semibold text-[var(--gold)]">{t.titulo}</p>}
-                    {(t.materias ?? []).length > 0 && (
-                      <div className="mt-1.5 flex flex-wrap gap-1">
-                        {(t.materias ?? []).map((m) => (
-                          <span key={m.code} className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">
-                            {m.name}
-                          </span>
-                        ))}
-                      </div>
+                    {cursos.length > 0 && (
+                      <p className="mt-1 text-xs text-slate-500">
+                        Enseña en: {cursos.map((c) => c.label).join(" · ")}
+                      </p>
                     )}
                     {t.bio && <p className="mt-1.5 text-sm text-slate-600">{t.bio}</p>}
                     {t.horario && <p className="mt-1 text-xs text-slate-500">Horario: {t.horario}</p>}
                     <button
                       type="button"
-                      onClick={() => {
-                        if (isOpen) {
-                          setExpanded(null);
-                        } else {
-                          setExpanded(t.id);
-                          const code = selSubject[t.id] ?? t.materias[0]?.code;
-                          if (code) pickSubject(t.id, code);
-                        }
-                      }}
+                      onClick={() => (isOpen ? setExpanded(null) : openTeacher(t))}
                       className="mt-2 rounded-lg bg-[var(--institutional)] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90"
                     >
                       {isOpen ? "Ocultar cursos" : "Ver cursos"}
@@ -165,18 +202,38 @@ export default function TeachersDirectory() {
 
                 {isOpen && (
                   <div className="border-t border-stone-200 bg-stone-50/60 p-4">
-                    {(t.materias ?? []).length === 0 ? (
+                    {cursos.length === 0 ? (
                       <p className="text-sm text-slate-500">Sin cursos asignados todavía.</p>
                     ) : (
                       <>
-                        <div className="flex flex-wrap gap-2">
-                          {(t.materias ?? []).map((m) => (
+                        <p className="text-xs font-extrabold uppercase tracking-wide text-slate-400">Cursos</p>
+                        <div className="mt-1.5 flex flex-wrap gap-2">
+                          {cursos.map((c) => (
+                            <button
+                              key={c.label}
+                              type="button"
+                              onClick={() => pickCurso(t, c.label)}
+                              className={`rounded-full px-4 py-1.5 text-xs font-bold transition-colors ${
+                                cursoActivo === c.label
+                                  ? "bg-[var(--institutional)] text-white"
+                                  : "bg-white text-slate-600 ring-1 ring-stone-200 hover:bg-stone-100"
+                              }`}
+                            >
+                              {c.label}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="mt-3 text-xs font-extrabold uppercase tracking-wide text-slate-400">
+                          Materias en {cursoActivo || "el curso"}
+                        </p>
+                        <div className="mt-1.5 flex flex-wrap gap-2">
+                          {materiasCurso.map((m) => (
                             <button
                               key={m.code}
                               type="button"
-                              onClick={() => pickSubject(t.id, m.code)}
+                              onClick={() => pickMateria(t, cursoActivo, m.code)}
                               className={`rounded-full px-4 py-1.5 text-xs font-bold transition-colors ${
-                                activeCode === m.code
+                                materiaActiva === m.code
                                   ? "bg-[var(--gold)] text-white"
                                   : "bg-white text-slate-600 ring-1 ring-stone-200 hover:bg-stone-100"
                               }`}
@@ -197,7 +254,7 @@ export default function TeachersDirectory() {
                                   Planillas y listas publicadas
                                 </p>
                                 {detail.logs.length === 0 ? (
-                                  <p className="mt-1 text-sm text-slate-500">Sin fotos publicadas en este curso.</p>
+                                  <p className="mt-1 text-sm text-slate-500">Sin fotos publicadas en este curso y materia.</p>
                                 ) : (
                                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                                     {detail.logs.map((l) => (
@@ -220,7 +277,7 @@ export default function TeachersDirectory() {
                                   Tareas publicadas
                                 </p>
                                 {detail.tasks.length === 0 ? (
-                                  <p className="mt-1 text-sm text-slate-500">Sin tareas publicadas en este curso.</p>
+                                  <p className="mt-1 text-sm text-slate-500">Sin tareas publicadas en este curso y materia.</p>
                                 ) : (
                                   <ul className="mt-2 grid gap-2">
                                     {detail.tasks.map((a) => (
