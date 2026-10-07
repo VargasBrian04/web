@@ -58,6 +58,16 @@ export default function TeachersDirectory() {
   const [selCurso, setSelCurso] = useState<Record<string, string>>({});
   const [selMateria, setSelMateria] = useState<Record<string, string>>({});
   const [details, setDetails] = useState<Record<string, Detail>>({});
+  const [zoom, setZoom] = useState<{ src: string; label: string } | null>(null);
+
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setZoom(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoom]);
 
   useEffect(() => {
     fetch("/api/teachers", { cache: "no-store" })
@@ -92,17 +102,18 @@ export default function TeachersDirectory() {
     setDetails((d) => ({ ...d, [key]: { loading: true, error: null, logs: [], tasks: [] } }));
     try {
       const [lRes, tRes] = await Promise.all([
-        fetch(`/api/fotolog?subject=${encodeURIComponent(subjectCode)}&teacher=${encodeURIComponent(teacherId)}&take=20`),
-        fetch(`/api/assignments?subject=${encodeURIComponent(subjectCode)}&teacher=${encodeURIComponent(teacherId)}`),
+        fetch(`/api/fotolog?subject=${encodeURIComponent(subjectCode)}&teacher=${encodeURIComponent(teacherId)}&take=20`, { signal: AbortSignal.timeout(20000) }),
+        fetch(`/api/assignments?subject=${encodeURIComponent(subjectCode)}&teacher=${encodeURIComponent(teacherId)}`, { signal: AbortSignal.timeout(20000) }),
       ]);
       const [lJson, tJson] = await Promise.all([lRes.json(), tRes.json()]);
       if (!lRes.ok) throw new Error(lJson.error || "No se pudo cargar la bitácora");
       if (!tRes.ok) throw new Error(tJson.error || "No se pudieron cargar las tareas");
       setDetails((d) => ({ ...d, [key]: { loading: false, error: null, logs: lJson.data ?? [], tasks: tJson.data ?? [] } }));
     } catch (e) {
+      const slow = e instanceof DOMException && e.name === "TimeoutError";
       setDetails((d) => ({
         ...d,
-        [key]: { loading: false, error: e instanceof Error ? e.message : "Error de red", logs: [], tasks: [] },
+        [key]: { loading: false, error: slow ? "Tardó demasiado (servidor frío). Tocá Reintentar." : e instanceof Error ? e.message : "Error de red", logs: [], tasks: [] },
       }));
     }
   }
@@ -246,7 +257,16 @@ export default function TeachersDirectory() {
                           {!detail || detail.loading ? (
                             <p className="text-sm text-slate-500">Cargando material del curso…</p>
                           ) : detail.error ? (
-                            <p className="text-sm text-red-600">{detail.error}</p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-sm text-red-600">{detail.error}</p>
+                              <button
+                                type="button"
+                                onClick={() => loadDetail(t.id, materiaActiva)}
+                                className="rounded-lg bg-[var(--institutional)] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90"
+                              >
+                                Reintentar
+                              </button>
+                            </div>
                           ) : (
                             <div className="grid gap-3">
                               <div>
@@ -257,18 +277,25 @@ export default function TeachersDirectory() {
                                   <p className="mt-1 text-sm text-slate-500">Sin fotos publicadas en este curso y materia.</p>
                                 ) : (
                                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                                    {detail.logs.map((l) => (
-                                      <figure key={l.id} className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={l.photoData} alt={l.kind === "ASISTENCIA" ? "Lista de asistencia" : "Planilla"} className="max-h-48 w-full bg-stone-100 object-contain" loading="lazy" />
-                                        <figcaption className="px-3 py-2 text-xs text-slate-500">
-                                          <span className="font-bold text-slate-700">
-                                            {l.kind === "ASISTENCIA" ? "Asistencia" : "Planilla"} · {fmtDate(l.logDate)}
-                                          </span>
-                                          {l.caption ? ` — ${l.caption}` : ""}
-                                        </figcaption>
-                                      </figure>
-                                    ))}
+                                    {detail.logs.map((l) => {
+                                      const label = `${l.kind === "ASISTENCIA" ? "Asistencia" : "Planilla"} · ${fmtDate(l.logDate)}${l.caption ? ` — ${l.caption}` : ""}`;
+                                      return (
+                                        <figure key={l.id} className="overflow-hidden rounded-lg border border-stone-200 bg-white">
+                                          <button
+                                            type="button"
+                                            onClick={() => setZoom({ src: l.photoData, label })}
+                                            title="Click para ampliar"
+                                            className="block w-full cursor-zoom-in"
+                                          >
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={l.photoData} alt={l.kind === "ASISTENCIA" ? "Lista de asistencia" : "Planilla"} className="max-h-48 w-full bg-stone-100 object-contain" loading="lazy" />
+                                          </button>
+                                          <figcaption className="px-3 py-2 text-xs text-slate-500">
+                                            <span className="font-bold text-slate-700">{label}</span>
+                                          </figcaption>
+                                        </figure>
+                                      );
+                                    })}
                                   </div>
                                 )}
                               </div>
@@ -300,6 +327,23 @@ export default function TeachersDirectory() {
               </article>
             );
           })}
+        </div>
+      )}
+      {zoom && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4" onClick={() => setZoom(null)}>
+          <button
+            type="button"
+            onClick={() => setZoom(null)}
+            aria-label="Cerrar"
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-xl font-bold text-white hover:bg-white/30"
+          >
+            ✕
+          </button>
+          <figure className="max-w-full" onClick={(e) => e.stopPropagation()}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={zoom.src} alt={zoom.label} className="max-h-[82vh] max-w-[92vw] rounded-lg bg-white object-contain" />
+            <figcaption className="mt-2 text-center text-sm font-semibold text-white">{zoom.label}</figcaption>
+          </figure>
         </div>
       )}
     </section>
