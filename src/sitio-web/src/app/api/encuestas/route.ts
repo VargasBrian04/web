@@ -4,12 +4,39 @@ import { auth } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 
 /**
- * Encuestas. GET público (activas + mi voto + conteo).
+ * Encuestas. GET público (activas + mi voto + conteo); ?all=1 solo ADMIN
+ * (todas, con totales, para gestionar).
  * POST voto { pollId, optionIdx } (con sesión, un voto por usuario).
  * POST admin { question, options[] } · PATCH admin { id, active }.
+ * DELETE admin ?id= (borra votos y encuesta).
  */
 export async function GET(request: Request) {
   const session = await auth();
+  const { searchParams } = new URL(request.url);
+  if (searchParams.get("all") === "1") {
+    if (!session?.user || session.user.role !== "ADMIN")
+      return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
+    try {
+      const polls = await prisma.poll.findMany({
+        select: { id: true, question: true, options: true, active: true, createdAt: true, votes: { select: { id: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 50,
+      });
+      return NextResponse.json({
+        data: polls.map((p: { id: string; question: string; options: unknown; active: boolean; createdAt: Date; votes: { id: string }[] }) => ({
+          id: p.id,
+          question: p.question,
+          options: p.options as string[],
+          active: p.active,
+          createdAt: p.createdAt,
+          total: p.votes.length,
+        })),
+      });
+    } catch (e) {
+      console.error("GET /api/encuestas?all=1", e);
+      return NextResponse.json({ error: "Error interno" }, { status: 500 });
+    }
+  }
   try {
     const polls = await prisma.poll.findMany({
       where: { active: true },
@@ -86,4 +113,23 @@ export async function PATCH(request: Request) {
   const updated = await prisma.poll.update({ where: { id }, data: { active } });
   await audit(session.user, active ? "ENCUESTA_ON" : "ENCUESTA_OFF", id);
   return NextResponse.json({ data: { id: updated.id, active: updated.active } });
+}
+
+/** DELETE /api/encuestas?id= — solo ADMIN. Borra votos y encuesta. */
+export async function DELETE(request: Request) {
+  const session = await auth();
+  if (!session?.user)
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  if (session.user.role !== "ADMIN")
+    return NextResponse.json({ error: "Solo Dirección" }, { status: 403 });
+  const id = new URL(request.url).searchParams.get("id") || "";
+  if (!id) return NextResponse.json({ error: "Falta id" }, { status: 400 });
+  const found = await prisma.poll.findUnique({ where: { id }, select: { id: true } });
+  if (!found) return NextResponse.json({ error: "Encuesta inexistente" }, { status: 404 });
+  await prisma.$transaction([
+    prisma.vote.deleteMany({ where: { pollId: id } }),
+    prisma.poll.delete({ where: { id } }),
+  ]);
+  await audit(session.user, "ENCUESTA_DEL", id);
+  return NextResponse.json({ data: { id } });
 }

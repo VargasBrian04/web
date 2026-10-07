@@ -16,6 +16,8 @@ function cursoLabel(s: Subject): string {
 /** Panel del docente organizado por curso: planilla, lista y tarea de cada materia. */
 export default function TeacherTools() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [catalog, setCatalog] = useState<Subject[]>([]);
+  const [addCode, setAddCode] = useState("");
   const [periods, setPeriods] = useState<Period[]>([]);
   const [curso, setCurso] = useState("");
   const [subject, setSubject] = useState("");
@@ -121,10 +123,11 @@ export default function TeacherTools() {
     setLoading(true);
     setLoadError(false);
     try {
-      const res = await fetch("/api/teacher/roster", { signal: AbortSignal.timeout(20000) });
+      const res = await fetch("/api/teacher/subjects", { signal: AbortSignal.timeout(20000) });
       const json = await res.json();
       if (res.ok) {
-        setSubjects(json.data.subjects?.length ? json.data.subjects : json.data.allSubjects ?? []);
+        setSubjects(json.data.links ?? []);
+        setCatalog(json.data.catalog ?? []);
         setPeriods(json.data.periods ?? []);
         if (json.data.periods?.[0]) setPeriod((p) => p || json.data.periods[0].label);
       } else {
@@ -136,6 +139,39 @@ export default function TeacherTools() {
       setLoadError(true);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function linkSubject(e: React.FormEvent) {
+    e.preventDefault();
+    setMsg(null);
+    if (!addCode) {
+      setMsg("Elegí la materia para agregarla a tus cursos.");
+      return;
+    }
+    const res = await fetch("/api/teacher/subjects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ subjectCode: addCode }),
+    });
+    const json = await res.json();
+    if (!res.ok) setMsg(json.error || "No se pudo agregar");
+    else {
+      setMsg(`Agregada a tus cursos: ${json.data.name}.`);
+      setAddCode("");
+      loadCatalog();
+    }
+  }
+
+  async function unlinkSubject() {
+    if (!subject) return;
+    setMsg(null);
+    const res = await fetch(`/api/teacher/subjects?subjectCode=${encodeURIComponent(subject)}`, { method: "DELETE" });
+    const json = await res.json();
+    if (!res.ok) setMsg(json.error || "No se pudo quitar");
+    else {
+      setMsg("Materia desvinculada de tus cursos.");
+      loadCatalog();
     }
   }
 
@@ -250,13 +286,25 @@ export default function TeacherTools() {
           </label>
           <label className="text-sm font-semibold text-slate-700">
             Materia
-            <select value={subject} onChange={(e) => setSubject(e.target.value)} className={inputCls} disabled={loading}>
-              {materiasCurso.map((s) => (
-                <option key={s.code} value={s.code}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+            <span className="flex items-center gap-1.5">
+              <select value={subject} onChange={(e) => setSubject(e.target.value)} className={inputCls} disabled={loading}>
+                {materiasCurso.map((s) => (
+                  <option key={s.code} value={s.code}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              {subject && (
+                <button
+                  type="button"
+                  onClick={unlinkSubject}
+                  title="Dejar de enseñar esta materia"
+                  className="mt-1 shrink-0 rounded-lg border border-red-200 px-2.5 py-2 text-xs font-bold text-red-700 hover:bg-red-50"
+                >
+                  Quitar
+                </button>
+              )}
+            </span>
           </label>
           <label className="text-sm font-semibold text-slate-700">
             Período
@@ -270,6 +318,24 @@ export default function TeacherTools() {
             </select>
           </label>
         </div>
+        <form onSubmit={linkSubject} className="mt-4 flex flex-wrap items-end gap-2 border-t border-stone-100 pt-4">
+          <label className="min-w-0 flex-1 text-sm font-semibold text-slate-700">
+            Agregar materia que enseño
+            <select value={addCode} onChange={(e) => setAddCode(e.target.value)} className={inputCls} disabled={loading}>
+              <option value="">— Elegí del catálogo —</option>
+              {catalog
+                .filter((s) => !subjects.some((m) => m.code === s.code))
+                .map((s) => (
+                  <option key={s.code} value={s.code}>
+                    {s.gradeYear}.º {s.academic?.shortName ?? ""} · {s.name}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <button type="submit" className="rounded-lg bg-[var(--institutional)] px-4 py-2 text-sm font-bold text-white hover:opacity-90">
+            Vincularme
+          </button>
+        </form>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
