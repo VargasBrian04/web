@@ -129,9 +129,14 @@ export default async function PadrePage() {
                 <div>
                   <h3 className="text-lg font-bold text-slate-900">{child.name}</h3>
                   <p className="text-xs text-slate-500">{child.academic ?? "Bachillerato por confirmar"}</p>
-                  <a href={`/portal/padre/${child.id}`} className="mt-1 inline-block text-sm font-bold text-[var(--institutional)] underline">
-                    Ver ficha completa →
-                  </a>
+                  <span className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                    <a href={`/portal/padre/${child.id}`} className="inline-block text-sm font-bold text-[var(--institutional)] underline">
+                      Ver ficha completa →
+                    </a>
+                    <a href={`/portal/padre/docentes?hijo=${child.id}`} className="inline-block text-sm font-bold text-[var(--institutional)] underline">
+                      Docentes de su curso →
+                    </a>
+                  </span>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs font-bold">
                   <span className="rounded-full bg-white px-3 py-1 text-slate-700">

@@ -6,7 +6,7 @@ type Materia = {
   code: string;
   name: string;
   gradeYear: number;
-  academic: { shortName: string; name: string } | null;
+  academic: { code: string; shortName: string; name: string } | null;
 };
 
 type Teacher = {
@@ -50,12 +50,21 @@ function cursoLabel(m: Materia): string {
   return `${m.gradeYear}.º ${bach}`;
 }
 
+/** Filtro opcional al curso de un hijo (verificado en el servidor). */
+export type TeachersScope = {
+  academicCode: string;
+  academicShort: string;
+  gradeYear: number | null;
+  hijoNombre: string;
+};
+
 /** Directorio de docentes: cursos que enseña → materias → planillas y tareas. */
-export default function TeachersDirectory() {
+export default function TeachersDirectory({ scope: initialScope = null }: { scope?: TeachersScope | null }) {
   const [items, setItems] = useState<Teacher[]>([]);
   const [q, setQ] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [scope, setScope] = useState<TeachersScope | null>(initialScope);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [selCurso, setSelCurso] = useState<Record<string, string>>({});
   const [selMateria, setSelMateria] = useState<Record<string, string>>({});
@@ -83,11 +92,49 @@ export default function TeachersDirectory() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = items.filter((t) =>
-    `${t.nombre} ${t.titulo ?? ""} ${(t.materias ?? []).map((m) => m.name).join(" ")}`
+  const filtered = items.filter((t) => {
+    if (
+      scope &&
+      !(t.materias ?? []).some(
+        (m) =>
+          m.academic?.code === scope.academicCode &&
+          (scope.gradeYear == null || m.gradeYear === scope.gradeYear)
+      )
+    )
+      return false;
+    return `${t.nombre} ${t.titulo ?? ""} ${(t.materias ?? []).map((m) => m.name).join(" ")}`
       .toLowerCase()
-      .includes(q.trim().toLowerCase())
-  );
+      .includes(q.trim().toLowerCase());
+  });
+
+  const scopeLabel = scope
+    ? `${scope.gradeYear != null ? `${scope.gradeYear}.º ` : ""}${scope.academicShort} · ${scope.hijoNombre}`
+    : "";
+
+  const [scopeOpened, setScopeOpened] = useState(false);
+  useEffect(() => {
+    if (!scope || scopeOpened || loading || filtered.length === 0) return;
+    setScopeOpened(true);
+    const t = filtered[0];
+    setExpanded(t.id);
+    const mat = (t.materias ?? []).find(
+      (m) =>
+        m.academic?.code === scope.academicCode &&
+        (scope.gradeYear == null || m.gradeYear === scope.gradeYear)
+    );
+    const cursos = cursosDe(t);
+    const curso =
+      (mat && `${mat.gradeYear}.º ${mat.academic?.shortName ?? ""}`) || cursos[0]?.label;
+    if (curso) {
+      setSelCurso((s) => ({ ...s, [t.id]: curso }));
+      const code = mat?.code ?? cursos.find((c) => c.label === curso)?.materias[0]?.code;
+      if (code) {
+        setSelMateria((s) => ({ ...s, [`${t.id}|${curso}`]: code }));
+        loadDetail(t.id, code);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   function cursosDe(t: Teacher): { label: string; materias: Materia[] }[] {
     const map = new Map<string, { label: string; materias: Materia[] }>();
@@ -195,6 +242,20 @@ export default function TeachersDirectory() {
           className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--institutional)]"
         />
       </div>
+      {scope && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-[var(--paper)] px-4 py-3">
+          <p className="text-sm font-bold text-[var(--institutional)]">
+            Docentes del curso de {scopeLabel}
+          </p>
+          <button
+            type="button"
+            onClick={() => setScope(null)}
+            className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-600 ring-1 ring-stone-200 hover:bg-stone-100"
+          >
+            Ver todos
+          </button>
+        </div>
+      )}
       {msg && <p className="mt-3 rounded-lg bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900">{msg}</p>}
       {loading ? (
         <p className="mt-4 text-sm text-slate-500">Cargando docentes…</p>
