@@ -37,7 +37,7 @@ export default function TeacherProfile() {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6">
+    <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
       <h2 className="text-lg font-extrabold text-[var(--institutional)]">Mi ficha pública</h2>
       <p className="mt-1 text-sm text-slate-500">
         Esto se muestra en el repositorio de docentes junto a tu nombre y materias.
@@ -49,7 +49,7 @@ export default function TeacherProfile() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={120}
-            placeholder="Ej: Prof. de Matemática"
+            placeholder="Tu título profesional"
             className={inputCls}
           />
         </label>
@@ -59,7 +59,7 @@ export default function TeacherProfile() {
             value={schedule}
             onChange={(e) => setSchedule(e.target.value)}
             maxLength={300}
-            placeholder="Ej: Lun–Vie 7:00–12:00"
+            placeholder="Tu horario de clases"
             className={inputCls}
           />
         </label>
@@ -70,7 +70,7 @@ export default function TeacherProfile() {
             onChange={(e) => setBio(e.target.value)}
             rows={4}
             maxLength={2000}
-            placeholder="Contanos sobre vos, tu formación y tu forma de enseñar…"
+            placeholder="Tu presentación"
             className={`${inputCls} leading-relaxed`}
           />
         </label>

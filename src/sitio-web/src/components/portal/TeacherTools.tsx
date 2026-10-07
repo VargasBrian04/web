@@ -7,20 +7,17 @@ type Subject = { id: string; code: string; name: string; gradeYear: number; acad
 type Period = { id: string; label: string; name: string };
 
 const inputCls =
-  "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--institutional)]";
+  "mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--institutional)]";
 
 function cursoLabel(s: Subject): string {
   return `${s.gradeYear}.º ${s.academic?.shortName ?? "Curso"}`;
 }
 
-/** Panel del docente organizado por curso: planilla, lista y tarea de cada materia. */
+/** Panel del docente: cada zona elige su curso y materia. */
 export default function TeacherTools() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [catalog, setCatalog] = useState<Subject[]>([]);
   const [addCode, setAddCode] = useState("");
-  const [periods, setPeriods] = useState<Period[]>([]);
-  const [curso, setCurso] = useState("");
-  const [subject, setSubject] = useState("");
   const [period, setPeriod] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +26,10 @@ export default function TeacherTools() {
   const [logFile, setLogFile] = useState<File | null>(null);
   const [logCaption, setLogCaption] = useState("");
   const [logDate, setLogDate] = useState(new Date().toISOString().slice(0, 10));
+  const [fotoCurso, setFotoCurso] = useState("");
+  const [fotoMateria, setFotoMateria] = useState("");
+  const [taskCurso, setTaskCurso] = useState("");
+  const [taskMateria, setTaskMateria] = useState("");
 
   type PhotoLog = {
     id: string; kind: string; photoData: string; caption: string | null;
@@ -45,13 +46,28 @@ export default function TeacherTools() {
     }
     return [...map.entries()].map(([label, list]) => ({ label, list }));
   }, [subjects]);
-  const materiasCurso = cursos.find((c) => c.label === curso)?.list ?? [];
-  const materiaNombre = subjects.find((s) => s.code === subject)?.name ?? "";
+  const materiasDe = (curso: string) => cursos.find((c) => c.label === curso)?.list ?? [];
+  const nombreMateria = (code: string) => subjects.find((s) => s.code === code)?.name ?? "";
+
+  const fotoPreview = useMemo(() => {
+    if (!logFile || !logFile.type.startsWith("image/")) return null;
+    return URL.createObjectURL(logFile);
+  }, [logFile]);
+  useEffect(() => () => {
+    if (fotoPreview) URL.revokeObjectURL(fotoPreview);
+  }, [fotoPreview]);
+  const taskPreview = useMemo(() => {
+    if (!taskFile || !taskFile.type.startsWith("image/")) return null;
+    return URL.createObjectURL(taskFile);
+  }, [taskFile]);
+  useEffect(() => () => {
+    if (taskPreview) URL.revokeObjectURL(taskPreview);
+  }, [taskPreview]);
 
   async function loadLogs() {
     try {
       const qs = new URLSearchParams();
-      if (subject) qs.set("subject", subject);
+      if (fotoMateria) qs.set("subject", fotoMateria);
       const res = await fetch(`/api/fotolog?${qs.toString()}`, { signal: AbortSignal.timeout(20000) });
       const json = await res.json();
       if (res.ok) {
@@ -69,12 +85,12 @@ export default function TeacherTools() {
 
   async function submitLog(kind: "ASISTENCIA" | "TAREA") {
     setMsg(null);
-    if (!subject) {
-      setMsg("Elegí el curso y la materia arriba.");
+    if (!fotoMateria) {
+      setMsg("Elegí el curso y la materia de la foto.");
       return;
     }
     if (!logFile) {
-      setMsg("Sacá o elegí la foto de la lista.");
+      setMsg("Sacá o elegí la foto.");
       return;
     }
     if (logFile.size > 4 * 1024 * 1024) {
@@ -86,12 +102,13 @@ export default function TeacherTools() {
     fd.set("kind", kind);
     fd.set("logDate", logDate);
     fd.set("caption", logCaption.trim());
-    fd.set("subjectCode", subject);
+    fd.set("subjectCode", fotoMateria);
     const res = await fetch("/api/fotolog", { method: "POST", body: fd });
     const json = await res.json();
     if (!res.ok) setMsg(json.error || "No se pudo subir");
     else {
-      setMsg(kind === "ASISTENCIA" ? `Lista guardada en ${curso} · ${materiaNombre}.` : `Planilla guardada en ${curso} · ${materiaNombre}.`);
+      const where = `${fotoCurso} · ${nombreMateria(fotoMateria)}`;
+      setMsg(kind === "ASISTENCIA" ? `Lista guardada en ${where}.` : `Planilla guardada en ${where}.`);
       setLogFile(null);
       setLogCaption("");
       loadLogs();
@@ -128,8 +145,8 @@ export default function TeacherTools() {
       if (res.ok) {
         setSubjects(json.data.links ?? []);
         setCatalog(json.data.catalog ?? []);
-        setPeriods(json.data.periods ?? []);
-        if (json.data.periods?.[0]) setPeriod((p) => p || json.data.periods[0].label);
+        const ps: Period[] = json.data.periods ?? [];
+        if (ps[0]) setPeriod((p) => p || ps[0].label);
       } else {
         setMsg(json.error || "No se pudieron cargar tus cursos");
         setLoadError(true);
@@ -140,6 +157,52 @@ export default function TeacherTools() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function retryLoad() {
+    setMsg(null);
+    setLoadError(false);
+    loadCatalog();
+    loadLogs();
+  }
+
+  useEffect(() => {
+    loadCatalog();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!subjects.length || !cursos.length) return;
+    const fix = (curso: string, code: string) => {
+      const list = cursos.find((c) => c.label === curso)?.list ?? cursos[0].list;
+      const okCurso = cursos.some((c) => c.label === curso) ? curso : cursos[0].label;
+      const okCode = list.some((s) => s.code === code) ? code : (list[0]?.code ?? "");
+      return { okCurso, okCode };
+    };
+    const f = fix(fotoCurso, fotoMateria);
+    if (f.okCurso !== fotoCurso) setFotoCurso(f.okCurso);
+    if (f.okCode !== fotoMateria) setFotoMateria(f.okCode);
+    const t = fix(taskCurso, taskMateria);
+    if (t.okCurso !== taskCurso) setTaskCurso(t.okCurso);
+    if (t.okCode !== taskMateria) setTaskMateria(t.okCode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subjects]);
+
+  useEffect(() => {
+    if (fotoMateria) loadLogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fotoMateria]);
+
+  function pickFotoCurso(label: string) {
+    setFotoCurso(label);
+    const list = cursos.find((c) => c.label === label)?.list ?? [];
+    setFotoMateria(list[0]?.code ?? "");
+  }
+
+  function pickTaskCurso(label: string) {
+    setTaskCurso(label);
+    const list = cursos.find((c) => c.label === label)?.list ?? [];
+    setTaskMateria(list[0]?.code ?? "");
   }
 
   async function linkSubject(e: React.FormEvent) {
@@ -163,10 +226,10 @@ export default function TeacherTools() {
     }
   }
 
-  async function unlinkSubject() {
-    if (!subject) return;
+  async function unlinkSubject(code: string) {
+    if (!code) return;
     setMsg(null);
-    const res = await fetch(`/api/teacher/subjects?subjectCode=${encodeURIComponent(subject)}`, { method: "DELETE" });
+    const res = await fetch(`/api/teacher/subjects?subjectCode=${encodeURIComponent(code)}`, { method: "DELETE" });
     const json = await res.json();
     if (!res.ok) setMsg(json.error || "No se pudo quitar");
     else {
@@ -175,43 +238,12 @@ export default function TeacherTools() {
     }
   }
 
-  function retryLoad() {
-    setMsg(null);
-    setLoadError(false);
-    loadCatalog();
-    loadLogs();
-  }
-
-  useEffect(() => {
-    loadCatalog();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!subjects.length) return;
-    const list = cursos.find((c) => c.label === curso)?.list ?? cursos[0]?.list ?? [];
-    if (!cursos.some((c) => c.label === curso) && cursos[0]) setCurso(cursos[0].label);
-    if (!list.some((s) => s.code === subject)) setSubject(list[0]?.code ?? "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subjects]);
-
-  useEffect(() => {
-    if (subject) loadLogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject]);
-
-  function pickCurso(label: string) {
-    setCurso(label);
-    const list = cursos.find((c) => c.label === label)?.list ?? [];
-    setSubject(list[0]?.code ?? "");
-  }
-
   async function submitTask(e: React.FormEvent) {
     e.preventDefault();
     if (savingTask) return;
     setMsg(null);
-    if (!subject || !taskForm.title.trim()) {
-      setMsg("Elegí el curso y la materia arriba, y escribí el título de la tarea.");
+    if (!taskMateria || !taskForm.title.trim()) {
+      setMsg("Elegí el curso y la materia de la tarea, y escribí el título.");
       return;
     }
     if (taskFile && (!["application/pdf", "image/png", "image/jpeg", "image/webp"].includes(taskFile.type) || taskFile.size > 4 * 1024 * 1024)) {
@@ -221,7 +253,7 @@ export default function TeacherTools() {
     setSavingTask(true);
     try {
       const fd = new FormData();
-      fd.set("subjectCode", subject);
+      fd.set("subjectCode", taskMateria);
       fd.set("title", taskForm.title.trim());
       fd.set("description", taskForm.description);
       fd.set("dueDate", taskForm.dueDate);
@@ -232,7 +264,7 @@ export default function TeacherTools() {
       const json = await res.json();
       if (!res.ok) setMsg(json.error || "No se pudo crear la tarea");
       else {
-        setMsg(`Tarea publicada en ${curso} · ${materiaNombre}.`);
+        setMsg(`Tarea publicada en ${taskCurso} · ${nombreMateria(taskMateria)}.`);
         setTaskForm({ title: "", description: "", dueDate: "", notes: "" });
         setTaskFile(null);
       }
@@ -243,10 +275,11 @@ export default function TeacherTools() {
     }
   }
 
-  const scopeLine = curso && materiaNombre ? `${curso} · ${materiaNombre}` : "";
+  const fotoScope = fotoCurso && fotoMateria ? `${fotoCurso} · ${nombreMateria(fotoMateria)}` : "";
+  const taskScope = taskCurso && taskMateria ? `${taskCurso} · ${nombreMateria(taskMateria)}` : "";
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-4 sm:gap-6">
       {msg && (
         <p className="rounded-lg bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-900">{msg}</p>
       )}
@@ -262,63 +295,11 @@ export default function TeacherTools() {
 
       <TeacherProfile />
 
-      <section className="rounded-2xl border-2 border-[var(--institutional)] bg-white p-6">
-        <h2 className="text-lg font-extrabold text-[var(--institutional)]">Mi curso y materia</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Todo lo que subas (planilla, lista o tarea) queda en el curso y materia elegidos.
-        </p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <label className="text-sm font-semibold text-slate-700">
-            Curso
-            <select value={curso} onChange={(e) => pickCurso(e.target.value)} className={inputCls} disabled={loading}>
-              {loading ? (
-                <option>Cargando cursos…</option>
-              ) : cursos.length === 0 ? (
-                <option value="">Sin cursos asignados</option>
-              ) : (
-                cursos.map((c) => (
-                  <option key={c.label} value={c.label}>
-                    {c.label}
-                  </option>
-                ))
-              )}
-            </select>
-          </label>
-          <label className="text-sm font-semibold text-slate-700">
-            Materia
-            <span className="flex items-center gap-1.5">
-              <select value={subject} onChange={(e) => setSubject(e.target.value)} className={inputCls} disabled={loading}>
-                {materiasCurso.map((s) => (
-                  <option key={s.code} value={s.code}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              {subject && (
-                <button
-                  type="button"
-                  onClick={unlinkSubject}
-                  title="Dejar de enseñar esta materia"
-                  className="mt-1 shrink-0 rounded-lg border border-red-200 px-2.5 py-2 text-xs font-bold text-red-700 hover:bg-red-50"
-                >
-                  Quitar
-                </button>
-              )}
-            </span>
-          </label>
-          <label className="text-sm font-semibold text-slate-700">
-            Período
-            <select value={period} onChange={(e) => setPeriod(e.target.value)} className={inputCls}>
-              <option value="">— Todos —</option>
-              {periods.map((p) => (
-                <option key={p.label} value={p.label}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <form onSubmit={linkSubject} className="mt-4 flex flex-wrap items-end gap-2 border-t border-stone-100 pt-4">
+      <details className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
+        <summary className="cursor-pointer text-sm font-extrabold text-[var(--institutional)]">
+          Mis materias y cursos
+        </summary>
+        <form onSubmit={linkSubject} className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
           <label className="min-w-0 flex-1 text-sm font-semibold text-slate-700">
             Agregar materia que enseño
             <select value={addCode} onChange={(e) => setAddCode(e.target.value)} className={inputCls} disabled={loading}>
@@ -336,13 +317,48 @@ export default function TeacherTools() {
             Vincularme
           </button>
         </form>
-      </section>
+        {subjects.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {subjects.map((s) => (
+              <span key={s.code} className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 py-1 pl-3 pr-1.5 text-xs font-bold text-slate-600">
+                {cursoLabel(s)} · {s.name}
+                <button
+                  type="button"
+                  onClick={() => unlinkSubject(s.code)}
+                  title="Dejar de enseñar esta materia"
+                  className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs text-red-600 ring-1 ring-red-200 hover:bg-red-50"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </details>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Registro de tareas</h2>
-        {scopeLine && <p className="mt-1 text-sm font-semibold text-[var(--gold)]">{scopeLine}</p>}
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <label className="text-sm font-semibold text-slate-700">
+            Curso
+            <select value={fotoCurso} onChange={(e) => pickFotoCurso(e.target.value)} className={inputCls} disabled={loading}>
+              {cursos.map((c) => (
+                <option key={c.label} value={c.label}>{c.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-slate-700">
+            Materia
+            <select value={fotoMateria} onChange={(e) => setFotoMateria(e.target.value)} className={inputCls} disabled={loading}>
+              {materiasDe(fotoCurso).map((s) => (
+                <option key={s.code} value={s.code}>{s.name}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {fotoScope && <p className="mt-2 text-sm font-semibold text-[var(--gold)]">{fotoScope}</p>}
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-          <label className="block text-sm font-semibold text-slate-700">
+          <label className="block min-w-0 text-sm font-semibold text-slate-700">
             Foto de la planilla
             <input
               type="file"
@@ -357,13 +373,27 @@ export default function TeacherTools() {
             <input type="date" value={logDate} onChange={(e) => setLogDate(e.target.value)} className={inputCls} />
           </label>
         </div>
+        {fotoPreview && (
+          <div className="relative mt-3 w-fit">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={fotoPreview} alt="Vista previa" className="max-h-48 rounded-xl border border-stone-200 object-contain" />
+            <button
+              type="button"
+              onClick={() => setLogFile(null)}
+              title="Quitar foto"
+              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+            >
+              ✕
+            </button>
+          </div>
+        )}
         <label className="mt-3 block text-sm font-semibold text-slate-700">
           Observación
           <input
             value={logCaption}
             onChange={(e) => setLogCaption(e.target.value)}
             maxLength={500}
-            placeholder="Ej: Ana Gómez no pasa la materia"
+            placeholder="Observación de la planilla"
             className={inputCls}
           />
         </label>
@@ -399,11 +429,29 @@ export default function TeacherTools() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Lista de asistencias</h2>
-        {scopeLine && <p className="mt-1 text-sm font-semibold text-[var(--gold)]">{scopeLine}</p>}
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <label className="text-sm font-semibold text-slate-700">
+            Curso
+            <select value={fotoCurso} onChange={(e) => pickFotoCurso(e.target.value)} className={inputCls} disabled={loading}>
+              {cursos.map((c) => (
+                <option key={c.label} value={c.label}>{c.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-slate-700">
+            Materia
+            <select value={fotoMateria} onChange={(e) => setFotoMateria(e.target.value)} className={inputCls} disabled={loading}>
+              {materiasDe(fotoCurso).map((s) => (
+                <option key={s.code} value={s.code}>{s.name}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {fotoScope && <p className="mt-2 text-sm font-semibold text-[var(--gold)]">{fotoScope}</p>}
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-          <label className="block text-sm font-semibold text-slate-700">
+          <label className="block min-w-0 text-sm font-semibold text-slate-700">
             Foto de la lista (con fecha de hoy)
             <input
               type="file"
@@ -418,13 +466,27 @@ export default function TeacherTools() {
             <input type="date" value={logDate} onChange={(e) => setLogDate(e.target.value)} className={inputCls} />
           </label>
         </div>
+        {fotoPreview && (
+          <div className="relative mt-3 w-fit">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={fotoPreview} alt="Vista previa" className="max-h-48 rounded-xl border border-stone-200 object-contain" />
+            <button
+              type="button"
+              onClick={() => setLogFile(null)}
+              title="Quitar foto"
+              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+            >
+              ✕
+            </button>
+          </div>
+        )}
         <label className="mt-3 block text-sm font-semibold text-slate-700">
           Observación
           <input
             value={logCaption}
             onChange={(e) => setLogCaption(e.target.value)}
             maxLength={500}
-            placeholder="Ej: Pedro falta demasiado"
+            placeholder="Observación de la lista"
             className={inputCls}
           />
         </label>
@@ -462,28 +524,46 @@ export default function TeacherTools() {
 
       <form
         onSubmit={submitTask}
-        className="relative rounded-2xl border-2 border-[var(--gold)] bg-white p-6 shadow-sm"
+        className="relative rounded-2xl border-2 border-[var(--gold)] bg-white p-4 shadow-sm sm:p-6"
       >
         {savingTask && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl bg-white/85">
             <span className="h-11 w-11 animate-spin rounded-full border-4 border-slate-300 border-t-[var(--institutional)]" />
             <p className="text-sm font-extrabold text-[var(--institutional)]">
-              Subiendo tarea{scopeLine ? ` a ${scopeLine}` : ""}…
+              Subiendo tarea{taskScope ? ` a ${taskScope}` : ""}…
             </p>
           </div>
         )}
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Crear tarea</h2>
-        {scopeLine && <p className="mt-1 text-sm font-semibold text-[var(--gold)]">{scopeLine}</p>}
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <label className="text-sm font-semibold text-slate-700">
+            Curso
+            <select value={taskCurso} onChange={(e) => pickTaskCurso(e.target.value)} className={inputCls} disabled={loading || savingTask}>
+              {cursos.map((c) => (
+                <option key={c.label} value={c.label}>{c.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-slate-700">
+            Materia
+            <select value={taskMateria} onChange={(e) => setTaskMateria(e.target.value)} className={inputCls} disabled={loading || savingTask}>
+              {materiasDe(taskCurso).map((s) => (
+                <option key={s.code} value={s.code}>{s.name}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {taskScope && <p className="mt-2 text-sm font-semibold text-[var(--gold)]">{taskScope}</p>}
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
             Título <span className="text-red-600">*</span>
-            <input value={taskForm.title} onChange={(e) => setTaskForm((f) => ({ ...f, title: e.target.value }))} placeholder="Ej: Práctico N.º 3" maxLength={160} className={inputCls} />
+            <input value={taskForm.title} onChange={(e) => setTaskForm((f) => ({ ...f, title: e.target.value }))} placeholder="Título de la tarea" maxLength={160} className={inputCls} />
           </label>
           <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
             Descripción
-            <textarea value={taskForm.description} onChange={(e) => setTaskForm((f) => ({ ...f, description: e.target.value }))} rows={3} className={inputCls} />
+            <textarea value={taskForm.description} onChange={(e) => setTaskForm((f) => ({ ...f, description: e.target.value }))} rows={3} placeholder="Descripción de la tarea" className={inputCls} />
           </label>
-          <label className="block text-sm font-semibold text-slate-700">
+          <label className="block min-w-0 text-sm font-semibold text-slate-700">
             Foto o PDF adjunto (máx 4 MB)
             <input type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/*" onChange={(e) => setTaskFile(e.target.files?.[0] ?? null)} className={inputCls} />
           </label>
@@ -491,6 +571,33 @@ export default function TeacherTools() {
             Vencimiento
             <input type="date" value={taskForm.dueDate} onChange={(e) => setTaskForm((f) => ({ ...f, dueDate: e.target.value }))} className={inputCls} />
           </label>
+          {taskFile ? (
+            taskPreview ? (
+              <div className="relative w-fit sm:col-span-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={taskPreview} alt="Vista previa del adjunto" className="max-h-48 rounded-xl border border-stone-200 object-contain" />
+                <button
+                  type="button"
+                  onClick={() => setTaskFile(null)}
+                  title="Quitar adjunto"
+                  className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <p className="flex flex-wrap items-center gap-2 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-slate-600 sm:col-span-2">
+                <span className="font-bold">PDF:</span> {taskFile.name} ({(taskFile.size / 1024 / 1024).toFixed(1)} MB)
+                <button
+                  type="button"
+                  onClick={() => setTaskFile(null)}
+                  className="rounded-lg bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700 hover:bg-red-200"
+                >
+                  Quitar
+                </button>
+              </p>
+            )
+          ) : null}
           <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
             Observaciones
             <textarea
@@ -498,7 +605,7 @@ export default function TeacherTools() {
               onChange={(e) => setTaskForm((f) => ({ ...f, notes: e.target.value }))}
               rows={2}
               maxLength={2000}
-              placeholder="Ej: Ana Gómez comunicarse al 0981… · Pedro falta demasiado · Tarea en PDF de psicología caps. 3 y 4"
+              placeholder="Observaciones de la tarea"
               className={inputCls}
             />
           </label>
@@ -519,7 +626,7 @@ export default function TeacherTools() {
               </p>
             </div>
             <p className="px-5 pt-4 text-sm text-slate-600">Esta acción no se puede deshacer.</p>
-            <div className="flex justify-end gap-2 p-5">
+            <div className="mt-5 flex flex-col gap-2 p-5 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={() => setConfirmDeleteId(null)}
