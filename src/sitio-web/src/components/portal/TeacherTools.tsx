@@ -113,6 +113,7 @@ export default function TeacherTools() {
 
   const [taskForm, setTaskForm] = useState({ title: "", description: "", dueDate: "", notes: "" });
   const [taskFile, setTaskFile] = useState<File | null>(null);
+  const [savingTask, setSavingTask] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const logToDelete = logs.find((l) => l.id === confirmDeleteId) ?? null;
 
@@ -171,6 +172,7 @@ export default function TeacherTools() {
 
   async function submitTask(e: React.FormEvent) {
     e.preventDefault();
+    if (savingTask) return;
     setMsg(null);
     if (!subject || !taskForm.title.trim()) {
       setMsg("Elegí el curso y la materia arriba, y escribí el título de la tarea.");
@@ -180,21 +182,28 @@ export default function TeacherTools() {
       setMsg("El adjunto debe ser PDF o foto de máx 4 MB.");
       return;
     }
-    const fd = new FormData();
-    fd.set("subjectCode", subject);
-    fd.set("title", taskForm.title.trim());
-    fd.set("description", taskForm.description);
-    fd.set("dueDate", taskForm.dueDate);
-    fd.set("periodLabel", period);
-    fd.set("notes", taskForm.notes);
-    if (taskFile) fd.set("file", taskFile);
-    const res = await fetch("/api/assignments", { method: "POST", body: fd });
-    const json = await res.json();
-    if (!res.ok) setMsg(json.error || "No se pudo crear la tarea");
-    else {
-      setMsg(`Tarea publicada en ${curso} · ${materiaNombre}.`);
-      setTaskForm({ title: "", description: "", dueDate: "", notes: "" });
-      setTaskFile(null);
+    setSavingTask(true);
+    try {
+      const fd = new FormData();
+      fd.set("subjectCode", subject);
+      fd.set("title", taskForm.title.trim());
+      fd.set("description", taskForm.description);
+      fd.set("dueDate", taskForm.dueDate);
+      fd.set("periodLabel", period);
+      fd.set("notes", taskForm.notes);
+      if (taskFile) fd.set("file", taskFile);
+      const res = await fetch("/api/assignments", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) setMsg(json.error || "No se pudo crear la tarea");
+      else {
+        setMsg(`Tarea publicada en ${curso} · ${materiaNombre}.`);
+        setTaskForm({ title: "", description: "", dueDate: "", notes: "" });
+        setTaskFile(null);
+      }
+    } catch {
+      setMsg("Error de red al publicar la tarea");
+    } finally {
+      setSavingTask(false);
     }
   }
 
@@ -387,8 +396,16 @@ export default function TeacherTools() {
 
       <form
         onSubmit={submitTask}
-        className="rounded-2xl border-2 border-[var(--gold)] bg-white p-6 shadow-sm"
+        className="relative rounded-2xl border-2 border-[var(--gold)] bg-white p-6 shadow-sm"
       >
+        {savingTask && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl bg-white/85">
+            <span className="h-11 w-11 animate-spin rounded-full border-4 border-slate-300 border-t-[var(--institutional)]" />
+            <p className="text-sm font-extrabold text-[var(--institutional)]">
+              Subiendo tarea{scopeLine ? ` a ${scopeLine}` : ""}…
+            </p>
+          </div>
+        )}
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Crear tarea</h2>
         {scopeLine && <p className="mt-1 text-sm font-semibold text-[var(--gold)]">{scopeLine}</p>}
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -420,7 +437,7 @@ export default function TeacherTools() {
             />
           </label>
         </div>
-        <button className="btn-gold mt-4 w-full justify-center sm:w-auto" type="submit">Publicar tarea</button>
+        <button className="btn-gold mt-4 w-full justify-center disabled:opacity-50 sm:w-auto" type="submit" disabled={savingTask}>{savingTask ? "Subiendo…" : "Publicar tarea"}</button>
       </form>
 
       {logToDelete && (
