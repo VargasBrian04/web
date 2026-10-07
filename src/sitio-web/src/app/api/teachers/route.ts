@@ -4,11 +4,20 @@ import { prisma } from "@/lib/prisma";
 /**
  * GET /api/teachers — público. Repositorio de docentes: nombre, título,
  * materias (especialidad), presentación y horario. Sin datos sensibles.
+ * Incluye a Dirección si también enseña (ficha docente con materias).
  */
 export async function GET() {
   try {
     const teachers = await prisma.teacher.findMany({
-      where: { user: { active: true, role: "TEACHER" } },
+      where: {
+        user: {
+          active: true,
+          OR: [
+            { role: "TEACHER" },
+            { role: "ADMIN", teacherProfile: { subjects: { some: {} } } },
+          ],
+        },
+      },
       select: {
         id: true,
         user: { select: { firstName: true, lastName: true } },
