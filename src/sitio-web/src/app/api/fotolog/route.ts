@@ -9,6 +9,8 @@ const KINDS = ["ASISTENCIA", "TAREA"] as const;
  * Bitácora de fotos (listas y planillas en papel).
  * GET con sesión: TEACHER ve las suyas; STUDENT las de sus materias;
  * PARENT las de sus hijos; ADMIN todas (?kind=&take=).
+ * ?teacher=<teacherId> filtra por docente (tutor/alumno: dentro de sus
+ * bachilleratos; docente: solo las suyas).
  * POST TEACHER/ADMIN multipart: photo* (PNG/JPG/WEBP ≤4MB), kind*,
  * logDate? (hoy por defecto), caption?, subjectCode?
  * DELETE ?id= — el docente borra las suyas; ADMIN cualquiera.
@@ -18,6 +20,7 @@ export async function GET(request: Request) {
   if (!session?.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   const { searchParams } = new URL(request.url);
   const kind = searchParams.get("kind") || undefined;
+  const teacherId = searchParams.get("teacher") || undefined;
   const take = Math.min(60, Math.max(1, Number(searchParams.get("take") || "30") || 30));
   const role = session.user.role;
 
@@ -29,7 +32,7 @@ export async function GET(request: Request) {
   try {
     if (role === "ADMIN") {
       const data = await prisma.photoLog.findMany({
-        where: { ...(kind ? { kind } : {}) },
+        where: { ...(kind ? { kind } : {}), ...(teacherId ? { teacherId } : {}) },
         include,
         orderBy: { logDate: "desc" },
         take,
@@ -64,6 +67,7 @@ export async function GET(request: Request) {
     const data = await prisma.photoLog.findMany({
       where: {
         ...(kind ? { kind } : {}),
+        ...(teacherId ? { teacherId } : {}),
         ...(academicIds.length
           ? { subject: { academicId: { in: academicIds } } }
           : { subjectId: null }),

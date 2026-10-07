@@ -5,9 +5,10 @@ import { prisma } from "@/lib/prisma";
 /**
  * GET /api/assignments — Tareas según rol.
  *  STUDENT: tareas de su bachillerato + su estado de entrega.
- *  PARENT: tareas de los bachilleratos de sus hijos.
+ *  PARENT: tareas de los bachilleratos de sus hijos (?subject= filtra
+ *    dentro de esos; ?teacher= filtra por docente).
  *  TEACHER: las que creó + entregas.
- *  ADMIN: todas.
+ *  ADMIN: todas (?subject=, ?teacher=).
  * POST /api/assignments — TEACHER/ADMIN crea tarea.
  * Body: { subjectCode, title, description?, dueDate?, periodLabel? }
  * POST /api/assignments/submit — STUDENT marca entrega.
@@ -18,6 +19,7 @@ export async function GET(request: Request) {
   if (!session?.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   const { searchParams } = new URL(request.url);
   const subjectCode = searchParams.get("subject") || undefined;
+  const teacherId = searchParams.get("teacher") || undefined;
   const role = session.user.role;
 
   const where = { ...(subjectCode ? { subject: { code: subjectCode } } : {}) };
@@ -56,8 +58,15 @@ export async function GET(request: Request) {
       const academicIds = [...new Set(links.map((l: any) => l.student.academicId).filter(Boolean))] as string[];
       const data = await prisma.assignment.findMany({
         where: {
-          ...where,
-          ...(academicIds.length && !subjectCode ? { subject: { academicId: { in: academicIds } } } : {}),
+          ...(subjectCode || academicIds.length
+            ? {
+                subject: {
+                  ...(subjectCode ? { code: subjectCode } : {}),
+                  ...(academicIds.length ? { academicId: { in: academicIds } } : {}),
+                },
+              }
+            : {}),
+          ...(teacherId ? { teacherId } : {}),
         },
         include,
         orderBy: { createdAt: "desc" },
@@ -77,7 +86,7 @@ export async function GET(request: Request) {
     }
     if (role === "ADMIN") {
       const data = await prisma.assignment.findMany({
-        where,
+        where: { ...where, ...(teacherId ? { teacherId } : {}) },
         include,
         orderBy: { createdAt: "desc" },
         take: 100,
