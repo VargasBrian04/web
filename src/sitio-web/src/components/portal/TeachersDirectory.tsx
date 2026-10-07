@@ -92,20 +92,21 @@ export default function TeachersDirectory({ scope: initialScope = null }: { scop
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = items.filter((t) => {
-    if (
-      scope &&
-      !(t.materias ?? []).some(
-        (m) =>
-          m.academic?.code === scope.academicCode &&
-          (scope.gradeYear == null || m.gradeYear === scope.gradeYear)
-      )
+  const matchesScope = (t: Teacher) =>
+    !scope ||
+    (t.materias ?? []).some(
+      (m) =>
+        m.academic?.code === scope.academicCode &&
+        (scope.gradeYear == null || m.gradeYear === scope.gradeYear)
+    );
+
+  const filtered = items
+    .filter((t) =>
+      `${t.nombre} ${t.titulo ?? ""} ${(t.materias ?? []).map((m) => m.name).join(" ")}`
+        .toLowerCase()
+        .includes(q.trim().toLowerCase())
     )
-      return false;
-    return `${t.nombre} ${t.titulo ?? ""} ${(t.materias ?? []).map((m) => m.name).join(" ")}`
-      .toLowerCase()
-      .includes(q.trim().toLowerCase());
-  });
+    .sort((a, b) => Number(matchesScope(b)) - Number(matchesScope(a)));
 
   const scopeLabel = scope
     ? `${scope.gradeYear != null ? `${scope.gradeYear}.º ` : ""}${scope.academicShort} · ${scope.hijoNombre}`
@@ -115,23 +116,19 @@ export default function TeachersDirectory({ scope: initialScope = null }: { scop
   useEffect(() => {
     if (!scope || scopeOpened || loading || filtered.length === 0) return;
     setScopeOpened(true);
-    const t = filtered[0];
+    const t = filtered.find((x) => matchesScope(x)) ?? filtered[0];
+    const mat =
+      (t.materias ?? []).find(
+        (m) =>
+          m.academic?.code === scope.academicCode &&
+          (scope.gradeYear == null || m.gradeYear === scope.gradeYear)
+      ) ?? (t.materias ?? [])[0];
     setExpanded(t.id);
-    const mat = (t.materias ?? []).find(
-      (m) =>
-        m.academic?.code === scope.academicCode &&
-        (scope.gradeYear == null || m.gradeYear === scope.gradeYear)
-    );
-    const cursos = cursosDe(t);
-    const curso =
-      (mat && `${mat.gradeYear}.º ${mat.academic?.shortName ?? ""}`) || cursos[0]?.label;
-    if (curso) {
+    if (mat) {
+      const curso = `${mat.gradeYear}.º ${mat.academic?.shortName ?? ""}`;
       setSelCurso((s) => ({ ...s, [t.id]: curso }));
-      const code = mat?.code ?? cursos.find((c) => c.label === curso)?.materias[0]?.code;
-      if (code) {
-        setSelMateria((s) => ({ ...s, [`${t.id}|${curso}`]: code }));
-        loadDetail(t.id, code);
-      }
+      setSelMateria((s) => ({ ...s, [`${t.id}|${curso}`]: mat.code }));
+      loadDetail(t.id, mat.code);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
@@ -245,7 +242,7 @@ export default function TeachersDirectory({ scope: initialScope = null }: { scop
       {scope && (
         <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-[var(--paper)] px-4 py-3">
           <p className="text-sm font-bold text-[var(--institutional)]">
-            Docentes del curso de {scopeLabel}
+            Docentes del curso de {scopeLabel} primero
           </p>
           <button
             type="button"

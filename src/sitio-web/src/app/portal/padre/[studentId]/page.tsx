@@ -91,6 +91,9 @@ export default async function FichaEstudiantePage({
           <span className="rounded-full bg-white/15 px-3 py-1">Promedio {promedio !== null ? promedio.toFixed(2) : "—"}</span>
           <span className="rounded-full bg-white/15 px-3 py-1">Asistencia {student.attendance.length ? `${pres}/${student.attendance.length}` : "—"}</span>
           <span className="rounded-full bg-white/15 px-3 py-1">{docs.length} documentos</span>
+          <Link href={`/portal/padre/docentes?hijo=${studentId}`} className="rounded-full bg-[var(--gold)] px-3 py-1 text-white hover:opacity-90">
+            Ver docentes de su curso →
+          </Link>
         </div>
       </section>
 
