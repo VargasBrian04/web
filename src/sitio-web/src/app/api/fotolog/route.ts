@@ -20,6 +20,7 @@ export async function GET(request: Request) {
   if (!session?.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   const { searchParams } = new URL(request.url);
   const kind = searchParams.get("kind") || undefined;
+  const subjectCode = searchParams.get("subject") || undefined;
   const teacherId = searchParams.get("teacher") || undefined;
   const take = Math.min(60, Math.max(1, Number(searchParams.get("take") || "30") || 30));
   const role = session.user.role;
@@ -32,7 +33,11 @@ export async function GET(request: Request) {
   try {
     if (role === "ADMIN") {
       const data = await prisma.photoLog.findMany({
-        where: { ...(kind ? { kind } : {}), ...(teacherId ? { teacherId } : {}) },
+        where: {
+          ...(kind ? { kind } : {}),
+          ...(teacherId ? { teacherId } : {}),
+          ...(subjectCode ? { subject: { code: subjectCode } } : {}),
+        },
         include,
         orderBy: { logDate: "desc" },
         take,
@@ -42,7 +47,11 @@ export async function GET(request: Request) {
     if (role === "TEACHER") {
       const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
       const data = await prisma.photoLog.findMany({
-        where: { teacherId: teacher?.id ?? "nadie", ...(kind ? { kind } : {}) },
+        where: {
+          teacherId: teacher?.id ?? "nadie",
+          ...(kind ? { kind } : {}),
+          ...(subjectCode ? { subject: { code: subjectCode } } : {}),
+        },
         include,
         orderBy: { logDate: "desc" },
         take,
@@ -64,13 +73,14 @@ export async function GET(request: Request) {
       });
       academicIds = [...new Set(links.map((l: { student: { academicId: string | null } }) => l.student.academicId).filter(Boolean) as string[])];
     }
+    const subjectFilter: Record<string, unknown> = {};
+    if (subjectCode) subjectFilter.code = subjectCode;
+    if (academicIds.length) subjectFilter.academicId = { in: academicIds };
     const data = await prisma.photoLog.findMany({
       where: {
         ...(kind ? { kind } : {}),
         ...(teacherId ? { teacherId } : {}),
-        ...(academicIds.length
-          ? { subject: { academicId: { in: academicIds } } }
-          : { subjectId: null }),
+        ...(Object.keys(subjectFilter).length ? { subject: subjectFilter } : { subjectId: null }),
       },
       include,
       orderBy: { logDate: "desc" },
