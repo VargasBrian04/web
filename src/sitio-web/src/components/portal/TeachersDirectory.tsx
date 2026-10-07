@@ -32,6 +32,8 @@ type TaskItem = {
   id: string;
   title: string;
   description: string | null;
+  notes: string | null;
+  fileData: string | null;
   dueDate: string | null;
   subject: { code: string; name: string } | null;
 };
@@ -59,6 +61,7 @@ export default function TeachersDirectory() {
   const [selMateria, setSelMateria] = useState<Record<string, string>>({});
   const [details, setDetails] = useState<Record<string, Detail>>({});
   const [zoom, setZoom] = useState<{ src: string; label: string } | null>(null);
+  const [openTask, setOpenTask] = useState<string | null>(null);
 
   useEffect(() => {
     if (!zoom) return;
@@ -307,13 +310,60 @@ export default function TeachersDirectory() {
                                   <p className="mt-1 text-sm text-slate-500">Sin tareas publicadas en este curso y materia.</p>
                                 ) : (
                                   <ul className="mt-2 grid gap-2">
-                                    {detail.tasks.map((a) => (
-                                      <li key={a.id} className="rounded-lg border border-stone-200 bg-white px-3 py-2">
-                                        <p className="text-sm font-bold text-slate-900">{a.title}</p>
-                                        {a.description && <p className="mt-0.5 text-sm text-slate-600">{a.description}</p>}
-                                        <p className="mt-0.5 text-xs text-slate-400">Vence: {fmtDate(a.dueDate)}</p>
-                                      </li>
-                                    ))}
+                                    {detail.tasks.map((a) => {
+                                      const isPdf = (a.fileData ?? "").startsWith("data:application/pdf");
+                                      const isImg = (a.fileData ?? "").startsWith("data:image/");
+                                      const isOpen = openTask === a.id;
+                                      return (
+                                        <li key={a.id} className="overflow-hidden rounded-lg border border-stone-200 bg-white">
+                                          <button
+                                            type="button"
+                                            onClick={() => setOpenTask(isOpen ? null : a.id)}
+                                            title="Click para ver el detalle"
+                                            className="block w-full px-3 py-2 text-left hover:bg-stone-50"
+                                          >
+                                            <p className="text-sm font-bold text-slate-900">
+                                              {a.title} <span className="font-normal text-slate-400">{isOpen ? "▾" : "▸"}</span>
+                                            </p>
+                                            <p className="mt-0.5 text-xs text-slate-400">
+                                              Vence: {fmtDate(a.dueDate)}
+                                              {a.fileData ? (isPdf ? " · 📄 PDF adjunto" : " · 🖼️ Foto adjunta") : ""}
+                                            </p>
+                                          </button>
+                                          {isOpen && (
+                                            <div className="grid gap-2 border-t border-stone-100 px-3 py-2">
+                                              {a.description && <p className="text-sm text-slate-600">{a.description}</p>}
+                                              {a.notes && (
+                                                <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                                                  <span className="font-bold">Observaciones: </span>{a.notes}
+                                                </p>
+                                              )}
+                                              {isImg && a.fileData && (
+                                                <button
+                                                  type="button"
+                                                  onClick={() => setZoom({ src: a.fileData as string, label: a.title })}
+                                                  title="Click para ampliar"
+                                                  className="block w-fit cursor-zoom-in"
+                                                >
+                                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                  <img src={a.fileData} alt={a.title} className="max-h-48 rounded-lg border border-stone-200 object-contain" loading="lazy" />
+                                                </button>
+                                              )}
+                                              {isPdf && a.fileData && (
+                                                <a
+                                                  href={a.fileData}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="w-fit rounded-lg bg-[var(--institutional)] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90"
+                                                >
+                                                  Abrir PDF adjunto ↗
+                                                </a>
+                                              )}
+                                            </div>
+                                          )}
+                                        </li>
+                                      );
+                                    })}
                                   </ul>
                                 )}
                               </div>
