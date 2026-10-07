@@ -24,9 +24,12 @@ export default function TeacherTools() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [logs, setLogs] = useState<PhotoLog[]>([]);
-  const [logFile, setLogFile] = useState<File | null>(null);
-  const [logCaption, setLogCaption] = useState("");
-  const [logDate, setLogDate] = useState(new Date().toISOString().slice(0, 10));
+  const [planFile, setPlanFile] = useState<File | null>(null);
+  const [planCaption, setPlanCaption] = useState("");
+  const [planDate, setPlanDate] = useState(new Date().toISOString().slice(0, 10));
+  const [listaFile, setListaFile] = useState<File | null>(null);
+  const [listaCaption, setListaCaption] = useState("");
+  const [listaDate, setListaDate] = useState(new Date().toISOString().slice(0, 10));
 
   type PhotoLog = {
     id: string; kind: string; photoData: string; caption: string | null;
@@ -47,12 +50,19 @@ export default function TeacherTools() {
   const materiaNombre = subjects.find((s) => s.code === subject)?.name ?? "";
 
   const fotoPreview = useMemo(() => {
-    if (!logFile || !logFile.type.startsWith("image/")) return null;
-    return URL.createObjectURL(logFile);
-  }, [logFile]);
+    if (!planFile || !planFile.type.startsWith("image/")) return null;
+    return URL.createObjectURL(planFile);
+  }, [planFile]);
   useEffect(() => () => {
     if (fotoPreview) URL.revokeObjectURL(fotoPreview);
   }, [fotoPreview]);
+  const listaPreview = useMemo(() => {
+    if (!listaFile || !listaFile.type.startsWith("image/")) return null;
+    return URL.createObjectURL(listaFile);
+  }, [listaFile]);
+  useEffect(() => () => {
+    if (listaPreview) URL.revokeObjectURL(listaPreview);
+  }, [listaPreview]);
 
   async function loadLogs() {
     try {
@@ -79,28 +89,37 @@ export default function TeacherTools() {
       setMsg("Elegí el curso y la materia arriba.");
       return;
     }
-    if (!logFile) {
+    const file = kind === "TAREA" ? planFile : listaFile;
+    const caption = (kind === "TAREA" ? planCaption : listaCaption).trim();
+    const date = kind === "TAREA" ? planDate : listaDate;
+    if (!file) {
       setMsg("Sacá o elegí la foto.");
       return;
     }
-    if (logFile.size > 4 * 1024 * 1024) {
+    if (file.size > 4 * 1024 * 1024) {
       setMsg("Foto muy pesada (máx 4 MB).");
       return;
     }
     const fd = new FormData();
-    fd.set("photo", logFile);
+    fd.set("photo", file);
     fd.set("kind", kind);
-    fd.set("logDate", logDate);
-    fd.set("caption", logCaption.trim());
+    fd.set("logDate", date);
+    fd.set("caption", caption);
     fd.set("subjectCode", subject);
     const res = await fetch("/api/fotolog", { method: "POST", body: fd });
     const json = await res.json();
     if (!res.ok) setMsg(json.error || "No se pudo subir");
     else {
       setMsg(kind === "ASISTENCIA" ? `Lista guardada en ${curso} · ${materiaNombre}.` : `Planilla guardada en ${curso} · ${materiaNombre}.`);
-      setLogFile(null);
-      setLogCaption("");
+      if (kind === "TAREA") {
+        setPlanFile(null);
+        setPlanCaption("");
+      } else {
+        setListaFile(null);
+        setListaCaption("");
+      }
       loadLogs();
+      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch { /* sin scroll */ }
     }
   }
 
@@ -249,6 +268,7 @@ export default function TeacherTools() {
         setMsg(`Tarea publicada en ${curso} · ${materiaNombre}.`);
         setTaskForm({ title: "", description: "", dueDate: "", notes: "" });
         setTaskFile(null);
+        try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch { /* sin scroll */ }
       }
     } catch {
       setMsg("Error de red al publicar la tarea");
@@ -350,13 +370,13 @@ export default function TeacherTools() {
               type="file"
               accept="image/*"
               capture="environment"
-              onChange={(e) => setLogFile(e.target.files?.[0] ?? null)}
+              onChange={(e) => setPlanFile(e.target.files?.[0] ?? null)}
               className={inputCls}
             />
           </label>
           <label className="block text-sm font-semibold text-slate-700">
             Fecha
-            <input type="date" value={logDate} onChange={(e) => setLogDate(e.target.value)} className={inputCls} />
+            <input type="date" value={planDate} onChange={(e) => setPlanDate(e.target.value)} className={inputCls} />
           </label>
         </div>
         {fotoPreview && (
@@ -365,7 +385,7 @@ export default function TeacherTools() {
             <img src={fotoPreview} alt="Vista previa" className="max-h-48 rounded-xl border border-stone-200 object-contain" />
             <button
               type="button"
-              onClick={() => setLogFile(null)}
+              onClick={() => setPlanFile(null)}
               title="Quitar foto"
               className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
             >
@@ -376,8 +396,8 @@ export default function TeacherTools() {
         <label className="mt-3 block text-sm font-semibold text-slate-700">
           Observación
           <input
-            value={logCaption}
-            onChange={(e) => setLogCaption(e.target.value)}
+            value={planCaption}
+            onChange={(e) => setPlanCaption(e.target.value)}
             maxLength={500}
             placeholder="Observación de la planilla"
             className={inputCls}
@@ -425,22 +445,22 @@ export default function TeacherTools() {
               type="file"
               accept="image/*"
               capture="environment"
-              onChange={(e) => setLogFile(e.target.files?.[0] ?? null)}
+              onChange={(e) => setListaFile(e.target.files?.[0] ?? null)}
               className={inputCls}
             />
           </label>
           <label className="block text-sm font-semibold text-slate-700">
             Fecha
-            <input type="date" value={logDate} onChange={(e) => setLogDate(e.target.value)} className={inputCls} />
+            <input type="date" value={listaDate} onChange={(e) => setListaDate(e.target.value)} className={inputCls} />
           </label>
         </div>
-        {fotoPreview && (
+        {listaPreview && (
           <div className="relative mt-3 w-fit">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={fotoPreview} alt="Vista previa" className="max-h-48 rounded-xl border border-stone-200 object-contain" />
+            <img src={listaPreview} alt="Vista previa" className="max-h-48 rounded-xl border border-stone-200 object-contain" />
             <button
               type="button"
-              onClick={() => setLogFile(null)}
+              onClick={() => setListaFile(null)}
               title="Quitar foto"
               className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
             >
@@ -451,8 +471,8 @@ export default function TeacherTools() {
         <label className="mt-3 block text-sm font-semibold text-slate-700">
           Observación
           <input
-            value={logCaption}
-            onChange={(e) => setLogCaption(e.target.value)}
+            value={listaCaption}
+            onChange={(e) => setListaCaption(e.target.value)}
             maxLength={500}
             placeholder="Observación de la lista"
             className={inputCls}
