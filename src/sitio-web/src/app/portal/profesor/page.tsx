@@ -27,7 +27,7 @@ export default async function ProfesorPage() {
           Lo oficial se emite en el MEC; aquí va el seguimiento diario.
         </p>
         <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm text-stone-200">
-          <li>Elegí el curso y la materia dentro de cada zona.</li>
+          <li>Elegí tu curso y materia arriba.</li>
           <li>Subí la foto de la planilla o lista con su observación.</li>
           <li>Publicá la tarea digital con PDF/foto para ese curso.</li>
         </ol>
