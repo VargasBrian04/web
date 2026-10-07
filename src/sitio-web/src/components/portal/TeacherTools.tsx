@@ -1,32 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TeacherProfile from "./TeacherProfile";
 
 type Subject = { id: string; code: string; name: string; gradeYear: number; academic?: { shortName: string; name: string } | null };
 type Period = { id: string; label: string; name: string };
-type Student = {
-  id: string;
-  academic?: { shortName: string; name: string } | null;
-  user: { firstName: string; lastName: string; ci: string; email: string };
-  grades: { id: string; score: number; note?: string | null; subject: { code: string; name: string }; period: { label: string; name: string } }[];
-};
 
 const inputCls =
   "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[var(--institutional)]";
 
-/** Panel del docente: nómina, registro de tareas, lista de asistencias y crear tareas con PDF. */
+function cursoLabel(s: Subject): string {
+  return `${s.gradeYear}.º ${s.academic?.shortName ?? "Curso"}`;
+}
+
+/** Panel del docente organizado por curso: planilla, lista y tarea de cada materia. */
 export default function TeacherTools() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [periods, setPeriods] = useState<Period[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
+  const [curso, setCurso] = useState("");
   const [subject, setSubject] = useState("");
   const [period, setPeriod] = useState("");
-  const [search, setSearch] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const [quickGrade, setQuickGrade] = useState<Record<string, string>>({});
   const [loadError, setLoadError] = useState(false);
   const [logs, setLogs] = useState<PhotoLog[]>([]);
   const [logFile, setLogFile] = useState<File | null>(null);
@@ -39,6 +34,17 @@ export default function TeacherTools() {
     subject: { code: string; name: string } | null;
     teacher: { user: { firstName: string; lastName: string } } | null;
   };
+
+  const cursos = useMemo(() => {
+    const map = new Map<string, Subject[]>();
+    for (const s of subjects) {
+      const k = cursoLabel(s);
+      map.set(k, [...(map.get(k) ?? []), s]);
+    }
+    return [...map.entries()].map(([label, list]) => ({ label, list }));
+  }, [subjects]);
+  const materiasCurso = cursos.find((c) => c.label === curso)?.list ?? [];
+  const materiaNombre = subjects.find((s) => s.code === subject)?.name ?? "";
 
   async function loadLogs() {
     try {
@@ -61,6 +67,10 @@ export default function TeacherTools() {
 
   async function submitLog(kind: "ASISTENCIA" | "TAREA") {
     setMsg(null);
+    if (!subject) {
+      setMsg("Elegí el curso y la materia arriba.");
+      return;
+    }
     if (!logFile) {
       setMsg("Sacá o elegí la foto de la lista.");
       return;
@@ -74,12 +84,12 @@ export default function TeacherTools() {
     fd.set("kind", kind);
     fd.set("logDate", logDate);
     fd.set("caption", logCaption.trim());
-    if (subject) fd.set("subjectCode", subject);
+    fd.set("subjectCode", subject);
     const res = await fetch("/api/fotolog", { method: "POST", body: fd });
     const json = await res.json();
     if (!res.ok) setMsg(json.error || "No se pudo subir");
     else {
-      setMsg(kind === "ASISTENCIA" ? "Lista guardada." : "Planilla guardada.");
+      setMsg(kind === "ASISTENCIA" ? `Lista guardada en ${curso} · ${materiaNombre}.` : `Planilla guardada en ${curso} · ${materiaNombre}.`);
       setLogFile(null);
       setLogCaption("");
       loadLogs();
@@ -106,26 +116,22 @@ export default function TeacherTools() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const logToDelete = logs.find((l) => l.id === confirmDeleteId) ?? null;
 
-  async function load() {
+  async function loadCatalog() {
     setLoading(true);
     setLoadError(false);
     try {
-      const qs = new URLSearchParams();
-      if (subject) qs.set("subject", subject);
-      if (period) qs.set("period", period);
-      const res = await fetch(`/api/teacher/roster?${qs.toString()}`, { signal: AbortSignal.timeout(20000) });
+      const res = await fetch("/api/teacher/roster", { signal: AbortSignal.timeout(20000) });
       const json = await res.json();
       if (res.ok) {
         setSubjects(json.data.subjects?.length ? json.data.subjects : json.data.allSubjects ?? []);
         setPeriods(json.data.periods ?? []);
-        setStudents(json.data.students ?? []);
-        if (!period && json.data.periods?.[0]) setPeriod(json.data.periods[0].label);
+        if (json.data.periods?.[0]) setPeriod((p) => p || json.data.periods[0].label);
       } else {
-        setMsg(json.error || "No se pudo cargar la nómina");
+        setMsg(json.error || "No se pudieron cargar tus cursos");
         setLoadError(true);
       }
     } catch {
-      setMsg("Tardó demasiado o falló la red al cargar la nómina");
+      setMsg("Tardó demasiado o falló la red al cargar tus cursos");
       setLoadError(true);
     } finally {
       setLoading(false);
@@ -135,46 +141,39 @@ export default function TeacherTools() {
   function retryLoad() {
     setMsg(null);
     setLoadError(false);
-    load();
+    loadCatalog();
     loadLogs();
   }
 
   useEffect(() => {
-    load();
-    loadLogs();
+    loadCatalog();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject, period]);
+  }, []);
 
-  const filtered = students.filter((s) =>
-    `${s.user.firstName} ${s.user.lastName} ${s.user.ci}`.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    if (!subjects.length) return;
+    const list = cursos.find((c) => c.label === curso)?.list ?? cursos[0]?.list ?? [];
+    if (!cursos.some((c) => c.label === curso) && cursos[0]) setCurso(cursos[0].label);
+    if (!list.some((s) => s.code === subject)) setSubject(list[0]?.code ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subjects]);
 
-  async function saveQuickGrade(studentId: string) {
-    const raw = (quickGrade[studentId] || "").trim().replace(",", ".");
-    const score = Number(raw);
-    if (!studentId || !subject || !period || Number.isNaN(score) || score < 1 || score > 5) {
-      setMsg("Nota inválida (1 a 5) o falta materia/período.");
-      return;
-    }
-    const res = await fetch("/api/grades", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ studentId, subjectCode: subject, periodLabel: period, score }),
-    });
-    const json = await res.json();
-    if (!res.ok) setMsg(json.error || "No se pudo guardar la nota");
-    else {
-      setMsg(`Nota ${score.toFixed(1)} guardada.`);
-      setQuickGrade((q) => ({ ...q, [studentId]: "" }));
-      load();
-    }
+  useEffect(() => {
+    if (subject) loadLogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subject]);
+
+  function pickCurso(label: string) {
+    setCurso(label);
+    const list = cursos.find((c) => c.label === label)?.list ?? [];
+    setSubject(list[0]?.code ?? "");
   }
 
   async function submitTask(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null);
     if (!subject || !taskForm.title.trim()) {
-      setMsg("Elegí la materia y escribí el título de la tarea.");
+      setMsg("Elegí el curso y la materia arriba, y escribí el título de la tarea.");
       return;
     }
     if (taskFile && (!["application/pdf", "image/png", "image/jpeg", "image/webp"].includes(taskFile.type) || taskFile.size > 4 * 1024 * 1024)) {
@@ -193,11 +192,13 @@ export default function TeacherTools() {
     const json = await res.json();
     if (!res.ok) setMsg(json.error || "No se pudo crear la tarea");
     else {
-      setMsg("Tarea publicada.");
+      setMsg(`Tarea publicada en ${curso} · ${materiaNombre}.`);
       setTaskForm({ title: "", description: "", dueDate: "", notes: "" });
       setTaskFile(null);
     }
   }
+
+  const scopeLine = curso && materiaNombre ? `${curso} · ${materiaNombre}` : "";
 
   return (
     <div className="grid gap-6">
@@ -216,16 +217,34 @@ export default function TeacherTools() {
 
       <TeacherProfile />
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="text-lg font-extrabold text-[var(--institutional)]">Mis cursos</h2>
+      <section className="rounded-2xl border-2 border-[var(--institutional)] bg-white p-6">
+        <h2 className="text-lg font-extrabold text-[var(--institutional)]">Mi curso y materia</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Todo lo que subas (planilla, lista o tarea) queda en el curso y materia elegidos.
+        </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <label className="text-sm font-semibold text-slate-700">
+            Curso
+            <select value={curso} onChange={(e) => pickCurso(e.target.value)} className={inputCls} disabled={loading}>
+              {loading ? (
+                <option>Cargando cursos…</option>
+              ) : cursos.length === 0 ? (
+                <option value="">Sin cursos asignados</option>
+              ) : (
+                cursos.map((c) => (
+                  <option key={c.label} value={c.label}>
+                    {c.label}
+                  </option>
+                ))
+              )}
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-slate-700">
             Materia
-            <select value={subject} onChange={(e) => setSubject(e.target.value)} className={inputCls}>
-              <option value="">— Todas / Elegí —</option>
-              {subjects.map((s) => (
+            <select value={subject} onChange={(e) => setSubject(e.target.value)} className={inputCls} disabled={loading}>
+              {materiasCurso.map((s) => (
                 <option key={s.code} value={s.code}>
-                  {s.name} ({s.code})
+                  {s.name}
                 </option>
               ))}
             </select>
@@ -241,125 +260,12 @@ export default function TeacherTools() {
               ))}
             </select>
           </label>
-          <label className="text-sm font-semibold text-slate-700">
-            Buscar alumno
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nombre o C.I." className={inputCls} />
-          </label>
-        </div>
-        <div className="mt-3">
-          <button
-            type="button"
-            disabled={filtered.length === 0}
-            onClick={() => {
-              const rows = [
-                ["Alumno", "CI", "Bachillerato", "Nota", "Materia"],
-                ...filtered.map((s) => {
-                  const g = s.grades[0];
-                  return [
-                    `${s.user.firstName} ${s.user.lastName}`,
-                    s.user.ci,
-                    s.academic?.shortName ?? "",
-                    g ? String(g.score) : "",
-                    g ? g.subject.code : "",
-                  ];
-                }),
-              ];
-              const csv = rows
-                .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";"))
-                .join("\n");
-              const url = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `planilla-${subject || "todas"}-${period || "todos"}.csv`;
-              a.click();
-              URL.revokeObjectURL(url);
-            }}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-40"
-          >
-            ⬇ Exportar planilla (Excel/CSV)
-          </button>
-        </div>
-
-        <div className="mt-4 overflow-x-auto rounded-xl border border-stone-200">
-          <table className="w-full min-w-[640px] text-sm">
-            <thead className="sticky top-0">
-              <tr className="bg-[var(--institutional)] text-left text-white">
-                <th className="px-4 py-3 font-bold">Alumno</th>
-                <th className="px-4 py-3 font-bold">Bachillerato</th>
-                <th className="px-4 py-3 text-center font-bold">Nota</th>
-                <th className="px-4 py-3 text-center font-bold">Cargar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr><td colSpan={4} className="px-4 py-6 text-center text-slate-500">Cargando nómina…</td></tr>
-              ) : filtered.length === 0 ? (
-                <tr><td colSpan={4} className="px-4 py-6 text-center text-slate-500">Sin alumnos.</td></tr>
-              ) : (
-                filtered.slice(0, 80).map((s, idx) => {
-                  const g = s.grades[0];
-                  const initials = `${s.user.firstName[0] ?? ""}${s.user.lastName[0] ?? ""}`.toUpperCase();
-                  return (
-                    <tr key={s.id} className={`border-b last:border-0 transition-colors hover:bg-amber-50/60 ${idx % 2 ? "bg-stone-50/60" : ""}`}>
-                      <td className="px-4 py-2.5">
-                        <span className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--institutional)] text-sm font-extrabold text-white">
-                            {initials}
-                          </span>
-                          <span>
-                            <span className="block font-bold text-slate-900">{s.user.firstName} {s.user.lastName}</span>
-                            <span className="block text-xs text-slate-400">CI {s.user.ci}</span>
-                          </span>
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">
-                          {s.academic?.shortName ?? "—"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5 text-center">
-                        {g ? (
-                          <span className={`inline-block min-w-12 rounded-lg px-2.5 py-1 font-extrabold ${g.score >= 4 ? "bg-emerald-100 text-emerald-800" : g.score >= 3 ? "bg-amber-100 text-amber-800" : "bg-red-100 text-red-800"}`}>
-                            {g.score.toFixed(1)}
-                          </span>
-                        ) : (
-                          <span className="text-slate-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className="flex items-center justify-center gap-1.5">
-                          <input
-                            type="number"
-                            min={1}
-                            max={5}
-                            step={0.1}
-                            placeholder="1–5"
-                            value={quickGrade[s.id] ?? ""}
-                            onChange={(e) => setQuickGrade((q) => ({ ...q, [s.id]: e.target.value }))}
-                            onKeyDown={(e) => { if (e.key === "Enter") saveQuickGrade(s.id); }}
-                            className="w-[70px] rounded-lg border border-slate-300 px-2 py-1.5 text-center text-sm font-bold outline-none focus:border-[var(--institutional)]"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => saveQuickGrade(s.id)}
-                            title="Guardar nota"
-                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--gold)] text-base font-bold text-white shadow hover:opacity-90"
-                          >
-                            ✓
-                          </button>
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
         </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Registro de tareas</h2>
+        {scopeLine && <p className="mt-1 text-sm font-semibold text-[var(--gold)]">{scopeLine}</p>}
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <label className="block text-sm font-semibold text-slate-700">
             Foto de la planilla
@@ -420,6 +326,7 @@ export default function TeacherTools() {
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Lista de asistencias</h2>
+        {scopeLine && <p className="mt-1 text-sm font-semibold text-[var(--gold)]">{scopeLine}</p>}
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <label className="block text-sm font-semibold text-slate-700">
             Foto de la lista (con fecha de hoy)
@@ -483,6 +390,7 @@ export default function TeacherTools() {
         className="rounded-2xl border-2 border-[var(--gold)] bg-white p-6 shadow-sm"
       >
         <h2 className="text-lg font-extrabold text-[var(--institutional)]">Crear tarea</h2>
+        {scopeLine && <p className="mt-1 text-sm font-semibold text-[var(--gold)]">{scopeLine}</p>}
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
             Título <span className="text-red-600">*</span>
