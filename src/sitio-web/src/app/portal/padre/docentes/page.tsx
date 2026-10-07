@@ -52,6 +52,9 @@ export default async function PadreDocentesPage({
 
   return (
     <div className="grid gap-6">
+      <a href="/portal/padre" className="w-fit text-sm font-bold text-[var(--institutional)] underline">
+        ← Volver a Mis hijos
+      </a>
       <section className="rounded-2xl bg-[var(--institutional)] p-6 text-white">
         <h2 className="text-xl font-extrabold">Docentes del colegio</h2>
         <p className="mt-1 text-sm text-stone-200">

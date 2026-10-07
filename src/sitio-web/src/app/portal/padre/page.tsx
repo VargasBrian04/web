@@ -130,9 +130,6 @@ export default async function PadrePage() {
                   <h3 className="text-lg font-bold text-slate-900">{child.name}</h3>
                   <p className="text-xs text-slate-500">{child.academic ?? "Bachillerato por confirmar"}</p>
                   <span className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
-                    <a href={`/portal/padre/${child.id}`} className="inline-block text-sm font-bold text-[var(--institutional)] underline">
-                      Ver ficha completa →
-                    </a>
                     <a href={`/portal/padre/docentes?hijo=${child.id}`} className="inline-block text-sm font-bold text-[var(--institutional)] underline">
                       Docentes de su curso →
                     </a>
