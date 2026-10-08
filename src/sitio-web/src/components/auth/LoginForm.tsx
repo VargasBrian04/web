@@ -61,7 +61,7 @@ export default function LoginForm() {
         redirect: false,
       });
       if (!res || res.error) {
-        setError("Usuario/correo o contraseña incorrectos, o cuenta inactiva.");
+        setError("Usuario o contraseña incorrectos.");
         return;
       }
       // "/" es la portada estática (rewrite sin RSC): requiere carga completa.

@@ -38,6 +38,19 @@ export default function AdminUsers() {
   });
   const [link, setLink] = useState({ guardian: "", student: "", relation: "tutor" });
   const [assign, setAssign] = useState({ teacher: "", subjectCode: "", classId: "" });
+  const [teachers, setTeachers] = useState<AdminUser[]>([]);
+  const [showNewTeacher, setShowNewTeacher] = useState(false);
+  const [newT, setNewT] = useState({ username: "", firstName: "", lastName: "", ci: "", password: "" });
+
+  async function loadTeachers() {
+    try {
+      const res = await fetch("/api/admin/users?role=TEACHER");
+      const json = await res.json();
+      if (res.ok) setTeachers(json.data ?? []);
+    } catch {
+      /* opcional */
+    }
+  }
 
   async function loadUsers() {
     try {
@@ -51,6 +64,7 @@ export default function AdminUsers() {
 
   useEffect(() => {
     loadUsers();
+    loadTeachers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -148,6 +162,33 @@ export default function AdminUsers() {
     }
   }
 
+  async function createTeacherQuick(e: React.FormEvent) {
+    e.preventDefault();
+    setMsg(null);
+    const res = await fetch("/api/admin/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: newT.username,
+        firstName: newT.firstName,
+        lastName: newT.lastName,
+        ci: newT.ci,
+        password: newT.password,
+        role: "TEACHER",
+      }),
+    });
+    const json = await res.json();
+    if (!res.ok) setMsg(json.error || "No se pudo crear el docente");
+    else {
+      setMsg(`Docente @${json.data.username} creado y listo para asignar.`);
+      setNewT({ username: "", firstName: "", lastName: "", ci: "", password: "" });
+      setShowNewTeacher(false);
+      setAssign((a) => ({ ...a, teacher: json.data.username }));
+      loadTeachers();
+      loadUsers();
+    }
+  }
+
   async function assignTeacher(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null);
@@ -239,7 +280,31 @@ export default function AdminUsers() {
 
         <form onSubmit={assignTeacher} className="rounded-2xl border border-slate-200 bg-white p-6">
           <h3 className="font-extrabold text-[var(--institutional)]">Asignar docente ↔ materia</h3>
-          <label className="mt-3 block text-sm font-semibold text-slate-700">Docente (usuario o CI)<input value={assign.teacher} onChange={(e) => setAssign((a) => ({ ...a, teacher: e.target.value }))} placeholder="Usuario o CI del docente" className={inputCls} /></label>
+          <label className="mt-3 block text-sm font-semibold text-slate-700">Docente (elegí o escribí usuario/CI)
+            <input value={assign.teacher} onChange={(e) => setAssign((a) => ({ ...a, teacher: e.target.value }))} placeholder="Usuario o CI del docente" list="teacherOptions" autoComplete="off" className={inputCls} />
+            <datalist id="teacherOptions">
+              {teachers.map((t) => (
+                <option key={t.id} value={t.username}>{t.firstName} {t.lastName} (CI {t.ci})</option>
+              ))}
+            </datalist>
+          </label>
+          <button type="button" onClick={() => setShowNewTeacher((v) => !v)} className="mt-2 text-sm font-bold text-[var(--institutional)] underline">
+            {showNewTeacher ? "− Ocultar nuevo docente" : "+ Añadir docente nuevo"}
+          </button>
+          {showNewTeacher && (
+            <div className="mt-2 grid gap-2 rounded-xl bg-stone-50 p-3">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <input value={newT.username} onChange={(e) => setNewT((t) => ({ ...t, username: e.target.value }))} placeholder="Usuario" autoComplete="off" className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none" />
+                <input value={newT.ci} onChange={(e) => setNewT((t) => ({ ...t, ci: e.target.value }))} placeholder="C.I. (6 a 10 dígitos)" className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none" />
+                <input value={newT.firstName} onChange={(e) => setNewT((t) => ({ ...t, firstName: e.target.value }))} placeholder="Nombres" className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none" />
+                <input value={newT.lastName} onChange={(e) => setNewT((t) => ({ ...t, lastName: e.target.value }))} placeholder="Apellidos" className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none" />
+                <input type="password" value={newT.password} onChange={(e) => setNewT((t) => ({ ...t, password: e.target.value }))} placeholder="Contraseña (8+)" autoComplete="new-password" className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none sm:col-span-2" />
+              </div>
+              <button type="button" onClick={createTeacherQuick} className="rounded-lg bg-[var(--institutional)] px-4 py-2 text-sm font-bold text-white hover:opacity-90">
+                Crear docente
+              </button>
+            </div>
+          )}
           <label className="mt-3 block text-sm font-semibold text-slate-700">Código de materia<input value={assign.subjectCode} onChange={(e) => setAssign((a) => ({ ...a, subjectCode: e.target.value }))} placeholder="Código de la materia" className={inputCls} /></label>
           <label className="mt-3 block text-sm font-semibold text-slate-700">ID de curso (opcional)<input value={assign.classId} onChange={(e) => setAssign((a) => ({ ...a, classId: e.target.value }))} placeholder="Vacío = solo materia" className={inputCls} /></label>
           <button className="btn-gold mt-4 w-full justify-center" type="submit">Asignar</button>
