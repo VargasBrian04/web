@@ -12,6 +12,56 @@ function cursoLabel(s: Subject): string {
   return `${s.gradeYear}.º ${s.academic?.shortName ?? "Curso"}`;
 }
 
+function isHeic(f: File): boolean {
+  return f.type === "image/heic" || f.type === "image/heif" || /\.hei(c|f)$/i.test(f.name);
+}
+
+const HEIC_MSG = "Tu foto está en formato HEIC (iPhone). Cambialo en Ajustes → Cámara → Formatos → Más compatible, o elegí la foto desde la galería.";
+
+/** Comprime una foto en el teléfono (máx 1920px, JPEG) hasta ≤4 MB. */
+function compressImage(file: File): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("canvas"));
+        return;
+      }
+      const steps: [number, number][] = [[1920, 0.82], [1280, 0.72], [960, 0.62]];
+      const attempt = (i: number) => {
+        if (i >= steps.length) {
+          reject(new Error("pesada"));
+          return;
+        }
+        const [max, q] = steps[i];
+        const r = Math.min(1, max / Math.max(img.width, img.height));
+        canvas.width = Math.max(1, Math.round(img.width * r));
+        canvas.height = Math.max(1, Math.round(img.height * r));
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          (b) => {
+            if (b && b.size <= 4 * 1024 * 1024) {
+              resolve(new File([b], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" }));
+            } else attempt(i + 1);
+          },
+          "image/jpeg",
+          q
+        );
+      };
+      attempt(0);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("formato"));
+    };
+    img.src = url;
+  });
+}
+
 /** Panel del docente: curso y materia globales, planilla, lista y tarea. */
 export default function TeacherTools() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -89,16 +139,31 @@ export default function TeacherTools() {
       setMsg("Elegí el curso y la materia arriba.");
       return;
     }
-    const file = kind === "TAREA" ? planFile : listaFile;
+    const fileRaw = kind === "TAREA" ? planFile : listaFile;
     const caption = (kind === "TAREA" ? planCaption : listaCaption).trim();
     const date = kind === "TAREA" ? planDate : listaDate;
-    if (!file) {
+    if (!fileRaw) {
       setMsg("Sacá o elegí la foto.");
       return;
     }
-    if (file.size > 4 * 1024 * 1024) {
-      setMsg("Foto muy pesada (máx 4 MB).");
+    if (isHeic(fileRaw)) {
+      setMsg(HEIC_MSG);
       return;
+    }
+    let file = fileRaw;
+    if (file.size > 4 * 1024 * 1024 || !["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      if (!file.type.startsWith("image/")) {
+        setMsg("La foto debe ser PNG, JPG o WEBP.");
+        return;
+      }
+      setMsg("Comprimiendo foto para subirla…");
+      try {
+        file = await compressImage(fileRaw);
+        setMsg(null);
+      } catch {
+        setMsg("No se pudo procesar la foto. Probá con una más liviana.");
+        return;
+      }
     }
     const fd = new FormData();
     fd.set("photo", file);
@@ -247,9 +312,31 @@ export default function TeacherTools() {
       setMsg("Elegí el curso y la materia arriba, y escribí el título de la tarea.");
       return;
     }
-    if (taskFile && (!["application/pdf", "image/png", "image/jpeg", "image/webp"].includes(taskFile.type) || taskFile.size > 4 * 1024 * 1024)) {
-      setMsg("El adjunto debe ser PDF o foto de máx 4 MB.");
-      return;
+    let fileToSend = taskFile;
+    if (taskFile) {
+      if (taskFile.type === "application/pdf") {
+        if (taskFile.size > 4 * 1024 * 1024) {
+          setMsg("El PDF supera los 4 MB.");
+          return;
+        }
+      } else if (isHeic(taskFile)) {
+        setMsg(HEIC_MSG);
+        return;
+      } else if (taskFile.type.startsWith("image/")) {
+        if (!["image/png", "image/jpeg", "image/webp"].includes(taskFile.type) || taskFile.size > 4 * 1024 * 1024) {
+          setMsg("Comprimiendo foto para subirla…");
+          try {
+            fileToSend = await compressImage(taskFile);
+            setMsg(null);
+          } catch {
+            setMsg("No se pudo procesar la foto. Probá con una más liviana o PDF.");
+            return;
+          }
+        }
+      } else {
+        setMsg("El adjunto debe ser PDF o foto.");
+        return;
+      }
     }
     setSavingTask(true);
     try {
@@ -260,7 +347,7 @@ export default function TeacherTools() {
       fd.set("dueDate", taskForm.dueDate);
       fd.set("periodLabel", period);
       fd.set("notes", taskForm.notes);
-      if (taskFile) fd.set("file", taskFile);
+      if (fileToSend) fd.set("file", fileToSend);
       const res = await fetch("/api/assignments", { method: "POST", body: fd });
       const json = await res.json();
       if (!res.ok) setMsg(json.error || "No se pudo crear la tarea");
