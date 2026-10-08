@@ -99,24 +99,30 @@ export default function AdminUsers() {
 
   async function confirmDelete() {
     if (!deleting || deletingBusy) return;
+    const target = deleting;
+    // Baja optimista: la fila desaparece al instante; si falla, se recarga.
+    setUsers((us) => us.filter((u) => u.id !== target.id));
+    setDeleting(null);
     setDeletingBusy(true);
     try {
       const res = await fetch("/api/admin/users", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: deleting.id }),
+        body: JSON.stringify({ id: target.id }),
+        signal: AbortSignal.timeout(25000),
       });
       const json = await res.json();
-      if (!res.ok) setMsg(json.error || "No se pudo eliminar");
-      else {
-        setMsg(`Cuenta @${deleting.username} eliminada definitivamente.`);
+      if (!res.ok) {
+        setMsg(json.error || "No se pudo eliminar");
         loadUsers();
+      } else {
+        setMsg(`Cuenta @${target.username} eliminada definitivamente.`);
       }
     } catch {
-      setMsg("Error de red al eliminar");
+      setMsg("Tardó demasiado o falló la red. Tocá Buscar para verificar.");
+      loadUsers();
     } finally {
       setDeletingBusy(false);
-      setDeleting(null);
     }
   }
 
@@ -168,7 +174,7 @@ export default function AdminUsers() {
           Solo Dirección crea cuentas con rol. El correo es opcional: el usuario lo vincula después en Mi perfil.
         </p>
         <form onSubmit={createUser} className="mt-4 grid gap-3 sm:grid-cols-3">
-          <label className="text-sm font-semibold text-slate-700">Usuario*<input value={form.username} onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))} placeholder="ej: maria.ayala" className={inputCls} /></label>
+          <label className="text-sm font-semibold text-slate-700">Usuario*<input value={form.username} onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))} placeholder="Nombre de usuario" className={inputCls} /></label>
           <label className="text-sm font-semibold text-slate-700">Rol*<select value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))} className={inputCls}><option value="TEACHER">Docente</option><option value="PARENT">Tutor / Padre</option><option value="ADMIN">Dirección / Admin</option><option value="STUDENT">Alumno</option></select></label>
           <label className="text-sm font-semibold text-slate-700">Contraseña inicial (8+)*<input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} placeholder="Mínimo 8 caracteres" className={inputCls} /></label>
           <label className="text-sm font-semibold text-slate-700">Nombres*<input value={form.firstName} onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))} className={inputCls} /></label>
@@ -217,7 +223,7 @@ export default function AdminUsers() {
       <div className="grid gap-6 lg:grid-cols-2">
         <form onSubmit={linkTutor} className="rounded-2xl border border-slate-200 bg-white p-6">
           <h3 className="font-extrabold text-[var(--institutional)]">Vincular tutor ↔ alumno</h3>
-          <label className="mt-3 block text-sm font-semibold text-slate-700">Tutor (usuario o CI)<input value={link.guardian} onChange={(e) => setLink((l) => ({ ...l, guardian: e.target.value }))} placeholder="ej: ana.gomez" className={inputCls} /></label>
+          <label className="mt-3 block text-sm font-semibold text-slate-700">Tutor (usuario o CI)<input value={link.guardian} onChange={(e) => setLink((l) => ({ ...l, guardian: e.target.value }))} placeholder="Usuario o CI del tutor" className={inputCls} /></label>
           <label className="mt-3 block text-sm font-semibold text-slate-700">Alumno (CI)<input value={link.student} onChange={(e) => setLink((l) => ({ ...l, student: e.target.value }))} placeholder="CI del alumno" className={inputCls} /></label>
           <label className="mt-3 block text-sm font-semibold text-slate-700">Parentesco<select value={link.relation} onChange={(e) => setLink((l) => ({ ...l, relation: e.target.value }))} className={inputCls}><option value="tutor">Tutor</option><option value="padre">Padre</option><option value="madre">Madre</option><option value="encargado">Encargado</option></select></label>
           <button className="btn-primary mt-4 w-full justify-center" type="submit">Vincular</button>
@@ -225,8 +231,8 @@ export default function AdminUsers() {
 
         <form onSubmit={assignTeacher} className="rounded-2xl border border-slate-200 bg-white p-6">
           <h3 className="font-extrabold text-[var(--institutional)]">Asignar docente ↔ materia</h3>
-          <label className="mt-3 block text-sm font-semibold text-slate-700">Docente (usuario o CI)<input value={assign.teacher} onChange={(e) => setAssign((a) => ({ ...a, teacher: e.target.value }))} placeholder="ej: juan.perez" className={inputCls} /></label>
-          <label className="mt-3 block text-sm font-semibold text-slate-700">Código de materia<input value={assign.subjectCode} onChange={(e) => setAssign((a) => ({ ...a, subjectCode: e.target.value }))} placeholder="ej: BTI-MAT" className={inputCls} /></label>
+          <label className="mt-3 block text-sm font-semibold text-slate-700">Docente (usuario o CI)<input value={assign.teacher} onChange={(e) => setAssign((a) => ({ ...a, teacher: e.target.value }))} placeholder="Usuario o CI del docente" className={inputCls} /></label>
+          <label className="mt-3 block text-sm font-semibold text-slate-700">Código de materia<input value={assign.subjectCode} onChange={(e) => setAssign((a) => ({ ...a, subjectCode: e.target.value }))} placeholder="Código de la materia" className={inputCls} /></label>
           <label className="mt-3 block text-sm font-semibold text-slate-700">ID de curso (opcional)<input value={assign.classId} onChange={(e) => setAssign((a) => ({ ...a, classId: e.target.value }))} placeholder="Vacío = solo materia" className={inputCls} /></label>
           <button className="btn-gold mt-4 w-full justify-center" type="submit">Asignar</button>
         </form>
