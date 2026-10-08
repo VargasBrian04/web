@@ -96,20 +96,26 @@ export default function AdminUsers() {
 
   const [deleting, setDeleting] = useState<AdminUser | null>(null);
   const [deletingBusy, setDeletingBusy] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
 
   async function confirmDelete() {
     if (!deleting || deletingBusy) return;
     const target = deleting;
+    if (confirmText.trim().toLowerCase() !== target.username.toLowerCase()) {
+      setMsg("Escribí el usuario exacto para confirmar.");
+      return;
+    }
     // Baja optimista: la fila desaparece al instante; si falla, se recarga.
     setUsers((us) => us.filter((u) => u.id !== target.id));
     setDeleting(null);
+    setConfirmText("");
     setDeletingBusy(true);
     try {
       const res = await fetch("/api/admin/users", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: target.id }),
-        signal: AbortSignal.timeout(25000),
+        body: JSON.stringify({ id: target.id, confirm: target.username }),
+        signal: AbortSignal.timeout(30000),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -210,7 +216,9 @@ export default function AdminUsers() {
                   <td className="py-2">
                     <div className="flex flex-wrap gap-1">
                       <button onClick={() => { if (window.confirm(u.active ? `¿Banear a @${u.username}? No podrá ingresar.` : `¿Reactivar a @${u.username}?`)) toggleActive(u); }} type="button" className={`rounded px-2 py-1 text-xs font-bold ${u.active ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-800"}`}>{u.active ? "Banear" : "Reactivar"}</button>
-                      <button onClick={() => setDeleting(u)} type="button" title="Eliminar cuenta definitivamente" className="rounded border border-red-200 px-2 py-1 text-xs font-bold text-red-700 hover:bg-red-50">Eliminar</button>
+                      {u.role !== "ADMIN" && (
+                        <button onClick={() => { setDeleting(u); setConfirmText(""); }} type="button" title="Eliminar cuenta definitivamente" className="rounded border border-red-200 px-2 py-1 text-xs font-bold text-red-700 hover:bg-red-50">Eliminar</button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -249,13 +257,23 @@ export default function AdminUsers() {
             </div>
             <div className="p-5">
               <p className="text-sm text-slate-600">
-                Borrado <strong>definitivo</strong>, no se puede deshacer. No podés eliminarte a vos mismo
-                ni al único admin activo. Si la cuenta tiene historial vinculado (materias, notas,
-                inscripciones, hijos), se rechaza: en ese caso baneala.
+                Borrado <strong>definitivo</strong>, no se puede deshacer. Se borran también sus fotos,
+                tareas, vínculos y fichas (las notas que cargó a alumnos quedan sin autor).
+                Las cuentas de Dirección no se borran.
               </p>
+              <label className="mt-4 block text-sm font-semibold text-slate-700">
+                Escribí <code className="rounded bg-slate-100 px-1.5 py-0.5 font-bold">{deleting.username}</code> para confirmar
+                <input
+                  value={confirmText}
+                  onChange={(e) => setConfirmText(e.target.value)}
+                  placeholder={deleting.username}
+                  autoComplete="off"
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-red-400"
+                />
+              </label>
               <div className="mt-5 flex justify-end gap-2">
-                <button type="button" onClick={() => setDeleting(null)} disabled={deletingBusy} className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50">Cancelar</button>
-                <button type="button" onClick={confirmDelete} disabled={deletingBusy} className="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-800 disabled:opacity-50">{deletingBusy ? "Eliminando…" : "Eliminar definitiva"}</button>
+                <button type="button" onClick={() => { setDeleting(null); setConfirmText(""); }} disabled={deletingBusy} className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50">Cancelar</button>
+                <button type="button" onClick={confirmDelete} disabled={deletingBusy || confirmText.trim().toLowerCase() !== deleting.username.toLowerCase()} className="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-800 disabled:opacity-50">{deletingBusy ? "Eliminando…" : "Eliminar definitiva"}</button>
               </div>
             </div>
           </div>

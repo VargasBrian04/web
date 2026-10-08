@@ -243,12 +243,13 @@ export async function PATCH(request: Request) {
 
 /**
  * DELETE /api/admin/users — Solo ADMIN. { id }.
- * Borrado definitivo (no es banear). Protecciones:
- *  - no borrarse a uno mismo ni al último admin activo;
- *  - si la cuenta tiene historial vinculado (materias, fotos, tareas,
- *    notas, inscripciones, hijos vinculados) se rechaza con 409:
- *    en ese caso hay que banear, no borrar.
- *  Las fichas vacías (sin datos) se eliminan en la misma transacción.
+ * Borrado definitivo con verificación en pantalla (escribir el usuario).
+ * Reglas:
+ *  - las cuentas de Dirección NUNCA se borran (ni la propia ni otras);
+ *  - el historial del resto se elimina en cascada dentro de una
+ *    transacción: sus fotos, tareas (con entregas), vínculos y fichas;
+ *    las notas/asistencias que cargó a alumnos quedan sin autor;
+ *    el historial del alumno eliminado se borra con él.
  */
 export async function DELETE(request: Request) {
   const session = await auth();
@@ -260,7 +261,7 @@ export async function DELETE(request: Request) {
       { status: 403 }
     );
 
-  const body = (await request.json().catch(() => null)) as { id?: string } | null;
+  const body = (await request.json().catch(() => null)) as { id?: string; confirm?: string } | null;
   if (!body?.id)
     return NextResponse.json({ error: "Falta id" }, { status: 400 });
   const target = await prisma.user.findUnique({
@@ -269,85 +270,67 @@ export async function DELETE(request: Request) {
   });
   if (!target)
     return NextResponse.json({ error: "Usuario inexistente" }, { status: 404 });
+  if (target.role === "ADMIN")
+    return NextResponse.json({ error: "Las cuentas de Dirección no se borran" }, { status: 403 });
   if (target.id === session.user.id)
     return NextResponse.json({ error: "No podés eliminar tu propia cuenta" }, { status: 400 });
-  if (target.role === "ADMIN") {
-    const others = await prisma.user.count({
-      where: { role: "ADMIN", active: true, id: { not: target.id } },
-    });
-    if (others === 0)
-      return NextResponse.json(
-        { error: "No podés eliminar al único admin activo" },
-        { status: 400 }
-      );
-  }
+  // Verificación: hay que reescribir el nombre de usuario.
+  if ((body.confirm || "").trim().toLowerCase() !== target.username.toLowerCase())
+    return NextResponse.json({ error: "Escribí el usuario exacto para confirmar" }, { status: 400 });
 
-  const linked: string[] = [];
   const teacher = await prisma.teacher.findUnique({
     where: { userId: target.id },
     select: { id: true },
   });
-  if (teacher) {
-    const [subs, logs, tasks, grades, atts, groups, docs, obs] = await Promise.all([
-      prisma.teacherSubject.count({ where: { teacherId: teacher.id } }),
-      prisma.photoLog.count({ where: { teacherId: teacher.id } }),
-      prisma.assignment.count({ where: { teacherId: teacher.id } }),
-      prisma.grade.count({ where: { teacherId: teacher.id } }),
-      prisma.attendance.count({ where: { teacherId: teacher.id } }),
-      prisma.classTeacher.count({ where: { teacherId: teacher.id } }),
-      prisma.document.count({ where: { teacherId: teacher.id } }),
-      prisma.observation.count({ where: { teacherId: teacher.id } }),
-    ]);
-    if (subs + logs + tasks + grades + atts + groups + docs + obs > 0)
-      linked.push("actividad docente (materias, fotos, tareas o notas)");
-  }
   const student = await prisma.student.findUnique({
     where: { userId: target.id },
     select: { id: true },
   });
-  if (student) {
-    const [links, enrolls, grades, atts, subs, docs, obs] = await Promise.all([
-      prisma.studentGuardian.count({ where: { studentId: student.id } }),
-      prisma.enrollment.count({ where: { studentId: student.id } }),
-      prisma.grade.count({ where: { studentId: student.id } }),
-      prisma.attendance.count({ where: { studentId: student.id } }),
-      prisma.assignmentSubmission.count({ where: { studentId: student.id } }),
-      prisma.document.count({ where: { studentId: student.id } }),
-      prisma.observation.count({ where: { studentId: student.id } }),
-    ]);
-    if (links + enrolls + grades + atts + subs + docs + obs > 0)
-      linked.push("historial de alumno (inscripciones, notas o vínculos)");
-  }
   const guardian = await prisma.guardian.findUnique({
     where: { userId: target.id },
     select: { id: true },
   });
-  if (guardian) {
-    const links = await prisma.studentGuardian.count({ where: { guardianId: guardian.id } });
-    if (links > 0) linked.push("hijos vinculados como tutor");
-  }
-  const news = await prisma.newsPost.count({ where: { authorId: target.id } });
-  if (news > 0) linked.push("noticias publicadas");
-  if (linked.length > 0)
-    return NextResponse.json(
-      { error: `No se puede eliminar: tiene ${linked.join(" y ")}. Baneá la cuenta en vez de borrarla.` },
-      { status: 409 }
-    );
 
   try {
     await prisma.$transaction(async (tx: any) => {
+      if (student) {
+        await tx.assignmentSubmission.deleteMany({ where: { studentId: student.id } });
+        await tx.grade.deleteMany({ where: { studentId: student.id } });
+        await tx.attendance.deleteMany({ where: { studentId: student.id } });
+        await tx.enrollment.deleteMany({ where: { studentId: student.id } });
+        await tx.document.deleteMany({ where: { studentId: student.id } });
+        await tx.observation.deleteMany({ where: { studentId: student.id } });
+        await tx.studentGuardian.deleteMany({ where: { studentId: student.id } });
+        await tx.student.delete({ where: { id: student.id } });
+      }
       if (teacher) {
+        const assigns: { id: string }[] = await tx.assignment.findMany({
+          where: { teacherId: teacher.id },
+          select: { id: true },
+        });
+        for (const a of assigns) {
+          await tx.assignmentSubmission.deleteMany({ where: { assignmentId: a.id } });
+        }
+        await tx.assignment.deleteMany({ where: { teacherId: teacher.id } });
+        await tx.photoLog.deleteMany({ where: { teacherId: teacher.id } });
+        await tx.grade.updateMany({ where: { teacherId: teacher.id }, data: { teacherId: null } });
+        await tx.attendance.updateMany({ where: { teacherId: teacher.id }, data: { teacherId: null } });
+        await tx.document.updateMany({ where: { teacherId: teacher.id }, data: { teacherId: null } });
+        await tx.observation.updateMany({ where: { teacherId: teacher.id }, data: { teacherId: null } });
+        await tx.classTeacher.deleteMany({ where: { teacherId: teacher.id } });
         await tx.teacherSubject.deleteMany({ where: { teacherId: teacher.id } });
         await tx.teacher.delete({ where: { id: teacher.id } });
       }
-      if (student) await tx.student.delete({ where: { id: student.id } });
-      if (guardian) await tx.guardian.delete({ where: { id: guardian.id } });
+      if (guardian) {
+        await tx.studentGuardian.deleteMany({ where: { guardianId: guardian.id } });
+        await tx.guardian.delete({ where: { id: guardian.id } });
+      }
       await tx.user.delete({ where: { id: target.id } });
-    });
+    }, { timeout: 30000 });
   } catch {
     return NextResponse.json(
-      { error: "No se pudo eliminar: tiene datos vinculados. Baneá la cuenta." },
-      { status: 409 }
+      { error: "No se pudo eliminar. Probá de nuevo." },
+      { status: 500 }
     );
   }
   return NextResponse.json({ data: { id: target.id, username: target.username } });
