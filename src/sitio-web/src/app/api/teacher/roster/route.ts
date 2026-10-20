@@ -15,6 +15,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
 
   const { searchParams } = new URL(request.url);
+  const isAdmin = session.user.role === "ADMIN";
   const subjectCode = searchParams.get("subject") || undefined;
   const periodLabel = searchParams.get("period") || undefined;
   const q = (searchParams.get("q") || "").trim().toLowerCase();
@@ -75,7 +76,7 @@ export async function GET(request: Request) {
               OR: [
                 { user: { firstName: { contains: q, mode: "insensitive" } } },
                 { user: { lastName: { contains: q, mode: "insensitive" } } },
-                { user: { ci: { contains: q } } },
+                ...(isAdmin ? [{ user: { ci: { contains: q } } }] : []),
               ],
             }
           : {}),
@@ -83,7 +84,13 @@ export async function GET(request: Request) {
       select: {
         id: true,
         academic: { select: { shortName: true, name: true } },
-        user: { select: { firstName: true, lastName: true, ci: true, email: true } },
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ...(isAdmin ? { ci: true, email: true } : {}),
+          },
+        },
         grades: {
           where: {
             ...(subjectCode ? { subject: { code: subjectCode } } : {}),

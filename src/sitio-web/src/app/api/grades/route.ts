@@ -158,6 +158,13 @@ export async function POST(request: Request) {
     if (!link) {
       return NextResponse.json({ error: "No tenés asignada esta materia" }, { status: 403 });
     }
+    // Además, el alumno debe pertenecer al bachillerato de esa materia.
+    if (student.academicId !== subject.academicId) {
+      return NextResponse.json(
+        { error: "El alumno no pertenece al bachillerato de esa materia" },
+        { status: 403 }
+      );
+    }
     teacherId = teacher.id;
   } else {
     const teacher = await prisma.teacher.findUnique({

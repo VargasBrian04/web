@@ -20,7 +20,7 @@ export default function Hero() {
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-slate-200">
           Formamos ciudadanos íntegros y técnicos altamente capacitados en
-          Caaguazú. 8 bachilleratos técnicos y científicos, educación pública,
+          Caaguazú. 10 bachilleratos técnicos y científicos, educación pública,
           gratuita y de calidad.
         </p>
 
@@ -36,7 +36,7 @@ export default function Hero() {
         <dl className="mt-12 grid grid-cols-3 gap-6 sm:gap-10">
           {[
             ["+40", "Años de trayectoria"],
-            ["8", "Bachilleratos técnicos y científicos"],
+            ["10", "Bachilleratos técnicos y científicos"],
             ["100%", "Educación pública y gratuita"]
           ].map(([n, l]) => (
             <div key={l}>

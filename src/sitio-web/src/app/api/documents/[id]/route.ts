@@ -3,7 +3,17 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { removeFile } from "@/lib/storage";
 
-async function canSee(doc: { teacherId: string | null; studentId: string | null; subjectId: string | null; visibleToTutor: boolean }, userId: string, role: string): Promise<boolean> {
+async function canSee(
+  doc: {
+    teacherId: string | null;
+    studentId: string | null;
+    subjectId: string | null;
+    visibleToTutor: boolean;
+    subject: { academicId: string | null } | null;
+  },
+  userId: string,
+  role: string
+): Promise<boolean> {
   if (role === "ADMIN") return true;
   if (role === "TEACHER") {
     const teacher = await prisma.teacher.findUnique({ where: { userId }, include: { subjects: true } });
@@ -15,9 +25,12 @@ async function canSee(doc: { teacherId: string | null; studentId: string | null;
   if (role === "STUDENT") {
     const student = await prisma.student.findUnique({ where: { userId } });
     if (!student) return false;
+    // Documentos propios.
     if (doc.studentId && doc.studentId === student.id) return true;
-    if (!doc.studentId) return true; // general del curso/materia
-    return false;
+    // Documentos generales: solo de su propio bachillerato.
+    if (doc.studentId) return false;
+    if (!student.academicId) return false;
+    return doc.subject?.academicId === student.academicId;
   }
   if (role === "PARENT") {
     if (!doc.visibleToTutor) return false;
@@ -37,7 +50,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const { id } = await ctx.params;
   const doc = await prisma.document.findUnique({
     where: { id },
-    include: { subject: { select: { code: true, name: true } } },
+    include: { subject: { select: { code: true, name: true, academicId: true } } },
   });
   if (!doc) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   if (!(await canSee(doc, session.user.id, session.user.role)))
@@ -86,7 +99,11 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
     if (!teacher || doc.teacherId !== teacher.id)
       return NextResponse.json({ error: "Solo el autor o Dirección" }, { status: 403 });
   }
+  try {
+    await removeFile(doc.fileName);
+  } catch (e) {
+    console.error("No se pudo borrar el archivo físico", id, e);
+  }
   await prisma.document.delete({ where: { id } });
-  await removeFile(doc.fileName);
   return NextResponse.json({ data: { ok: true } });
 }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 /** Cumpleaños del día en el portal. */
 export default function CumplesHoy() {
-  const [items, setItems] = useState<{ nombre: string; edad: number | null }[]>([]);
+  const [items, setItems] = useState<{ nombre: string }[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

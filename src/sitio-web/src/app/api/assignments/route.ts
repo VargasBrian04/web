@@ -22,7 +22,6 @@ export async function GET(request: Request) {
   const teacherId = searchParams.get("teacher") || undefined;
   const role = session.user.role;
 
-  const where = { ...(subjectCode ? { subject: { code: subjectCode } } : {}) };
   const include = {
     subject: { select: { code: true, name: true } },
     teacher: { select: { user: { select: { firstName: true, lastName: true } } } },
@@ -35,11 +34,13 @@ export async function GET(request: Request) {
   try {
     if (role === "STUDENT") {
       const student = await prisma.student.findUnique({ where: { userId: session.user.id } });
-      if (!student) return NextResponse.json({ data: [] });
+      if (!student || !student.academicId) return NextResponse.json({ data: [] });
       const data = await prisma.assignment.findMany({
         where: {
-          ...where,
-          ...(student.academicId ? { subject: { academicId: student.academicId } } : {}),
+          subject: {
+            academicId: student.academicId,
+            ...(subjectCode ? { code: subjectCode } : {}),
+          },
         },
         include: {
           ...include,
@@ -56,16 +57,13 @@ export async function GET(request: Request) {
         include: { student: { select: { academicId: true } } },
       });
       const academicIds = [...new Set(links.map((l: any) => l.student.academicId).filter(Boolean))] as string[];
+      if (!academicIds.length) return NextResponse.json({ data: [] });
       const data = await prisma.assignment.findMany({
         where: {
-          ...(subjectCode || academicIds.length
-            ? {
-                subject: {
-                  ...(subjectCode ? { code: subjectCode } : {}),
-                  ...(academicIds.length ? { academicId: { in: academicIds } } : {}),
-                },
-              }
-            : {}),
+          subject: {
+            academicId: { in: academicIds },
+            ...(subjectCode ? { code: subjectCode } : {}),
+          },
           ...(teacherId ? { teacherId } : {}),
         },
         include,
@@ -76,8 +74,12 @@ export async function GET(request: Request) {
     }
     if (role === "TEACHER") {
       const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
+      if (!teacher) return NextResponse.json({ data: [] });
       const data = await prisma.assignment.findMany({
-        where: { ...where, ...(teacher ? { teacherId: teacher.id } : {}) },
+        where: {
+          teacherId: teacher.id,
+          ...(subjectCode ? { subject: { code: subjectCode } } : {}),
+        },
         include,
         orderBy: { createdAt: "desc" },
         take: 100,
@@ -86,7 +88,10 @@ export async function GET(request: Request) {
     }
     if (role === "ADMIN") {
       const data = await prisma.assignment.findMany({
-        where: { ...where, ...(teacherId ? { teacherId } : {}) },
+        where: {
+          ...(subjectCode ? { subject: { code: subjectCode } } : {}),
+          ...(teacherId ? { teacherId } : {}),
+        },
         include,
         orderBy: { createdAt: "desc" },
         take: 100,

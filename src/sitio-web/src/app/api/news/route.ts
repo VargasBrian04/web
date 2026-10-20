@@ -26,6 +26,12 @@ const selectNews = {
   updatedAt: true,
 };
 
+/** Nunca enviar el data URI de la imagen al cliente: solo si existe. */
+function toClientNews<T extends { imageFile: string | null }>(n: T) {
+  const { imageFile, ...rest } = n;
+  return { ...rest, hasImage: !!imageFile };
+}
+
 /**
  * GET /api/news — público: solo PUBLICADA, recientes primero.
  *  ?limit=4 (portada) · ?page=&pageSize= (paginado de "todas")
@@ -55,7 +61,7 @@ export async function GET(request: Request) {
         orderBy,
         take: limit,
       });
-      return NextResponse.json({ data });
+      return NextResponse.json({ data: data.map(toClientNews) });
     }
     const [total, data] = await Promise.all([
       prisma.newsPost.count({ where }),
@@ -67,7 +73,7 @@ export async function GET(request: Request) {
         take: pageSize,
       }),
     ]);
-    return NextResponse.json({ data, page, pageSize, total });
+    return NextResponse.json({ data: data.map(toClientNews), page, pageSize, total });
   } catch (e) {
     console.error("GET /api/news", e);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
@@ -173,5 +179,5 @@ export async function POST(request: Request) {
       console.error("MAIL avisos", e);
     }
   }
-  return NextResponse.json({ data: { ...created, avisados } }, { status: 201 });
+  return NextResponse.json({ data: { ...toClientNews(created), avisados } }, { status: 201 });
 }

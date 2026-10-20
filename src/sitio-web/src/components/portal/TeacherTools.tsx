@@ -65,8 +65,6 @@ function compressImage(file: File): Promise<File> {
 /** Panel del docente: curso y materia globales, planilla, lista y tarea. */
 export default function TeacherTools() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [catalog, setCatalog] = useState<Subject[]>([]);
-  const [addCode, setAddCode] = useState("");
   const [curso, setCurso] = useState("");
   const [subject, setSubject] = useState("");
   const [period, setPeriod] = useState("");
@@ -225,7 +223,6 @@ export default function TeacherTools() {
       const json = await res.json();
       if (res.ok) {
         setSubjects(json.data.links ?? []);
-        setCatalog(json.data.catalog ?? []);
         const ps: { label: string }[] = json.data.periods ?? [];
         if (ps[0]) setPeriod((p) => p || ps[0].label);
       } else {
@@ -269,39 +266,6 @@ export default function TeacherTools() {
     setCurso(label);
     const list = cursos.find((c) => c.label === label)?.list ?? [];
     setSubject(list[0]?.code ?? "");
-  }
-
-  async function linkSubject(e: React.FormEvent) {
-    e.preventDefault();
-    setMsg(null);
-    if (!addCode) {
-      setMsg("Elegí la materia para agregarla a tus cursos.");
-      return;
-    }
-    const res = await fetch("/api/teacher/subjects", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subjectCode: addCode }),
-    });
-    const json = await res.json();
-    if (!res.ok) setMsg(json.error || "No se pudo agregar");
-    else {
-      setMsg(`Agregada a tus cursos: ${json.data.name}.`);
-      setAddCode("");
-      loadCatalog();
-    }
-  }
-
-  async function unlinkSubject() {
-    if (!subject) return;
-    setMsg(null);
-    const res = await fetch(`/api/teacher/subjects?subjectCode=${encodeURIComponent(subject)}`, { method: "DELETE" });
-    const json = await res.json();
-    if (!res.ok) setMsg(json.error || "No se pudo quitar");
-    else {
-      setMsg("Materia desvinculada de tus cursos.");
-      loadCatalog();
-    }
   }
 
   async function submitTask(e: React.FormEvent) {
@@ -407,44 +371,19 @@ export default function TeacherTools() {
           </label>
           <label className="text-sm font-semibold text-slate-700">
             Materia
-            <span className="flex items-center gap-1.5">
-              <select value={subject} onChange={(e) => setSubject(e.target.value)} className={inputCls} disabled={loading}>
-                {materiasCurso.map((s) => (
-                  <option key={s.code} value={s.code}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              {subject && (
-                <button
-                  type="button"
-                  onClick={unlinkSubject}
-                  title="Dejar de enseñar esta materia"
-                  className="mt-1 shrink-0 rounded-lg border border-red-200 px-2.5 py-2 text-xs font-bold text-red-700 hover:bg-red-50"
-                >
-                  Quitar
-                </button>
-              )}
-            </span>
-          </label>
-        </div>
-        <form onSubmit={linkSubject} className="mt-4 flex flex-col gap-2 border-t border-stone-100 pt-4 sm:flex-row sm:items-end">
-          <label className="min-w-0 flex-1 text-sm font-semibold text-slate-700">
-            Agregar materia que enseño
-            <select value={addCode} onChange={(e) => setAddCode(e.target.value)} className={inputCls} disabled={loading}>
-              <option value="">— Todas las materias —</option>
-              {catalog.map((s) => (
+            <select value={subject} onChange={(e) => setSubject(e.target.value)} className={inputCls} disabled={loading}>
+              {materiasCurso.map((s) => (
                 <option key={s.code} value={s.code}>
-                  {s.gradeYear}.º {s.academic?.shortName ?? ""} · {s.name}
-                  {subjects.some((m) => m.code === s.code) ? " ✓" : ""}
+                  {s.name}
                 </option>
               ))}
             </select>
           </label>
-          <button type="submit" className="rounded-lg bg-[var(--institutional)] px-4 py-2 text-sm font-bold text-white hover:opacity-90">
-            Vincularme
-          </button>
-        </form>
+        </div>
+        <p className="mt-4 rounded-lg bg-stone-50 px-3 py-2 text-xs text-slate-500">
+          Las materias y cursos los asigna Dirección/Secretaría. Si falta alguna,
+          comunicate con la Secretaría del colegio.
+        </p>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">

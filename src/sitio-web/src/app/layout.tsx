@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
@@ -12,7 +12,12 @@ export const metadata: Metadata = {
   description:
     "Institución educativa pública de Caaguazú, Paraguay. Inscripciones, oferta académica y portal para estudiantes, docentes y familias.",
   manifest: "/manifest.webmanifest",
+};
+
+export const viewport: Viewport = {
   themeColor: "#5d4037",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

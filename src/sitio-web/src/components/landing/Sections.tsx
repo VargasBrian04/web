@@ -2,52 +2,84 @@ import GalleryExplorer from "./GalleryExplorer";
 
 const bachilleratos = [
   {
-    short: "BTI",
-    name: "Bachillerato Técnico en Informática",
-    desc: "Programación, redes y mantenimiento de equipos para el mundo del software y las TIC.",
-    image: "/images/galeria/info-2.jpg",
-  },
-  {
-    short: "BTS",
-    name: "Bachillerato Técnico en Salud",
-    desc: "Enfermería, primeros auxilios y ciencias de la salud al servicio de la comunidad.",
-    image: "/images/galeria/salud-1.jpg",
-  },
-  {
-    short: "BTE",
-    name: "Bachillerato Técnico en Electricidad",
-    desc: "Instalaciones eléctricas, electrónica y mantenimiento de sistemas de potencia.",
-    image: "/images/galeria/elec-1.jpg",
-  },
-  {
-    short: "Mecánica",
-    name: "Bachillerato Técnico en Mecánica",
-    desc: "Mecánica automotriz e industrial, soldadura y mantenimiento de maquinarias.",
-    image: "/images/galeria/mecanica-1.jpg",
-  },
-  {
-    short: "Agronomía",
-    name: "Bachillerato Técnico en Agronomía",
-    desc: "Producción agrícola, ganadería y manejo sustentable de los recursos naturales.",
-    image: "/images/galeria/agro-1.jpg",
-  },
-  {
-    short: "Construcciones Civiles",
-    name: "Bachillerato Técnico en Construcciones Civiles",
-    desc: "Dibujo técnico, obra, instalaciones sanitarias y eléctricas.",
-    image: "/images/galeria/constr-1.jpg",
-  },
-  {
+    code: "CCB",
     short: "Ciencias Básicas",
+    group: "Bachillerato Científico",
     name: "Científico con énfasis en Ciencias Básicas",
     desc: "Matemática, física, química y biología con énfasis en la investigación.",
-    image: "/images/galeria/basicas-1.jpg",
+    logo: null,
   },
   {
+    code: "CCS",
     short: "Ciencias Sociales",
+    group: "Bachillerato Científico",
     name: "Científico con énfasis en Ciencias Sociales",
     desc: "Historia, geografía, derecho y ciencias políticas.",
-    image: "/images/galeria/sociales-1.jpg",
+    logo: "/images/bachilleratos/ciencias-sociales.webp",
+  },
+  {
+    code: "BTS",
+    short: "Salud",
+    group: "Bachillerato en Servicios",
+    name: "Bachillerato Técnico en Salud",
+    desc: "Enfermería, primeros auxilios y ciencias de la salud al servicio de la comunidad.",
+    logo: null,
+  },
+  {
+    code: "BTI",
+    short: "Informática",
+    group: "Bachillerato en Servicios",
+    name: "Bachillerato Técnico en Informática",
+    desc: "Programación, redes y mantenimiento de equipos para el mundo del software y las TIC.",
+    logo: null,
+  },
+  {
+    code: "BTC",
+    short: "Contabilidad",
+    group: "Bachillerato en Servicios",
+    name: "Bachillerato Técnico en Contabilidad",
+    desc: "Gestión contable y administrativa con salida laboral y base para estudios universitarios.",
+    logo: "/images/bachilleratos/btc-contabilidad.webp",
+  },
+  {
+    code: "ADN",
+    short: "Administración",
+    group: "Bachillerato en Servicios",
+    name: "Bachillerato en Administración de Negocios",
+    desc: "Gestión, administración y emprendedurismo para el mundo de los negocios.",
+    logo: "/images/bachilleratos/adn-negocios.webp",
+  },
+  {
+    code: "BTE",
+    short: "Electricidad",
+    group: "Bachillerato Técnico Industrial",
+    name: "Bachillerato Técnico en Electricidad",
+    desc: "Instalaciones eléctricas, electrónica y mantenimiento de sistemas de potencia.",
+    logo: null,
+  },
+  {
+    code: "BTM",
+    short: "Mecánica",
+    group: "Bachillerato Técnico Industrial",
+    name: "Bachillerato Técnico en Mecánica",
+    desc: "Mecánica automotriz e industrial, soldadura y mantenimiento de maquinarias.",
+    logo: null,
+  },
+  {
+    code: "BTCC",
+    short: "Construcciones",
+    group: "Bachillerato Técnico Industrial",
+    name: "Bachillerato Técnico en Construcciones Civiles",
+    desc: "Dibujo técnico, obra, instalaciones sanitarias y eléctricas.",
+    logo: null,
+  },
+  {
+    code: "BTA",
+    short: "Agropecuaria",
+    group: "Bachillerato Técnico Industrial",
+    name: "Bachillerato Técnico en Agropecuaria",
+    desc: "Producción agrícola, ganadería y manejo sustentable de los recursos naturales.",
+    logo: null,
   }
 ];
 
@@ -80,7 +112,7 @@ export function AcademicOfferSection() {
           <div>
             <h2 className="section-title">Oferta académica</h2>
             <p className="mt-3 text-slate-600">
-              Educación Escolar Básica (7.º a 9.º) y ocho bachilleratos del
+              Educación Escolar Básica (7.º a 9.º) y diez bachilleratos del
               Nivel Medio, con salida laboral y preparación para la universidad.
             </p>
           </div>
@@ -89,19 +121,45 @@ export function AcademicOfferSection() {
         <h3 className="mt-10 text-lg font-extrabold text-[var(--institutional)]">
           Nivel Medio — Bachilleratos
         </h3>
-        <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <p className="mt-2 text-sm text-slate-600">
+          Cada bachillerato construye su propia identidad. Estamos incorporando
+          los logos de todas las orientaciones; los que ya están listos se
+          muestran a continuación.
+        </p>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {bachilleratos.map((b) => (
             <article
-              key={b.short}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-[var(--paper)] transition-shadow hover:shadow-md"
+              key={b.code}
+              className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:border-[var(--gold)] hover:shadow-lg"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={b.image} alt={b.name} loading="lazy" className="h-36 w-full object-cover" />
-              <div className="flex flex-1 flex-col p-6">
-                <span className="mb-4 inline-flex w-fit rounded-lg bg-[var(--institutional)] px-3 py-1 text-xs font-bold text-white">
-                  {b.short}
+              <div className="relative flex h-44 items-center justify-center overflow-hidden border-b border-slate-100 bg-[radial-gradient(circle_at_top,_#ffffff,_#f7f3ee)]">
+                <span className="absolute right-3 top-3 rounded-full bg-[var(--institutional)] px-2.5 py-1 text-[10px] font-bold tracking-wide text-white shadow-sm">
+                  {b.code}
                 </span>
-                <h4 className="text-base font-bold text-slate-900">{b.name}</h4>
+                {b.logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={b.logo}
+                    alt={`Logo de ${b.name}`}
+                    loading="lazy"
+                    className="h-32 w-32 object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center text-center">
+                    <span className="text-4xl font-black tracking-tight text-slate-200">
+                      {b.code}
+                    </span>
+                    <span className="mt-2 rounded-full border border-dashed border-slate-300 bg-white/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      Logo próximamente
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-1 flex-col p-5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--gold)]">
+                  {b.group}
+                </span>
+                <h4 className="mt-1 text-base font-bold text-slate-900">{b.name}</h4>
                 <p className="mt-2 text-sm text-slate-600">{b.desc}</p>
               </div>
             </article>

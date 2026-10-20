@@ -20,7 +20,9 @@ export async function GET(request: Request) {
   try {
     const data = await prisma.galleryItem.findMany({
       where: { ...(slot ? { slot } : {}) },
-      select: { id: true, slot: true, category: true, caption: true, imageFile: true, createdAt: true },
+      // No se selecciona imageFile: es un data URI pesado. El cliente pide
+      // los bytes por /api/media/:id/image.
+      select: { id: true, slot: true, category: true, caption: true, createdAt: true },
       orderBy: { createdAt: "desc" },
       take: 200,
     });

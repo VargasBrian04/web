@@ -11,7 +11,7 @@ type Post = {
   content: string;
   category: string;
   imageUrl: string | null;
-  imageFile: string | null;
+  hasImage: boolean;
   status: "BORRADOR" | "PUBLICADA";
   publishedAt: string | null;
   createdAt?: string | null;
@@ -29,7 +29,7 @@ function todayISO(): string {
 }
 
 function thumbOf(p: Post): string | null {
-  if (p.imageFile) return `/api/news/${p.id}/image`;
+  if (p.hasImage) return `/api/news/${p.id}/image`;
   return p.imageUrl;
 }
 

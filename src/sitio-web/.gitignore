@@ -5,6 +5,7 @@ out/
 .env.local
 uploads/
 *.log
+*.tsbuildinfo
 README*_private.md
 /public/images/gallery/
 .vercel

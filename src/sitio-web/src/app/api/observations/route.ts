@@ -25,8 +25,10 @@ export async function GET(request: Request) {
     }
     if (role === "TEACHER") {
       const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
+      // Sin ficha docente no hay observaciones propias: no debe ver las de otros.
+      if (!teacher) return NextResponse.json({ data: [] });
       const data = await prisma.observation.findMany({
-        where: { ...(teacher ? { teacherId: teacher.id } : {}), ...(qStudent ? { studentId: qStudent } : {}) },
+        where: { teacherId: teacher.id, ...(qStudent ? { studentId: qStudent } : {}) },
         orderBy: { createdAt: "desc" },
         take: 100,
       });
@@ -75,15 +77,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Alumno y texto (máx 1000) obligatorios" }, { status: 400 });
   const student = await prisma.student.findUnique({ where: { id: studentId } });
   if (!student) return NextResponse.json({ error: "Alumno inválido" }, { status: 400 });
+  let teacherId: string | null = null;
+  if (session.user.role === "TEACHER") {
+    const teacher = await prisma.teacher.findUnique({
+      where: { userId: session.user.id },
+      include: { subjects: { select: { subject: { select: { academicId: true } } } } },
+    });
+    if (!teacher) return NextResponse.json({ error: "Sin perfil docente" }, { status: 403 });
+    const academicIds = new Set(
+      teacher.subjects.map((s: any) => s.subject.academicId).filter(Boolean)
+    );
+    if (!student.academicId || !academicIds.has(student.academicId))
+      return NextResponse.json({ error: "El alumno no pertenece a tus materias" }, { status: 403 });
+    teacherId = teacher.id;
+  }
   let periodId: string | null = null;
   if (periodLabel) {
     const p = await prisma.period.findUnique({ where: { label: periodLabel } });
     if (!p) return NextResponse.json({ error: "Período inválido" }, { status: 400 });
     periodId = p.id;
   }
-  const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
   const created = await prisma.observation.create({
-    data: { studentId, teacherId: teacher?.id ?? null, periodId, text: text.trim(), visibleToTutor: visibleToTutor !== false },
+    data: { studentId, teacherId, periodId, text: text.trim(), visibleToTutor: visibleToTutor !== false },
   });
   return NextResponse.json({ data: created }, { status: 201 });
 }

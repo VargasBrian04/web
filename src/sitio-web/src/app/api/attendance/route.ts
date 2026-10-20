@@ -71,9 +71,8 @@ export async function GET(request: Request) {
         include: { subjects: true },
       });
       const subjectIds = teacher?.subjects.map((s: any) => s.subjectId) ?? [];
-      const subjects = subjectIds.length
-        ? await prisma.subject.findMany({ where: { id: { in: subjectIds } }, select: { code: true } })
-        : [];
+      if (!subjectIds.length) return NextResponse.json({ data: [] });
+      const subjects = await prisma.subject.findMany({ where: { id: { in: subjectIds } }, select: { code: true } });
       const codes = subjects.map((s: any) => s.code);
       // Si pide una materia concreta, debe ser una de las suyas.
       if (subjectCode && !codes.includes(subjectCode)) {
@@ -82,7 +81,10 @@ export async function GET(request: Request) {
       const data = await prisma.attendance.findMany({
         where: {
           ...baseWhere,
-          ...(codes.length && !subjectCode ? { subject: { code: { in: codes } } } : {}),
+          // Restringir por ID de materia (los códigos pueden repetirse entre
+          // bachilleratos) y no solo por código.
+          subjectId: { in: subjectIds },
+          ...(subjectCode ? {} : { subject: { code: { in: codes } } }),
         },
         select,
         orderBy: { classDate: "desc" },
@@ -124,10 +126,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
 
   let subjectId: string | null = null;
+  let subjectAcademicId: string | null = null;
   if (subjectCode) {
-    const subject = await prisma.subject.findFirst({ where: { code: subjectCode } });
+    const subject = await prisma.subject.findFirst({
+      where: { code: subjectCode },
+      select: { id: true, academicId: true },
+    });
     if (!subject) return NextResponse.json({ error: "Materia inválida" }, { status: 400 });
     subjectId = subject.id;
+    subjectAcademicId = subject.academicId;
     // El docente solo registra asistencia de sus materias asignadas.
     if (session.user.role === "TEACHER") {
       const teacherCheck = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
@@ -138,33 +145,64 @@ export async function POST(request: Request) {
       if (!link) return NextResponse.json({ error: "No tenés asignada esta materia" }, { status: 403 });
     }
   }
+  // Un docente no puede pasar lista "general": siempre debe indicar materia.
+  if (session.user.role === "TEACHER" && !subjectId)
+    return NextResponse.json({ error: "Elegí la materia para pasar lista" }, { status: 400 });
 
   const student = await prisma.student.findUnique({ where: { id: studentId } });
   if (!student) return NextResponse.json({ error: "Alumno inválido" }, { status: 400 });
+  if (
+    session.user.role === "TEACHER" &&
+    subjectAcademicId &&
+    student.academicId !== subjectAcademicId
+  )
+    return NextResponse.json({ error: "El alumno no pertenece a esa materia" }, { status: 403 });
 
   const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
-  const date = new Date(classDate);
-  if (Number.isNaN(date.getTime())) return NextResponse.json({ error: "Fecha inválida" }, { status: 400 });
+  const rawDate = new Date(classDate);
+  if (Number.isNaN(rawDate.getTime())) return NextResponse.json({ error: "Fecha inválida" }, { status: 400 });
+  // Guardar al mediodía UTC (mejor visualización) y buscar por día completo:
+  // así no se duplican registros históricos guardados a medianoche UTC.
+  const y = rawDate.getUTCFullYear();
+  const m = rawDate.getUTCMonth();
+  const d = rawDate.getUTCDate();
+  const date = new Date(Date.UTC(y, m, d, 12));
+  const dayStart = new Date(Date.UTC(y, m, d, 0, 0, 0, 0));
+  const dayEnd = new Date(Date.UTC(y, m, d, 23, 59, 59, 999));
+  const cleanNote = note?.trim().slice(0, 500) || null;
+  const updateData = {
+    status: status as "PRESENTE",
+    note: cleanNote,
+    teacherId: teacher?.id ?? null,
+  };
 
-  // Con materia: upsert por unique(student, subject, fecha). Sin materia: crear directo
-  // (el unique no cubre subjectId null y el parche "" generaba colisiones).
+  // Buscar primero cualquier registro del mismo día (con o sin materia).
+  const existing = await prisma.attendance.findFirst({
+    where: {
+      studentId,
+      ...(subjectId ? { subjectId } : { subjectId: null }),
+      classDate: { gte: dayStart, lte: dayEnd },
+    },
+    select: { id: true },
+  });
+  if (existing) {
+    const row = await prisma.attendance.update({ where: { id: existing.id }, data: updateData });
+    return NextResponse.json({ data: row }, { status: 201 });
+  }
+
+  // Con materia: upsert por unique(student, subject, fecha). Sin materia: crear
+  // directo, porque PostgreSQL no aplica el unique cuando subjectId es NULL.
   if (subjectId) {
     const row = await prisma.attendance.upsert({
       where: {
-        studentId_subjectId_classDate: {
-          studentId,
-          subjectId,
-          classDate: date,
-        },
+        studentId_subjectId_classDate: { studentId, subjectId, classDate: date },
       },
-      update: { status: status as "PRESENTE", note: note ?? null, teacherId: teacher?.id ?? null },
+      update: updateData,
       create: {
         studentId,
         subjectId,
         classDate: date,
-        status: status as "PRESENTE",
-        note: note ?? null,
-        teacherId: teacher?.id ?? null,
+        ...updateData,
       },
     });
     return NextResponse.json({ data: row }, { status: 201 });
@@ -174,9 +212,7 @@ export async function POST(request: Request) {
       studentId,
       subjectId: null,
       classDate: date,
-      status: status as "PRESENTE",
-      note: note ?? null,
-      teacherId: teacher?.id ?? null,
+      ...updateData,
     },
   });
   return NextResponse.json({ data: row }, { status: 201 });

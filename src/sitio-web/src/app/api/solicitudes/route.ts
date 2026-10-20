@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { audit } from "@/lib/audit";
 import { CI_RE, EMAIL_RE, normalizeUsername } from "@/lib/users";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 const EEB_GRADES = ["7.º", "8.º", "9.º"];
 const MEDIA_COURSES = ["1.º", "2.º", "3.º"];
@@ -47,6 +48,13 @@ async function resolveAcademic(ref: string) {
  * Toda la validación (incluidos combos dependientes) se repite en servidor.
  */
 export async function POST(request: Request) {
+  const limited = rateLimit(`solicitud:${clientIp(request)}`, 10, 10 * 60 * 1000);
+  if (!limited.ok)
+    return NextResponse.json(
+      { error: "Demasiadas solicitudes. Esperá unos minutos e intentá de nuevo." },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfter) } }
+    );
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();

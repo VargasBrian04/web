@@ -56,9 +56,11 @@ export default async function PortalLayout({ children }: { children: React.React
         </div>
       </div>
       {children}
-      <div className="mt-6">
-        <CumplesHoy />
-      </div>
+      {(role === "ADMIN" || role === "TEACHER") && (
+        <div className="mt-6">
+          <CumplesHoy />
+        </div>
+      )}
     </div>
   );
 }

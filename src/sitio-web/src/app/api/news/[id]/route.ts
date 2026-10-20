@@ -25,6 +25,12 @@ const selectFull = {
   updatedAt: true,
 };
 
+/** Nunca enviar el data URI de la imagen al cliente: solo si existe. */
+function toClientNews<T extends { imageFile: string | null }>(n: T) {
+  const { imageFile, ...rest } = n;
+  return { ...rest, hasImage: !!imageFile };
+}
+
 /** GET /api/news/:id — pública si PUBLICADA; borrador solo ADMIN. */
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
@@ -38,7 +44,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     if (!session?.user || session.user.role !== "ADMIN")
       return NextResponse.json({ error: "No encontrada" }, { status: 404 });
   }
-  return NextResponse.json({ data: post });
+  return NextResponse.json({ data: toClientNews(post) });
 }
 
 /**
@@ -137,7 +143,7 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
     data,
     select: selectFull,
   });
-  return NextResponse.json({ data: updated });
+  return NextResponse.json({ data: toClientNews(updated) });
 }
 
 /** DELETE /api/news/:id — solo ADMIN. Borra registro + imagen subida. */

@@ -73,14 +73,16 @@ export async function GET(request: Request) {
       });
       academicIds = [...new Set(links.map((l: { student: { academicId: string | null } }) => l.student.academicId).filter(Boolean) as string[])];
     }
-    const subjectFilter: Record<string, unknown> = {};
+    // Alumno/tutor solo ven fotos de los bachilleratos a los que pertenecen.
+    // Sin bachillerato asignado no hay fotos que mostrar: nunca abrir a "todas".
+    if (!academicIds.length) return NextResponse.json({ data: [] });
+    const subjectFilter: Record<string, unknown> = { academicId: { in: academicIds } };
     if (subjectCode) subjectFilter.code = subjectCode;
-    if (academicIds.length) subjectFilter.academicId = { in: academicIds };
     const data = await prisma.photoLog.findMany({
       where: {
         ...(kind ? { kind } : {}),
         ...(teacherId ? { teacherId } : {}),
-        ...(Object.keys(subjectFilter).length ? { subject: subjectFilter } : { subjectId: null }),
+        subject: subjectFilter,
       },
       include,
       orderBy: { logDate: "desc" },
@@ -119,7 +121,17 @@ export async function POST(request: Request) {
   }
   // La foto queda atribuida a la ficha docente del que sube (también
   // Dirección, si enseña): así aparece en su zona del directorio.
+  // Un docente solo puede subir fotos de sus materias asignadas.
   const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
+  if (session.user.role === "TEACHER") {
+    if (!teacher) return NextResponse.json({ error: "Sin perfil docente" }, { status: 403 });
+    if (subjectId) {
+      const link = await prisma.teacherSubject.findUnique({
+        where: { teacherId_subjectId: { teacherId: teacher.id, subjectId } },
+      });
+      if (!link) return NextResponse.json({ error: "No tenés asignada esta materia" }, { status: 403 });
+    }
+  }
 
   try {
     const uri = imageToDataUri(

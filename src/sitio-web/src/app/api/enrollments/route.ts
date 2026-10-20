@@ -3,8 +3,9 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { avisarInscripcion } from "@/lib/mail";
-import { normalizeUsername, usernameFromEmail } from "@/lib/users";
+import { usernameFromEmail } from "@/lib/users";
 import { audit } from "@/lib/audit";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EEB_GRADES = ["7.º", "8.º", "9.º"];
@@ -21,6 +22,14 @@ const TURNOS = ["MAÑANA", "TARDE"];
  * registra el manifiesto y Secretaría verifica los físicos.
  */
 export async function POST(request: Request) {
+  const ip = clientIp(request);
+  const limited = rateLimit(`enroll:${ip}`, 20, 10 * 60 * 1000);
+  if (!limited.ok)
+    return NextResponse.json(
+      { error: "Demasiadas solicitudes. Esperá unos minutos e intentá de nuevo." },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfter) } }
+    );
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -77,8 +86,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Elegí la sección (${validSec.join(" o ")})` }, { status: 400 });
     sec = seccion;
   }
-  if (!Array.isArray(documents) || documents.length === 0)
-    return NextResponse.json({ error: "Adjuntá al menos un documento" }, { status: 400 });
+  const docsToStore: { name: string; type: string; size: number }[] = [];
+  if (!Array.isArray(documents) || documents.length === 0 || documents.length > 10)
+    return NextResponse.json({ error: "Adjuntá entre 1 y 10 documentos" }, { status: 400 });
+  for (const d of documents) {
+    if (
+      !d ||
+      typeof d.name !== "string" ||
+      !d.name.trim() ||
+      d.name.length > 200 ||
+      typeof d.size !== "number" ||
+      !Number.isFinite(d.size) ||
+      d.size < 0 ||
+      d.size > 10 * 1024 * 1024
+    )
+      return NextResponse.json({ error: "Documento inválido (nombre o tamaño)" }, { status: 400 });
+    docsToStore.push({
+      name: d.name.trim().slice(0, 200),
+      type: typeof d.type === "string" ? d.type.slice(0, 100) : "",
+      size: Math.round(d.size),
+    });
+  }
+
+  const birth = birthDate ? new Date(birthDate) : null;
+  if (birth && Number.isNaN(birth.getTime()))
+    return NextResponse.json({ error: "Fecha de nacimiento inválida" }, { status: 400 });
 
   const period = (periodLabel?.trim() || String(new Date().getFullYear()));
   const emailNorm = email.trim().toLowerCase();
@@ -86,52 +118,49 @@ export async function POST(request: Request) {
 
   try {
     const result = await prisma.$transaction(async (tx: any) => {
-      // Usuario existente por CI o email: se reutiliza, no se duplica
+      // La inscripción pública NO modifica cuentas existentes: si la CI o el
+      // correo ya existen, la persona debe iniciar sesión o ir a Secretaría.
       const existing = await tx.user.findFirst({
-        where: { OR: [{ ci: ciNorm }, { email: emailNorm }] }
+        where: { OR: [{ ci: ciNorm }, { email: emailNorm }] },
+        select: { id: true },
       });
-      if (existing && existing.ci !== ciNorm && existing.email !== emailNorm) {
-        throw Object.assign(new Error("La cédula o el correo ya están registrados"), { status: 409 });
+      if (existing) {
+        throw Object.assign(
+          new Error("Ya existe una cuenta con esa cédula o correo. Iniciá sesión o contactá a Secretaría."),
+          { status: 409 }
+        );
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
-      // Nombre de usuario: se conserva el existente o se genera del correo.
-      let username = existing?.username ?? "";
-      if (!username) {
-        const base = usernameFromEmail(emailNorm);
-        username = base;
-        for (let i = 2; ; i++) {
-          const taken = await tx.user.findUnique({ where: { username } });
-          if (!taken) break;
-          username = `${base}${i}`.slice(0, 30);
-        }
+      const base = usernameFromEmail(emailNorm);
+      let username = base;
+      for (let i = 2; ; i++) {
+        const taken = await tx.user.findUnique({ where: { username } });
+        if (!taken) break;
+        username = `${base}${i}`.slice(0, 30);
       }
-      const user = existing
-        ? await tx.user.update({
-            where: { id: existing.id },
-            data: {
-              firstName: firstName.trim(),
-              lastName: lastName.trim(),
-              phone: phone?.trim() || null,
-              address: address?.trim() || null,
-              username: existing.username ?? username,
-            }
-          })
-        : await tx.user.create({
-            data: {
-              ci: ciNorm, email: emailNorm, username, passwordHash,
-              firstName: firstName.trim(), lastName: lastName.trim(),
-              phone: phone?.trim() || null,
-              birthDate: birthDate ? new Date(birthDate) : null,
-              address: address?.trim() || null,
-              role: "ASPIRANT"
-            }
-          });
 
-      const student = await tx.student.upsert({
-        where: { userId: user.id },
-        update: { academicId: academic?.id ?? null, enrollmentYear: Number(period) || null },
-        create: { userId: user.id, academicId: academic?.id ?? null, enrollmentYear: Number(period) || null }
+      const user = await tx.user.create({
+        data: {
+          ci: ciNorm,
+          email: emailNorm,
+          username,
+          passwordHash,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          phone: phone?.trim() || null,
+          birthDate: birth,
+          address: address?.trim() || null,
+          role: "ASPIRANT",
+        },
+      });
+
+      const student = await tx.student.create({
+        data: {
+          userId: user.id,
+          academicId: academic?.id ?? null,
+          enrollmentYear: Number(period) || null,
+        },
       });
 
       const enrollment = await tx.enrollment.create({
@@ -140,16 +169,19 @@ export async function POST(request: Request) {
           academicId: academic?.id ?? null,
           periodLabel: period,
           status: "PENDIENTE",
-          nivel, curso, seccion: sec, turno,
-          documents: documents as object,
+          nivel,
+          curso,
+          seccion: sec,
+          turno,
+          documents: docsToStore,
           tutorName: guardian.name!.trim(),
           tutorRelation: guardian.relation?.trim() || null,
           tutorPhone: guardian.phone!.trim(),
-          tutorEmail: guardian.email?.trim() || null
-        }
+          tutorEmail: guardian.email?.trim() || null,
+        },
       });
 
-      return { enrollmentId: enrollment.id, username: user.username };
+      return { enrollmentId: enrollment.id };
     });
 
     // Aviso por correo a Dirección (no bloquea si el correo falla)

@@ -8,7 +8,10 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   const { id } = await ctx.params;
-  const doc = await prisma.document.findUnique({ where: { id } });
+  const doc = await prisma.document.findUnique({
+    where: { id },
+    include: { subject: { select: { academicId: true } } },
+  });
   if (!doc) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
 
   const role = session.user.role;
@@ -19,7 +22,13 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     ok = !!teacher && (doc.teacherId === teacher.id || (doc.subjectId != null && teacher.subjects.some((s: { subjectId: string }) => s.subjectId === doc.subjectId)));
   } else if (role === "STUDENT") {
     const student = await prisma.student.findUnique({ where: { userId: session.user.id } });
-    ok = !!student && (doc.studentId === student.id || doc.studentId == null);
+    if (student) {
+      if (doc.studentId && doc.studentId === student.id) ok = true;
+      else if (!doc.studentId) {
+        // General: solo si pertenece al bachillerato del alumno.
+        ok = !!student.academicId && doc.subject?.academicId === student.academicId;
+      }
+    }
   } else if (role === "PARENT") {
     ok = doc.visibleToTutor && doc.studentId != null && !!(await prisma.studentGuardian.findFirst({
       where: { studentId: doc.studentId, guardian: { userId: session.user.id } },

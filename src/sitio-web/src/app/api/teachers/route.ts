@@ -42,7 +42,8 @@ export async function GET() {
         materias: t.subjects.map((s: { subject: { code: string; name: string; gradeYear: number; academic: { code: string; shortName: string; name: string } | null } }) => s.subject),
         bio: t.bio,
         horario: t.schedule,
-        foto: t.photo,
+        // No se envía el data URI (pesado) en el listado público: solo la URL.
+        foto: t.photo ? `/api/teachers/${t.id}/photo` : null,
       })),
     });
   } catch (e) {

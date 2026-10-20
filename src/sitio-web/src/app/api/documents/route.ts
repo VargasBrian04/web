@@ -81,11 +81,14 @@ export async function GET(request: Request) {
     if (role === "STUDENT") {
       const student = await prisma.student.findUnique({ where: { userId: session.user.id } });
       if (!student) return NextResponse.json({ data: [] });
+      // Propios + documentos generales de SU bachillerato. Sin bachillerato
+      // asignado solo ve lo propio: nunca documentos generales de todos.
+      const or: Record<string, unknown>[] = [{ studentId: student.id }];
+      if (student.academicId) {
+        or.push({ studentId: null, subject: { academicId: student.academicId } });
+      }
       const data = await prisma.document.findMany({
-        where: {
-          ...baseWhere,
-          OR: [{ studentId: student.id }, { studentId: null, subject: { academicId: student.academicId ?? undefined } }],
-        },
+        where: { ...baseWhere, OR: or },
         select: selectDoc,
         orderBy: { createdAt: "desc" },
         take: 100,
@@ -149,19 +152,27 @@ export async function POST(request: Request) {
   if (!(DOC_TYPES as readonly string[]).includes(type))
     return NextResponse.json({ error: "Tipo inválido" }, { status: 400 });
 
+  // Ficha docente y materias asignadas (para verificar alcance).
+  const teacher = await prisma.teacher.findUnique({
+    where: { userId: session.user.id },
+    include: { subjects: { select: { subject: { select: { id: true, academicId: true } } } } },
+  });
+  if (session.user.role === "TEACHER" && !teacher)
+    return NextResponse.json({ error: "Sin perfil docente" }, { status: 403 });
+  const teacherSubjectIds = new Set(
+    (teacher?.subjects ?? []).map((s: any) => s.subject.id)
+  );
+  const teacherAcademicIds = new Set(
+    (teacher?.subjects ?? []).map((s: any) => s.subject.academicId).filter(Boolean)
+  );
+
   let subjectId: string | null = null;
   if (subjectCode) {
     const subject = await prisma.subject.findFirst({ where: { code: subjectCode } });
     if (!subject) return NextResponse.json({ error: "Materia inválida" }, { status: 400 });
     subjectId = subject.id;
-    if (session.user.role === "TEACHER") {
-      const teacherCheck = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
-      if (!teacherCheck) return NextResponse.json({ error: "Sin perfil docente" }, { status: 403 });
-      const link = await prisma.teacherSubject.findUnique({
-        where: { teacherId_subjectId: { teacherId: teacherCheck.id, subjectId: subject.id } },
-      });
-      if (!link) return NextResponse.json({ error: "No tenés asignada esta materia" }, { status: 403 });
-    }
+    if (session.user.role === "TEACHER" && !teacherSubjectIds.has(subject.id))
+      return NextResponse.json({ error: "No tenés asignada esta materia" }, { status: 403 });
   }
   let periodId: string | null = null;
   if (periodLabel) {
@@ -170,8 +181,13 @@ export async function POST(request: Request) {
     periodId = period.id;
   }
   if (studentId) {
-    const st = await prisma.student.findUnique({ where: { id: studentId } });
+    const st = await prisma.student.findUnique({ where: { id: studentId }, select: { id: true, academicId: true } });
     if (!st) return NextResponse.json({ error: "Alumno inválido" }, { status: 400 });
+    if (
+      session.user.role === "TEACHER" &&
+      (!st.academicId || !teacherAcademicIds.has(st.academicId))
+    )
+      return NextResponse.json({ error: "El alumno no pertenece a tus materias" }, { status: 403 });
   }
   if (classId) {
     const cl = await prisma.class.findUnique({ where: { id: classId } });
@@ -188,8 +204,6 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-
-  const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
 
   const doc = await prisma.document.create({
     data: {
