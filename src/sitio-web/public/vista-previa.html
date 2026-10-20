@@ -5,6 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="/images/logo-nuevo.png">
 <title>Colegio Nacional Mariscal Francisco Solano López — Caaguazú</title>
+<script>
+(function(){
+  try{if('scrollRestoration' in history)history.scrollRestoration='manual'}catch(e){}
+  var KEY='csl-scroll-y';
+  function save(){try{sessionStorage.setItem(KEY,String(window.scrollY||window.pageYOffset||0))}catch(e){}}
+  function restore(){
+    var nav=null;try{nav=performance.getEntriesByType('navigation')[0]}catch(e){}
+    if(nav&&nav.type!=='reload'&&nav.type!=='back_forward')return;
+    if(location.hash)return;
+    var y=0;try{y=parseInt(sessionStorage.getItem(KEY)||'0',10)||0}catch(e){}
+    if(y<=0)return;
+    var go=function(){var h=document.documentElement;var prev=h.style.scrollBehavior;h.style.scrollBehavior='auto';try{window.scrollTo(0,y)}catch(e){}h.style.scrollBehavior=prev};
+    requestAnimationFrame(function(){requestAnimationFrame(go)});
+    setTimeout(go,250);setTimeout(go,900);
+  }
+  addEventListener('pagehide',save);
+  addEventListener('beforeunload',save);
+  var t=0;
+  addEventListener('scroll',function(){if(t)return;t=setTimeout(function(){t=0;save()},200)},{passive:true});
+  if(document.readyState==='loading')addEventListener('DOMContentLoaded',restore);else restore();
+})();
+</script>
 <style>
 :root{--inst:#5d4037;--inst2:#795548;--gold:#a67c52;--gold2:#c49a6c;--paper:#faf6f1;--ink:#292524;--mut:#78716c}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -1155,7 +1177,7 @@ var BACH=[
 {id:'bts',short:'BTS',icon:'🏥',group:'Bachillerato en Servicios',name:'Bachillerato Técnico en Salud',desc:'Enfermería, primeros auxilios y ciencias de la salud al servicio de la comunidad.',students:99,photos:[['/images/landing/909190852eb2.webp','Bachillerato en Salud'],['/images/landing/178473f8b6e3.webp','Actividad de Salud'],['/images/landing/e3ef1b73aff0.webp','Homenaje a la Profe Elcira'],['/images/landing/e40115851cea.webp','Práctica de Salud'],['/images/landing/8f52110a7170.webp','Estudiantes de Salud']]},
 {id:'bti',short:'BTI',icon:'💻',group:'Bachillerato en Servicios',name:'Bachillerato Técnico en Informática',desc:'Programación, redes y mantenimiento de equipos para el mundo del software y las TIC.',students:89,photos:[['/images/landing/9d73076309b4.webp','Estudiantes del BTI'],['/images/landing/867472e489dd.webp','Laboratorio de Informática'],['/images/landing/7bd73b6c343a.webp','Práctica de Informática'],['/images/landing/6608be621689.webp','Actividad de Informática'],['/images/landing/f767ce3641a9.webp','Estudiantes de Informática'],['/images/landing/6831a92e421e.webp','Taller de Informática'],['/images/landing/e37d414b1667.webp','Bachillerato en Informática']]},
 {id:'btc',short:'BTC',icon:'🧾',group:'Bachillerato en Servicios',name:'Bachillerato Técnico en Contabilidad',desc:'Gestión contable y administrativa con salida laboral.',students:39,photos:[['/images/landing/e26861cbb604.webp','Actividad de Contabilidad']]},
-{id:'adn',short:'ADN',icon:'🧬',group:'Bachillerato en Servicios',name:'Bachillerato en Administración de Negocios',desc:'Gestión y administración de negocios y servicios.',students:60,photos:[['/images/galeria/adm-4.webp','Estudiantes de Administración de Negocios'],['/images/landing/8304f01872d6.webp','Administración de Empresas'],['/images/landing/2d9a2ddb122e.webp','Bachillerato en ADN']]},
+{id:'adn',short:'ADN',icon:'🧬',group:'Bachillerato en Servicios',name:'Bachillerato en Administración de Negocios',desc:'Gestión y administración de negocios y servicios.',students:60,photos:[['/images/landing/8304f01872d6.webp','Administración de Empresas'],['/images/landing/2d9a2ddb122e.webp','Bachillerato en ADN']],pinnedPhotos:[['/images/galeria/adm-4.webp','Estudiantes de Administración de Negocios']]},
 {id:'bte',short:'BTE',icon:'⚡',group:'Bachillerato Técnico',name:'Bachillerato Técnico en Electricidad',desc:'Instalaciones eléctricas, electrónica y mantenimiento de sistemas de potencia.',students:104,photos:[['/images/landing/6e21a266764e.webp','Taller de Electricidad'],['/images/landing/893906b72d90.webp','Práctica de Electricidad'],['/images/landing/c1de6a4a3722.webp','Bachillerato en Electricidad']]},
 {id:'btm',short:'BTM',icon:'🔧',group:'Bachillerato Técnico',name:'Bachillerato Técnico en Mecánica',desc:'Mecánica automotriz e industrial, soldadura y mantenimiento de maquinarias.',students:64,photos:[['/images/landing/48dbd2a80753.webp','Taller de Mecánica'],['/images/landing/2ec01591d60d.webp','Práctica de Mecánica'],['/images/landing/1fe233270660.webp','Proyecto de Mecánica'],['/images/landing/924a7b1917f0.webp','Actividad de Mecánica'],['/images/landing/2688b1dd0b36.webp','Bachillerato en Mecánica'],['/images/landing/1f1a2cf7f3e4.webp','Sede de Mecánica']]},
 {id:'btcc',short:'BTCC',icon:'🏗',group:'Bachillerato Técnico',name:'Bachillerato Técnico en Construcción Civil',desc:'Dibujo técnico, obra e instalaciones sanitarias y eléctricas.',students:82,photos:[['/images/landing/a50ab4bf9f61.webp','Obra'],['/images/landing/93b8bd860ea0.webp','Taller'],['/images/landing/45fdc82e7182.webp','Practica'],['/images/landing/17d742e05a26.webp','Proyecto']]},
@@ -1175,7 +1197,7 @@ function addBachPhotos(){var fi=document.getElementById('beFotos');if(!fi||!fi.f
 var files=Array.prototype.slice.call(fi.files,0,6);var id=curBach;bachCustom[id]=bachCustom[id]||{};bachCustom[id].photos=bachCustom[id].photos||[];var n=0;
 files.forEach(function(f){var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var cv=document.createElement('canvas');var sc=Math.min(1,900/im.width);cv.width=Math.round(im.width*sc);cv.height=Math.round(im.height*sc);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);bachCustom[id].photos.push([cv.toDataURL('image/jpeg',.72),f.name||'Foto']);n++;if(n===files.length){persistBach();paintBach();toast(files.length+' foto(s) publicada(s)');sfx('ok')}};im.src=rd.result};rd.readAsDataURL(f)})}
 function delBachPhoto(i){if(bachCustom[curBach]&&bachCustom[curBach].photos){bachCustom[curBach].photos.splice(i,1);persistBach();paintBach();toast('Foto quitada')}}
-function paintBach(){var b=BACH.find(function(x){return x.id===curBach});if(!b)return;var v=bachView(b);var bx=(window.__bachMedia&&window.__bachMedia[curBach])||[];if(bx.length){var bc=(typeof bachCustom!=='undefined'&&bachCustom[curBach]&&bachCustom[curBach].photos)||[];v={students:v.students,turno:v.turno,nivel:v.nivel,desc:v.desc,photos:bx.concat(bc)}}
+function paintBach(){var b=BACH.find(function(x){return x.id===curBach});if(!b)return;var v=bachView(b);var bx=(window.__bachMedia&&window.__bachMedia[curBach])||[];var bc=(typeof bachCustom!=='undefined'&&bachCustom[curBach]&&bachCustom[curBach].photos)||[];var base=bx.length?bx:b.photos;var seen={},photos=[];(b.pinnedPhotos||[]).concat(base||[],bc).forEach(function(p){if(!p||!p[0]||seen[p[0]])return;seen[p[0]]=1;photos.push(p)});v={students:v.students,turno:v.turno,nivel:v.nivel,desc:v.desc,photos:photos};
 var gal=v.photos.length?'<h4 style="color:var(--inst);margin-top:20px">Galería · '+b.short+' ('+v.photos.length+')</h4><div class="bach-gal">'+v.photos.map(function(p){return '<img src="'+p[0]+'" alt="'+p[1]+'" loading="lazy" onerror="this.style.display=\'none\'">'}).join('')+'</div>':'<div class="soon-box"><div class="big">📷</div><b>Próximamente</b><p style="font-size:.82rem;margin-top:6px">Galería de '+b.short+' pendiente — la Dirección puede publicar fotos ingresando como administradora.</p></div>';
 bdBox.innerHTML='<div class="bach-head"><div class="bach-logo-slot">'+bachLogoHtml(b.id,b.short)+'</div><div class="bach-head-info"><span class="tag">'+b.icon+' '+b.group+'</span><h3>'+b.name+'</h3><p class="muted" style="font-size:.9rem">'+v.desc+'</p></div></div><div class="bach-meta"><span>👥 '+v.students+' estudiantes (2026)</span><span>🕘 Turno: '+v.turno+'</span><span>🎓 '+v.nivel+'</span></div>'+gal+((typeof isDirector==='function'&&isDirector()&&lastUser)?bachEditorHtml(b,v):'');
 bdBox.querySelectorAll('.bach-gal img').forEach(function(im,ix){im.onclick=function(){openLb(v.photos,ix)}})}
@@ -1254,21 +1276,8 @@ var GAL=[
 ['/images/landing/da9e2b25e31a.webp','Institución','Obras y mejoras edilicias'],
 ['/images/landing/9fe45d54ab34.webp','Actos escolares','Día de la Juventud'],
 ['/images/landing/5fb314a71d96.webp','Deportes','Dia de la Juventud campeones'],
-['/images/landing/e3ef1b73aff0.webp','Actos escolares','Homenaje a la Profe Elcira'],
 ['/images/landing/d5d693a0b9d3.webp','Institución','Patio del colegio'],
 ['/images/landing/ffbfaf4ac50e.webp','Actos escolares','Palco del colegio'],
-['/images/landing/41dc1bbdef06.webp','Actividades academicas','Agropecuaria - Practica de campo'],
-['/images/landing/e71dd6d70d21.webp','Actividades academicas','Agropecuaria - Trabajo en parcela'],
-['/images/landing/9f851e788c4d.webp','Actividades academicas','Agropecuaria - Produccion agricola'],
-['/images/landing/b987d6b18bea.webp','Actividades academicas','Agropecuaria - Campo'],
-['/images/landing/70c8171de186.webp','Actividades academicas','Agropecuaria - Cultivo'],
-['/images/landing/517aeac46185.webp','Actividades academicas','Agropecuaria - Produccion'],
-['/images/landing/a50ab4bf9f61.webp','Actividades academicas','Construcciones - Obra'],
-['/images/landing/93b8bd860ea0.webp','Actividades academicas','Construcciones - Taller'],
-['/images/landing/45fdc82e7182.webp','Actividades academicas','Construcciones - Practica'],
-['/images/landing/17d742e05a26.webp','Actividades academicas','Construcciones - Proyecto'],
-['/images/landing/f464bcf86280.webp','Actos escolares','Sociales - Actividad'],
-['/images/landing/baa146cc9b8a.webp','Actos escolares','Sociales - Grupo'],
 ['/images/landing/daa666e1b47e.webp','Actos escolares','Despedida a Liz Sosa 1 de 6'],
 ['/images/landing/666dedee1057.webp','Actos escolares','Despedida a Liz Sosa 2 de 6'],
 ['/images/landing/2fed237ac55b.webp','Actos escolares','Despedida a Liz Sosa 3 de 6'],
