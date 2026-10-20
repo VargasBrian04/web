@@ -8,17 +8,21 @@
 <script>
 (function(){
   try{if('scrollRestoration' in history)history.scrollRestoration='manual'}catch(e){}
-  var KEY='csl-scroll-y';
-  function save(){try{sessionStorage.setItem(KEY,String(window.scrollY||window.pageYOffset||0))}catch(e){}}
+  var KEY='csl-scroll-y',restoring=false;
+  function save(){if(restoring)return;try{sessionStorage.setItem(KEY,String(window.scrollY||window.pageYOffset||0))}catch(e){}}
+  function goTo(y){var h=document.documentElement,prev=h.style.scrollBehavior;h.style.scrollBehavior='auto';try{window.scrollTo(0,y)}catch(e){}h.style.scrollBehavior=prev}
   function restore(){
     var nav=null;try{nav=performance.getEntriesByType('navigation')[0]}catch(e){}
     if(nav&&nav.type!=='reload'&&nav.type!=='back_forward')return;
     if(location.hash)return;
     var y=0;try{y=parseInt(sessionStorage.getItem(KEY)||'0',10)||0}catch(e){}
     if(y<=0)return;
-    var go=function(){var h=document.documentElement;var prev=h.style.scrollBehavior;h.style.scrollBehavior='auto';try{window.scrollTo(0,y)}catch(e){}h.style.scrollBehavior=prev};
+    restoring=true;
+    var go=function(){goTo(y)};
     requestAnimationFrame(function(){requestAnimationFrame(go)});
-    setTimeout(go,250);setTimeout(go,900);
+    addEventListener('load',go,{once:true});
+    [250,700,1400,2200].forEach(function(ms){setTimeout(go,ms)});
+    setTimeout(function(){restoring=false;save()},2500);
   }
   addEventListener('pagehide',save);
   addEventListener('beforeunload',save);
