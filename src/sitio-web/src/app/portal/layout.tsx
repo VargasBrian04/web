@@ -27,7 +27,7 @@ export default async function PortalLayout({ children }: { children: React.React
             : role;
 
   return (
-    <div className="container-c py-6 sm:py-10">
+    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 sm:py-10">
       <div className="portal-head mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--institutional)] px-4 py-4 text-white sm:mb-8 sm:px-6">
         <div className="portal-user min-w-0">
           <p className="text-sm text-stone-300">

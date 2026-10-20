@@ -1,6 +1,26 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { dataUriMeta, storageUrl } from "@/lib/data-uri";
+
+/**
+ * Convierte las tareas en una respuesta segura. Por defecto conserva
+ * fileData (compatibilidad con las pantallas docentes); con ?fields=meta
+ * solo devuelve la URL y los metadatos del adjunto.
+ */
+function withFileUrls<T extends { id: string; fileData: string | null }>(data: T[], metaOnly: boolean) {
+  return data.map((task) => {
+    const { fileData, ...rest } = task;
+    const meta = dataUriMeta(fileData);
+    return {
+      ...rest,
+      fileUrl: fileData ? storageUrl("assignment", task.id, fileData) : null,
+      fileMime: meta?.mime ?? null,
+      fileSize: meta?.size ?? null,
+      ...(metaOnly ? {} : { fileData }),
+    };
+  });
+}
 
 /**
  * GET /api/assignments — Tareas según rol.
@@ -20,6 +40,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const subjectCode = searchParams.get("subject") || undefined;
   const teacherId = searchParams.get("teacher") || undefined;
+  const metaOnly = searchParams.get("fields") === "meta";
   const role = session.user.role;
 
   const include = {
@@ -49,7 +70,7 @@ export async function GET(request: Request) {
         orderBy: { createdAt: "desc" },
         take: 100,
       });
-      return NextResponse.json({ data });
+      return NextResponse.json({ data: withFileUrls(data, metaOnly) });
     }
     if (role === "PARENT") {
       const links = await prisma.studentGuardian.findMany({
@@ -70,7 +91,7 @@ export async function GET(request: Request) {
         orderBy: { createdAt: "desc" },
         take: 100,
       });
-      return NextResponse.json({ data });
+      return NextResponse.json({ data: withFileUrls(data, metaOnly) });
     }
     if (role === "TEACHER") {
       const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
@@ -84,7 +105,7 @@ export async function GET(request: Request) {
         orderBy: { createdAt: "desc" },
         take: 100,
       });
-      return NextResponse.json({ data });
+      return NextResponse.json({ data: withFileUrls(data, metaOnly) });
     }
     if (role === "ADMIN") {
       const data = await prisma.assignment.findMany({
@@ -96,7 +117,7 @@ export async function GET(request: Request) {
         orderBy: { createdAt: "desc" },
         take: 100,
       });
-      return NextResponse.json({ data });
+      return NextResponse.json({ data: withFileUrls(data, metaOnly) });
     }
     return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
   } catch (e) {

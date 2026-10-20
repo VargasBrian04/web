@@ -2,15 +2,37 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { imageToDataUri, NEWS_IMAGE_MIME } from "@/lib/storage";
+import { dataUriMeta } from "@/lib/data-uri";
 
 const KINDS = ["ASISTENCIA", "TAREA"] as const;
 
 /**
+ * Convierte las filas de PhotoLog en una respuesta segura. Por defecto
+ * conserva photoData (lo usan las pantallas docentes); con ?fields=meta
+ * solo devuelve la URL y los metadatos para que el tutor cargue las
+ * imágenes de forma diferida.
+ */
+function withPhotoUrls<T extends { id: string; photoData?: string | null }>(data: T[], metaOnly: boolean) {
+  return data.map((log) => {
+    const { photoData, ...rest } = log;
+    const meta = dataUriMeta(photoData);
+    return {
+      ...rest,
+      photoUrl: `/api/fotolog/${log.id}/photo`,
+      photoMime: meta?.mime ?? null,
+      photoSize: meta?.size ?? null,
+      ...(metaOnly ? {} : { photoData: photoData ?? null }),
+    };
+  });
+}
+
+/**
  * Bitácora de fotos (listas y planillas en papel).
  * GET con sesión: TEACHER ve las suyas; STUDENT las de sus materias;
- * PARENT las de sus hijos; ADMIN todas (?kind=&take=).
+ * PARENT las de sus hijos; ADMIN todas (?kind=&take=&skip=).
  * ?teacher=<teacherId> filtra por docente (tutor/alumno: dentro de sus
- * bachilleratos; docente: solo las suyas).
+ * bachilleratos; docente: solo las suyas). ?fields=meta devuelve URL y
+ * metadatos en lugar del data URI completo.
  * POST TEACHER/ADMIN multipart: photo* (PNG/JPG/WEBP ≤4MB), kind*,
  * logDate? (hoy por defecto), caption?, subjectCode?
  * DELETE ?id= — el docente borra las suyas; ADMIN cualquiera.
@@ -23,11 +45,21 @@ export async function GET(request: Request) {
   const subjectCode = searchParams.get("subject") || undefined;
   const teacherId = searchParams.get("teacher") || undefined;
   const take = Math.min(60, Math.max(1, Number(searchParams.get("take") || "30") || 30));
+  const skip = Math.min(10000, Math.max(0, Number(searchParams.get("skip") || "0") || 0));
+  const metaOnly = searchParams.get("fields") === "meta";
   const role = session.user.role;
 
-  const include = {
+  const logSelect = {
+    id: true,
+    kind: true,
+    caption: true,
+    logDate: true,
+    subjectId: true,
+    teacherId: true,
+    createdAt: true,
     subject: { select: { code: true, name: true } },
     teacher: { select: { user: { select: { firstName: true, lastName: true } } } },
+    ...(metaOnly ? {} : { photoData: true }),
   };
 
   try {
@@ -38,11 +70,12 @@ export async function GET(request: Request) {
           ...(teacherId ? { teacherId } : {}),
           ...(subjectCode ? { subject: { code: subjectCode } } : {}),
         },
-        include,
+        select: logSelect,
         orderBy: { logDate: "desc" },
         take,
+        skip,
       });
-      return NextResponse.json({ data });
+      return NextResponse.json({ data: withPhotoUrls(data, metaOnly) });
     }
     if (role === "TEACHER") {
       const teacher = await prisma.teacher.findUnique({ where: { userId: session.user.id } });
@@ -52,11 +85,12 @@ export async function GET(request: Request) {
           ...(kind ? { kind } : {}),
           ...(subjectCode ? { subject: { code: subjectCode } } : {}),
         },
-        include,
+        select: logSelect,
         orderBy: { logDate: "desc" },
         take,
+        skip,
       });
-      return NextResponse.json({ data });
+      return NextResponse.json({ data: withPhotoUrls(data, metaOnly) });
     }
     let academicIds: string[] = [];
     if (role === "STUDENT") {
@@ -84,11 +118,12 @@ export async function GET(request: Request) {
         ...(teacherId ? { teacherId } : {}),
         subject: subjectFilter,
       },
-      include,
+      select: logSelect,
       orderBy: { logDate: "desc" },
       take,
+      skip,
     });
-    return NextResponse.json({ data });
+    return NextResponse.json({ data: withPhotoUrls(data, metaOnly) });
   } catch (e) {
     console.error("GET /api/fotolog", e);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

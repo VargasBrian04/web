@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -7,7 +8,7 @@ export const metadata = { title: "Docentes — Portal del Tutor" };
 
 /**
  * Zona de docentes para tutores: directorio completo del plantel.
- * Con ?hijo=<studentId> (verificado) se filtra a los docentes del
+ * Con ?hijo=<studentId> (verificado) se priorizan los docentes del
  * curso del hijo y se abre el primero con sus planillas.
  */
 export default async function PadreDocentesPage({
@@ -51,17 +52,20 @@ export default async function PadreDocentesPage({
   }
 
   return (
-    <div className="grid gap-6">
-      <a href="/portal/padre" className="w-fit text-sm font-bold text-[var(--institutional)] underline">
-        ← Volver a Mis hijos
-      </a>
-      <section className="rounded-2xl bg-[var(--institutional)] p-6 text-white">
-        <h2 className="text-xl font-extrabold">Docentes del colegio</h2>
-        <p className="mt-1 text-sm text-stone-200">
-          Plantel docente, materias y horarios de atención.
-        </p>
-      </section>
-      <TeachersDirectory scope={scope} />
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Link
+          href="/portal/padre"
+          className="inline-flex w-fit items-center gap-1.5 rounded-lg px-1 py-1 text-sm font-bold text-[var(--institutional)] hover:underline"
+        >
+          <span aria-hidden="true">←</span>
+          Volver a Mis hijos
+        </Link>
+        <span className="rounded-full bg-white px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500 ring-1 ring-stone-200">
+          Portal del tutor
+        </span>
+      </div>
+      <TeachersDirectory key={hijo ?? "todos"} scope={scope} />
     </div>
   );
 }
