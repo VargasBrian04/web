@@ -148,6 +148,7 @@ export const galleryItems: { src: string; category: GalleryCategory; caption: st
   { src: "/images/galeria/constr-2.jpg", category: "Actividades académicas", caption: "Construcciones · Taller" },
   { src: "/images/galeria/constr-3.jpg", category: "Actividades académicas", caption: "Construcciones · Práctica" },
   { src: "/images/galeria/constr-4.jpg", category: "Actividades académicas", caption: "Construcciones · Proyecto" },
+  { src: "/images/galeria/adm-4.webp", category: "Actividades académicas", caption: "Administración de Negocios · Estudiantes" },
   { src: "/images/galeria/sociales-2.jpg", category: "Actos escolares", caption: "Sociales · Actividad" },
   { src: "/images/galeria/sociales-3.jpg", category: "Actos escolares", caption: "Sociales · Grupo" },
   { src: "/images/galeria/despedida-1.jpg", category: "Actos escolares", caption: "Despedida a Liz Sosa 1 de 6" },
