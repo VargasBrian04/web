@@ -12,8 +12,8 @@ export const metadata = { title: "Acceso al portal" };
 export const dynamic = "force-dynamic";
 export default function LoginPage() {
   return (
-    <section className="container-c flex min-h-[70vh] flex-col items-center justify-center py-16">
-      <a href="/acceso" className="mb-6 text-sm font-semibold text-slate-500 hover:text-[var(--institutional)]">
+    <section className="container-c flex min-h-[70vh] flex-col items-center justify-center py-10 sm:py-16">
+      <a href="/acceso" className="mb-5 text-center text-sm font-semibold text-slate-500 hover:text-[var(--institutional)] sm:mb-6">
         ← Elegir perfil (Docente / Padre / Visitante)
       </a>
       <Suspense

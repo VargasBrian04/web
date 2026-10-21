@@ -15,7 +15,7 @@ const bachilleratos = [
     group: "Bachillerato Científico",
     name: "Científico con énfasis en Ciencias Sociales",
     desc: "Historia, geografía, derecho y ciencias políticas.",
-    logo: "/images/bachilleratos/ciencias-sociales.webp",
+    logo: "/images/bachilleratos/ciencias-sociales.webp?v=2",
   },
   {
     code: "BTS",
@@ -31,7 +31,7 @@ const bachilleratos = [
     group: "Bachillerato en Servicios",
     name: "Bachillerato Técnico en Informática",
     desc: "Programación, redes y mantenimiento de equipos para el mundo del software y las TIC.",
-    logo: "/images/bachilleratos/informatica.webp",
+    logo: "/images/bachilleratos/informatica.webp?v=2",
   },
   {
     code: "BTC",
@@ -39,7 +39,7 @@ const bachilleratos = [
     group: "Bachillerato en Servicios",
     name: "Bachillerato Técnico en Contabilidad",
     desc: "Gestión contable y administrativa con salida laboral y base para estudios universitarios.",
-    logo: "/images/bachilleratos/btc-contabilidad.webp",
+    logo: "/images/bachilleratos/btc-contabilidad.webp?v=2",
   },
   {
     code: "ADN",
@@ -47,7 +47,7 @@ const bachilleratos = [
     group: "Bachillerato en Servicios",
     name: "Bachillerato en Administración de Negocios",
     desc: "Gestión, administración y emprendedurismo para el mundo de los negocios.",
-    logo: "/images/bachilleratos/adn-negocios.webp",
+    logo: "/images/bachilleratos/adn-negocios.webp?v=2",
   },
   {
     code: "BTE",
@@ -71,7 +71,7 @@ const bachilleratos = [
     group: "Bachillerato Técnico Industrial",
     name: "Bachillerato Técnico en Construcciones Civiles",
     desc: "Dibujo técnico, obra, instalaciones sanitarias y eléctricas.",
-    logo: "/images/bachilleratos/construcciones-civiles.webp",
+    logo: "/images/bachilleratos/construcciones-civiles.webp?v=2",
   },
   {
     code: "BTA",
@@ -79,7 +79,7 @@ const bachilleratos = [
     group: "Bachillerato Técnico Industrial",
     name: "Bachillerato Técnico en Agropecuaria",
     desc: "Producción agrícola, ganadería y manejo sustentable de los recursos naturales.",
-    logo: "/images/bachilleratos/agropecuaria.webp",
+    logo: "/images/bachilleratos/agropecuaria.webp?v=2",
   }
 ];
 
@@ -106,34 +106,34 @@ const eebGrados = [
 
 export function AcademicOfferSection() {
   return (
-    <section id="oferta" className="bg-white py-20">
+    <section id="oferta" className="bg-white py-12 sm:py-20">
       <div className="container-c">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="section-title">Oferta académica</h2>
-            <p className="mt-3 text-slate-600">
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate-600 sm:text-base">
               Educación Escolar Básica (7.º a 9.º) y diez bachilleratos del
               Nivel Medio, con salida laboral y preparación para la universidad.
             </p>
           </div>
         </div>
 
-        <h3 className="mt-10 text-lg font-extrabold text-[var(--institutional)]">
+        <h3 className="mt-8 text-base font-extrabold text-[var(--institutional)] sm:mt-10 sm:text-lg">
           Nivel Medio — Bachilleratos
         </h3>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">
           Cada bachillerato construye su propia identidad. Estamos incorporando
           los logos de todas las orientaciones; los que ya están listos se
           muestran a continuación.
         </p>
-        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="mt-5 grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
           {bachilleratos.map((b) => (
             <article
               key={b.code}
               className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:border-[var(--gold)] hover:shadow-lg"
             >
-              <div className="relative flex h-44 items-center justify-center overflow-hidden border-b border-slate-100 bg-[radial-gradient(circle_at_top,_#ffffff,_#f7f3ee)]">
-                <span className="absolute right-3 top-3 rounded-full bg-[var(--institutional)] px-2.5 py-1 text-[10px] font-bold tracking-wide text-white shadow-sm">
+              <div className="relative flex h-32 items-center justify-center overflow-hidden border-b border-slate-100 bg-[radial-gradient(circle_at_top,_#ffffff,_#f7f3ee)] sm:h-40 lg:h-44">
+                <span className="absolute right-2.5 top-2.5 rounded-full bg-[var(--institutional)] px-2 py-0.5 text-[9px] font-bold tracking-wide text-white shadow-sm sm:right-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-[10px]">
                   {b.code}
                 </span>
                 {b.logo ? (
@@ -142,11 +142,11 @@ export function AcademicOfferSection() {
                     src={b.logo}
                     alt={`Logo de ${b.name}`}
                     loading="lazy"
-                    className="h-32 w-32 object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105"
+                    className="h-24 w-24 object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105 sm:h-28 sm:w-28 lg:h-32 lg:w-32"
                   />
                 ) : (
-                  <div className="flex flex-col items-center text-center">
-                    <span className="text-4xl font-black tracking-tight text-slate-200">
+                  <div className="flex flex-col items-center px-4 text-center">
+                    <span className="text-3xl font-black tracking-tight text-slate-200 sm:text-4xl">
                       {b.code}
                     </span>
                     <span className="mt-2 rounded-full border border-dashed border-slate-300 bg-white/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -155,25 +155,25 @@ export function AcademicOfferSection() {
                   </div>
                 )}
               </div>
-              <div className="flex flex-1 flex-col p-5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--gold)]">
+              <div className="flex flex-1 flex-col p-4 sm:p-5">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--gold)] sm:text-[10px]">
                   {b.group}
                 </span>
-                <h4 className="mt-1 text-base font-bold text-slate-900">{b.name}</h4>
-                <p className="mt-2 text-sm text-slate-600">{b.desc}</p>
+                <h4 className="mt-1 text-[15px] font-bold leading-snug text-slate-900 sm:text-base">{b.name}</h4>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600 sm:mt-2 sm:text-sm">{b.desc}</p>
               </div>
             </article>
           ))}
         </div>
 
-        <h3 className="mt-12 text-lg font-extrabold text-[var(--institutional)]">
+        <h3 className="mt-10 text-base font-extrabold text-[var(--institutional)] sm:mt-12 sm:text-lg">
           Educación Escolar Básica — 7.º, 8.º y 9.º
         </h3>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">
           Turnos mañana y tarde. Base sólida en lengua, matemática, ciencias y
           formación ciudadana para el ingreso al Nivel Medio.
         </p>
-        <div className="mt-4 grid gap-6 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {eebGrados.map((g) => (
             <article
               key={g.short}
@@ -181,24 +181,24 @@ export function AcademicOfferSection() {
             >
               {g.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={g.image} alt={g.name} loading="lazy" className="h-36 w-full object-cover" />
+                <img src={g.image} alt={g.name} loading="lazy" className="h-32 w-full object-cover sm:h-36" />
               ) : (
-                <div className="flex h-36 w-full items-center justify-center bg-[var(--institutional)] text-4xl font-extrabold text-white">
+                <div className="flex h-32 w-full items-center justify-center bg-[var(--institutional)] text-4xl font-extrabold text-white sm:h-36">
                   {g.short}
                 </div>
               )}
-              <div className="flex flex-1 flex-col p-6">
-                <span className="mb-4 inline-flex w-fit rounded-lg bg-[var(--gold)] px-3 py-1 text-xs font-bold text-white">
+              <div className="flex flex-1 flex-col p-4 sm:p-6">
+                <span className="mb-3 inline-flex w-fit rounded-lg bg-[var(--gold)] px-3 py-1 text-xs font-bold text-white sm:mb-4">
                   EEB · {g.short}
                 </span>
-                <h4 className="text-base font-bold text-slate-900">{g.name}</h4>
-                <p className="mt-2 text-sm text-slate-600">{g.desc}</p>
+                <h4 className="text-[15px] font-bold text-slate-900 sm:text-base">{g.name}</h4>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600 sm:mt-2 sm:text-sm">{g.desc}</p>
               </div>
             </article>
           ))}
         </div>
 
-        <p className="mt-8 text-sm text-slate-500">
+        <p className="mt-6 text-[13px] leading-relaxed text-slate-500 sm:mt-8 sm:text-sm">
           Consulta disponibilidad de cupos, horarios y turnos en la Secretaría
           del colegio o a través del registro de inscripciones.
         </p>

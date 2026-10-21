@@ -1,8 +1,9 @@
-import NextAuth, { type NextAuthConfig } from "next-auth";
+import NextAuth, { CredentialsSignin, type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { normalizeUsername } from "@/lib/users";
+import { canRoleAccessZone, parsePortalZone } from "@/lib/portal-access";
 import type { UserRole } from "@prisma/client";
 
 declare module "next-auth" {
@@ -27,7 +28,8 @@ export const authConfig = {
       name: "Credenciales",
       credentials: {
         identifier: { label: "Correo o usuario", type: "text" },
-        password: { label: "Contraseña", type: "password" }
+        password: { label: "Contraseña", type: "password" },
+        zone: { label: "Zona de ingreso", type: "text" }
       },
       async authorize(credentials) {
         // Compatibilidad: acepta `identifier` (nuevo) o `email` (formularios viejos).
@@ -52,6 +54,15 @@ export const authConfig = {
           valid = await bcrypt.compare(password.trim(), user.passwordHash);
         }
         if (!valid) return null;
+
+        // La zona se valida antes de crear el JWT: una cuenta docente no puede
+        // iniciar sesión desde la tarjeta de Padre/Tutor (ni viceversa).
+        const zone = parsePortalZone(creds?.zone);
+        if (!canRoleAccessZone(user.role, zone)) {
+          const wrongZone = new CredentialsSignin();
+          wrongZone.code = "wrong_zone";
+          throw wrongZone;
+        }
 
         return {
           id: user.id,
