@@ -31,7 +31,7 @@ const bachilleratos = [
     group: "Bachillerato en Servicios",
     name: "Bachillerato Técnico en Informática",
     desc: "Programación, redes y mantenimiento de equipos para el mundo del software y las TIC.",
-    logo: null,
+    logo: "/images/bachilleratos/informatica.webp",
   },
   {
     code: "BTC",
@@ -71,7 +71,7 @@ const bachilleratos = [
     group: "Bachillerato Técnico Industrial",
     name: "Bachillerato Técnico en Construcciones Civiles",
     desc: "Dibujo técnico, obra, instalaciones sanitarias y eléctricas.",
-    logo: null,
+    logo: "/images/bachilleratos/construcciones-civiles.webp",
   },
   {
     code: "BTA",
@@ -79,7 +79,7 @@ const bachilleratos = [
     group: "Bachillerato Técnico Industrial",
     name: "Bachillerato Técnico en Agropecuaria",
     desc: "Producción agrícola, ganadería y manejo sustentable de los recursos naturales.",
-    logo: null,
+    logo: "/images/bachilleratos/agropecuaria.webp",
   }
 ];
 
