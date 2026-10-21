@@ -1,5 +1,5 @@
 /* SW: red primero para HTML/navegaciones (siempre fresco), cache para estaticos. */
-const CACHE = "csl-v2";
+const CACHE = "csl-v3";
 const CORE = ["/manifest.webmanifest", "/images/logo-nuevo.png"];
 
 self.addEventListener("install", (e) => {
