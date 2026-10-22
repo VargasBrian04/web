@@ -1037,7 +1037,7 @@ function fillDemo(email){document.getElementById('liUser').value=email;document.
 /* Solicitudes reales a la base de datos (POST /api/solicitudes + catálogo). */
 var REG_CAT=null,REG_TAB='tutor',REG_SENDING=false;
 function openReg(tab){closeLogin();regTab(tab||'tutor');if(!rtHijos.length)rtAddHijo();document.getElementById('regTopErr').style.display='none';document.getElementById('regModal').classList.add('open');loadRegCat()}
-var rdNiveles=[];function rdNivelChange(){paintRegChips()}function rdToggleNivel(n){var i=rdNiveles.indexOf(n);if(i>=0)rdNiveles.splice(i,1);else rdNiveles.push(n);rdCursosSel=[];rdBachSel=[];paintRegChips()}
+var rdNiveles=[];function rdToggleNivel(n){var i=rdNiveles.indexOf(n);if(i>=0)rdNiveles.splice(i,1);else rdNiveles.push(n);rdCursosSel=[];rdBachSel=[];rdNivelChange()}
 function closeReg(){document.getElementById('regModal').classList.remove('open')}
 function regTab(t){REG_TAB=t;document.getElementById('regTabT').classList.toggle('on',t==='tutor');document.getElementById('regTabD').classList.toggle('on',t==='docente');document.getElementById('regFormT').style.display=t==='tutor'?'':'none';document.getElementById('regFormD').style.display=t==='docente'?'':'none';document.getElementById('regOk').style.display='none'}
 function loadRegCat(){if(REG_CAT){paintRegCat();return}fetch('/api/catalogo').then(function(r){return r.json()}).then(function(j){if(j.data){REG_CAT=j.data;paintRegCat()}else{regTopErr('No se pudo cargar la oferta académica')}}).catch(function(){regTopErr('No se pudo completar. Intentá de nuevo.')})}
