@@ -141,7 +141,7 @@ export function LevelsSection() {
     {
       tag: "Media · 332 estudiantes",
       title: "Técnico Industrial",
-      text: "Electricidad (BTE), Mecánica (BTM), Construcción Civil (BTCC) y Agropecuaria (BTA): talleres y práctica intensiva.",
+      text: "Electricidad (BTE), Mecánica (BTM), Construcciones Civiles (BTCC) y Agropecuaria (BTA): talleres y práctica intensiva.",
     },
   ];
   return (

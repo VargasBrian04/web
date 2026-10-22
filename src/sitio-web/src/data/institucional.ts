@@ -9,9 +9,9 @@ export const studentStats = {
   total: 1577,
   levels: [
     { name: "Educación Escolar Básica (7.º, 8.º y 9.º)", total: 621, detail: "Turnos mañana (TM) y tarde (TT)" },
-    { name: "Bachillerato Científico (Ciencias Básicas y Ciencias Sociales)", total: 337, detail: "CB “A”, CB “B”, Sociales, CB TT y Sociales TN" },
+    { name: "Bachillerato Científico (Ciencias Básicas y Ciencias Sociales)", total: 337, detail: "BCCB “A”, BCCB “B”, BCCS, BCCB TT y BCCS TN" },
     { name: "Bachillerato en Servicios (Salud, Informática, Contabilidad y Adm. de Negocios)", total: 287, detail: "BTS, BTI, BTC y ADN" },
-    { name: "Técnico Industrial (Electricidad, Mecánica, Construcción Civil y Agropecuaria)", total: 332, detail: "BTE, BTM, BTCC y BTA" },
+    { name: "Técnico Industrial (Electricidad, Mecánica, Construcciones Civiles y Agropecuaria)", total: 332, detail: "BTE, BTM, BTCC y BTA" },
   ],
   eeb: [
     {
@@ -88,7 +88,7 @@ export const studentStats = {
       rows: [
         { orientation: "Electricidad (BTE)", c1: 39, c2: 32, c3: 33 },
         { orientation: "Mecánica (BTM)", c1: 27, c2: 18, c3: 19 },
-        { orientation: "Construcción Civil (BTCC)", c1: 28, c2: 26, c3: 28 },
+        { orientation: "Construcciones Civiles (BTCC)", c1: 28, c2: 26, c3: 28 },
         { orientation: "Agropecuaria (BTA)", c1: 35, c2: 23, c3: 24 },
       ],
     },

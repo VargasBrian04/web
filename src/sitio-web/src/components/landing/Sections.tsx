@@ -2,20 +2,20 @@ import GalleryExplorer from "./GalleryExplorer";
 
 const bachilleratos = [
   {
-    code: "CCB",
+    code: "BCCB",
     short: "Ciencias Básicas",
     group: "Bachillerato Científico",
     name: "Científico con énfasis en Ciencias Básicas",
     desc: "Matemática, física, química y biología con énfasis en la investigación.",
-    logo: null,
+    logo: "/images/bachilleratos/bccb.webp?v=3",
   },
   {
-    code: "CCS",
+    code: "BCCS",
     short: "Ciencias Sociales",
     group: "Bachillerato Científico",
     name: "Científico con énfasis en Ciencias Sociales",
     desc: "Historia, geografía, derecho y ciencias políticas.",
-    logo: "/images/bachilleratos/ciencias-sociales.webp?v=2",
+    logo: "/images/bachilleratos/bccs.webp?v=3",
   },
   {
     code: "BTS",
@@ -23,7 +23,7 @@ const bachilleratos = [
     group: "Bachillerato en Servicios",
     name: "Bachillerato Técnico en Salud",
     desc: "Enfermería, primeros auxilios y ciencias de la salud al servicio de la comunidad.",
-    logo: null,
+    logo: "/images/bachilleratos/bts.webp?v=3",
   },
   {
     code: "BTI",
@@ -31,7 +31,7 @@ const bachilleratos = [
     group: "Bachillerato en Servicios",
     name: "Bachillerato Técnico en Informática",
     desc: "Programación, redes y mantenimiento de equipos para el mundo del software y las TIC.",
-    logo: "/images/bachilleratos/informatica.webp?v=2",
+    logo: "/images/bachilleratos/informatica.webp?v=3",
   },
   {
     code: "BTC",
@@ -39,7 +39,7 @@ const bachilleratos = [
     group: "Bachillerato en Servicios",
     name: "Bachillerato Técnico en Contabilidad",
     desc: "Gestión contable y administrativa con salida laboral y base para estudios universitarios.",
-    logo: "/images/bachilleratos/btc-contabilidad.webp?v=2",
+    logo: "/images/bachilleratos/btc-contabilidad.webp?v=3",
   },
   {
     code: "ADN",
@@ -47,7 +47,7 @@ const bachilleratos = [
     group: "Bachillerato en Servicios",
     name: "Bachillerato en Administración de Negocios",
     desc: "Gestión, administración y emprendedurismo para el mundo de los negocios.",
-    logo: "/images/bachilleratos/adn-negocios.webp?v=2",
+    logo: "/images/bachilleratos/adn-negocios.webp?v=3",
   },
   {
     code: "BTE",
@@ -55,7 +55,7 @@ const bachilleratos = [
     group: "Bachillerato Técnico Industrial",
     name: "Bachillerato Técnico en Electricidad",
     desc: "Instalaciones eléctricas, electrónica y mantenimiento de sistemas de potencia.",
-    logo: null,
+    logo: "/images/bachilleratos/bte.webp?v=3",
   },
   {
     code: "BTM",
@@ -63,7 +63,7 @@ const bachilleratos = [
     group: "Bachillerato Técnico Industrial",
     name: "Bachillerato Técnico en Mecánica",
     desc: "Mecánica automotriz e industrial, soldadura y mantenimiento de maquinarias.",
-    logo: null,
+    logo: "/images/bachilleratos/btm.webp?v=3",
   },
   {
     code: "BTCC",
@@ -71,7 +71,7 @@ const bachilleratos = [
     group: "Bachillerato Técnico Industrial",
     name: "Bachillerato Técnico en Construcciones Civiles",
     desc: "Dibujo técnico, obra, instalaciones sanitarias y eléctricas.",
-    logo: "/images/bachilleratos/construcciones-civiles.webp?v=2",
+    logo: "/images/bachilleratos/construcciones-civiles.webp?v=3",
   },
   {
     code: "BTA",
@@ -79,7 +79,7 @@ const bachilleratos = [
     group: "Bachillerato Técnico Industrial",
     name: "Bachillerato Técnico en Agropecuaria",
     desc: "Producción agrícola, ganadería y manejo sustentable de los recursos naturales.",
-    logo: "/images/bachilleratos/agropecuaria.webp?v=2",
+    logo: "/images/bachilleratos/agropecuaria.webp?v=3",
   }
 ];
 
