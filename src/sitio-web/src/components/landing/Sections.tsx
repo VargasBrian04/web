@@ -31,7 +31,7 @@ const bachilleratos = [
     group: "Bachillerato en Servicios",
     name: "Bachillerato Técnico en Informática",
     desc: "Programación, redes y mantenimiento de equipos para el mundo del software y las TIC.",
-    logo: "/images/bachilleratos/informatica.webp?v=3",
+    logo: "/images/bachilleratos/bti.webp?v=4",
   },
   {
     code: "BTC",
