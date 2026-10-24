@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import {
-  FieldError, Person, PersonErrors, PersonFields, SectionTitle, SuccessView,
-  inputCls, necesitaSeccion, useCatalog,
+  FieldError, Field, FormError, Person, PersonErrors, PersonFields, RegFoot, RegShell,
+  SectionTitle, SuccessView, inputCls, necesitaSeccion, useCatalog,
 } from "./shared";
 
 type Hijo = { nombre: string; nivel: "" | "EEB" | "MEDIA"; curso: string; seccion: string; turno: string; bachiller: string };
@@ -124,164 +124,149 @@ export default function TutorForm() {
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-8" noValidate>
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <SectionTitle n="1" title="Datos personales" desc="Tus datos como tutor o encargado." />
-        <div className="mt-5">
+    <RegShell>
+      <form onSubmit={submit} noValidate>
+        <section className="reg-block">
+          <SectionTitle n="1" title="Datos personales" desc="Tus datos como tutor o encargado." icon="👤" />
           <PersonFields
             value={person}
             errors={pErr}
             disabled={sending}
             onChange={(k, v) => setPerson((p) => ({ ...p, [k]: v }))}
           />
-        </div>
-      </section>
+        </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <SectionTitle n="2" title="Hijos a cargo" desc="Podés registrar varios hijos en la misma solicitud." />
-          <button
-            type="button"
-            disabled={sending || hijos.length >= 8}
-            onClick={() => setHijos((hs) => [...hs, { ...BLANK_HIJO }])}
-            className="rounded-lg border-2 border-dashed border-[var(--gold)] px-4 py-2 text-sm font-bold text-[var(--institutional)] hover:bg-amber-50 disabled:opacity-40"
-          >
-            ＋ Agregar otro hijo
-          </button>
-        </div>
+        <section className="reg-block">
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: "0.7rem" }}>
+            <SectionTitle n="2" title="Hijos a cargo" desc="Podés registrar varios hijos en la misma solicitud." icon="👨‍👩‍👧" />
+            <button
+              type="button"
+              disabled={sending || hijos.length >= 8}
+              onClick={() => setHijos((hs) => [...hs, { ...BLANK_HIJO }])}
+              className="reg-btn-add"
+            >
+              ＋ Agregar otro hijo
+            </button>
+          </div>
 
-        <div className="mt-5 grid gap-4">
-          {hijos.map((h, i) => {
-            const courses = h.nivel === "EEB" ? cat?.eebGrades ?? [] : h.nivel === "MEDIA" ? cat?.mediaCourses ?? [] : [];
-            const e = hErr[i] ?? {};
-            return (
-              <article key={i} className="rounded-xl border border-slate-200 bg-[var(--paper)] p-4 sm:p-5">
-                <div className="flex items-center justify-between gap-2">
-                  <h4 className="font-extrabold text-[var(--institutional)]">Hijo {i + 1}</h4>
-                  {hijos.length > 1 && (
-                    <button
-                      type="button"
-                      disabled={sending}
-                      onClick={() => setHijos((hs) => hs.filter((_, j) => j !== i))}
-                      className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100"
-                    >
-                      ✕ Quitar
-                    </button>
-                  )}
-                </div>
-                <div className="mt-3 grid gap-4 sm:grid-cols-2">
-                  <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
-                    Nombre y apellido del alumno <span className="text-red-600">*</span>
-                    <input
-                      value={h.nombre}
-                      onChange={(e2) => setHijo(i, "nombre", e2.target.value)}
-                      disabled={sending}
-                      placeholder="Ej: Ana Gómez"
-                      className={`${inputCls} ${e.nombre ? "!border-red-500" : ""}`}
-                    />
-                    <FieldError msg={e.nombre} />
-                  </label>
-                  <label className="block text-sm font-semibold text-slate-700">
-                    Nivel educativo <span className="text-red-600">*</span>
-                    <select
-                      value={h.nivel}
-                      onChange={(e2) => setHijo(i, "nivel", e2.target.value)}
-                      disabled={sending || !cat}
-                      className={`${inputCls} ${e.nivel ? "!border-red-500" : ""}`}
-                    >
-                      <option value="">Seleccionar…</option>
-                      <option value="EEB">Educación Escolar Básica</option>
-                      <option value="MEDIA">Educación Media</option>
-                    </select>
-                    <FieldError msg={e.nivel} />
-                  </label>
-                  <label className="block text-sm font-semibold text-slate-700">
-                    Curso <span className="text-red-600">*</span>
-                    <select
-                      value={h.curso}
-                      onChange={(e2) => setHijo(i, "curso", e2.target.value)}
-                      disabled={sending || !h.nivel}
-                      className={`${inputCls} ${e.curso ? "!border-red-500" : ""}`}
-                    >
-                      <option value="">{h.nivel ? "Seleccionar…" : "Primero elegí el nivel"}</option>
-                      {courses.map((c) => (
-                        <option key={c} value={c}>{h.nivel === "EEB" ? `${c} grado` : `${c} curso`}</option>
-                      ))}
-                    </select>
-                    <FieldError msg={e.curso} />
-                  </label>
-                  <label className="block text-sm font-semibold text-slate-700">
-                    Turno <span className="text-red-600">*</span>
-                    <select
-                      value={h.turno}
-                      onChange={(e2) => setHijo(i, "turno", e2.target.value)}
-                      disabled={sending || !h.nivel}
-                      className={`${inputCls} ${e.turno ? "!border-red-500" : ""}`}
-                    >
-                      <option value="">{h.nivel ? "Seleccionar…" : "Primero elegí el nivel"}</option>
-                      <option value="MAÑANA">Mañana</option>
-                      <option value="TARDE">Tarde</option>
-                    </select>
-                    <FieldError msg={e.turno} />
-                  </label>
-                  {necesitaSeccion(h.nivel, h.bachiller) && (
-                    <label className="block text-sm font-semibold text-slate-700">
-                      Sección <span className="text-red-600">*</span>
+          <div style={{ marginTop: "0.9rem" }}>
+            {hijos.map((h, i) => {
+              const courses = h.nivel === "EEB" ? cat?.eebGrades ?? [] : h.nivel === "MEDIA" ? cat?.mediaCourses ?? [] : [];
+              const e = hErr[i] ?? {};
+              return (
+                <article key={i} className="reg-child">
+                  <div className="reg-child-head">
+                    <b>Hijo {i + 1}</b>
+                    {hijos.length > 1 && (
+                      <button
+                        type="button"
+                        disabled={sending}
+                        onClick={() => setHijos((hs) => hs.filter((_, j) => j !== i))}
+                        className="reg-btn-mini"
+                      >
+                        ✕ Quitar
+                      </button>
+                    )}
+                  </div>
+                  <div className="reg-grid">
+                    <Field label="Nombre y apellido del alumno" required error={e.nombre} className="reg-col-full">
+                      <input
+                        value={h.nombre}
+                        onChange={(e2) => setHijo(i, "nombre", e2.target.value)}
+                        disabled={sending}
+                        placeholder="Ej: Ana Gómez"
+                        className={inputCls}
+                      />
+                    </Field>
+                    <Field label="Nivel educativo" required error={e.nivel}>
                       <select
-                        value={h.seccion}
-                        onChange={(e2) => setHijo(i, "seccion", e2.target.value)}
+                        value={h.nivel}
+                        onChange={(e2) => setHijo(i, "nivel", e2.target.value)}
+                        disabled={sending || !cat}
+                        className="reg-select"
+                      >
+                        <option value="">Seleccionar…</option>
+                        <option value="EEB">Educación Escolar Básica</option>
+                        <option value="MEDIA">Educación Media</option>
+                      </select>
+                    </Field>
+                    <Field label="Curso" required error={e.curso}>
+                      <select
+                        value={h.curso}
+                        onChange={(e2) => setHijo(i, "curso", e2.target.value)}
                         disabled={sending || !h.nivel}
-                        className={`${inputCls} ${e.seccion ? "!border-red-500" : ""}`}
+                        className="reg-select"
                       >
                         <option value="">{h.nivel ? "Seleccionar…" : "Primero elegí el nivel"}</option>
-                        {(h.nivel === "EEB"
-                          ? (cat?.secciones ?? ["A", "B", "C", "D"])
-                          : (cat?.seccionesCCB ?? ["A", "B"])
-                        ).map((s) => (
-                          <option key={s} value={s}>{s}</option>
+                        {courses.map((c) => (
+                          <option key={c} value={c}>{h.nivel === "EEB" ? `${c} grado` : `${c} curso`}</option>
                         ))}
                       </select>
-                      <FieldError msg={e.seccion} />
-                    </label>
-                  )}
-                  {h.nivel === "MEDIA" && (
-                    <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
-                      Bachiller <span className="text-red-600">*</span>
+                    </Field>
+                    <Field label="Turno" required error={e.turno}>
                       <select
-                        value={h.bachiller}
-                        onChange={(e2) => setHijo(i, "bachiller", e2.target.value)}
-                        disabled={sending}
-                        className={`${inputCls} ${e.bachiller ? "!border-red-500" : ""}`}
+                        value={h.turno}
+                        onChange={(e2) => setHijo(i, "turno", e2.target.value)}
+                        disabled={sending || !h.nivel}
+                        className="reg-select"
                       >
-                        <option value="">Seleccionar bachiller…</option>
-                        {(cat?.bachilleratos ?? []).map((b) => (
-                          <option key={b.code} value={b.code}>
-                            {b.shortName} — {b.name}
-                          </option>
-                        ))}
+                        <option value="">{h.nivel ? "Seleccionar…" : "Primero elegí el nivel"}</option>
+                        <option value="MAÑANA">Mañana</option>
+                        <option value="TARDE">Tarde</option>
                       </select>
-                      <FieldError msg={e.bachiller} />
-                    </label>
-                  )}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-        {catError && <p className="mt-3 text-sm font-semibold text-red-600">{catError}</p>}
-      </section>
+                    </Field>
+                    {necesitaSeccion(h.nivel, h.bachiller) && (
+                      <Field label="Sección" required error={e.seccion}>
+                        <select
+                          value={h.seccion}
+                          onChange={(e2) => setHijo(i, "seccion", e2.target.value)}
+                          disabled={sending || !h.nivel}
+                          className="reg-select"
+                        >
+                          <option value="">{h.nivel ? "Seleccionar…" : "Primero elegí el nivel"}</option>
+                          {(h.nivel === "EEB"
+                            ? (cat?.secciones ?? ["A", "B", "C", "D"])
+                            : (cat?.seccionesCCB ?? ["A", "B"])
+                          ).map((s) => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                      </Field>
+                    )}
+                    {h.nivel === "MEDIA" && (
+                      <Field label="Bachiller" required error={e.bachiller} className="reg-col-full">
+                        <select
+                          value={h.bachiller}
+                          onChange={(e2) => setHijo(i, "bachiller", e2.target.value)}
+                          disabled={sending}
+                          className="reg-select"
+                        >
+                          <option value="">Seleccionar bachiller…</option>
+                          {(cat?.bachilleratos ?? []).map((b) => (
+                            <option key={b.code} value={b.code}>
+                              {b.shortName} — {b.name}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+          {catError && <p className="reg-field-err show" style={{ marginTop: "0.6rem" }}>{catError}</p>}
+        </section>
 
-      {serverError && (
-        <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{serverError}</p>
-      )}
-      <div>
-        <button type="submit" disabled={sending} className="btn-primary w-full justify-center sm:w-auto">
-          {sending ? "Enviando…" : "Enviar solicitud"}
-        </button>
-        <p className="mt-2 text-xs text-slate-500">
-          Los campos con * son obligatorios.
-        </p>
-      </div>
-    </form>
+        <FormError msg={serverError} />
+
+        <div style={{ marginTop: "1.2rem" }}>
+          <button type="submit" disabled={sending} className="reg-btn reg-btn-primary">
+            {sending ? "Enviando…" : "Enviar solicitud →"}
+          </button>
+        </div>
+        <RegFoot note="Dirección revisa la solicitud antes de crear tu cuenta." />
+      </form>
+    </RegShell>
   );
 }

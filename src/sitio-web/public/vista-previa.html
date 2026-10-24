@@ -476,6 +476,83 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 .shine{position:relative;overflow:hidden}
 .shine::before{content:"";position:absolute;top:0;left:-80%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-20deg);animation:shine 3.4s infinite}
 @keyframes shine{0%{left:-80%}60%,100%{left:130%}}
+<style>
+/* ===== Rediseño de la zona de registro (modal de la portada) ===== */
+.reg-shell{display:grid;grid-template-columns:20rem 1fr;background:#fbf7f1;border:1px solid #e6d8c9;border-radius:18px;overflow:hidden}
+.reg-side{position:relative;background:linear-gradient(155deg,#673d29,#4b291b);color:#fff;padding:28px 22px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.reg-side::after{content:'';position:absolute;right:-52px;bottom:-52px;width:180px;height:180px;border-radius:50%;background:rgba(184,137,87,.18);pointer-events:none}
+.reg-crest{background:#fff;border-radius:13px;padding:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.28)}
+.reg-crest img{display:block;width:96px;height:auto;object-fit:contain}
+.reg-side-title{font-size:1.12rem;font-weight:800;line-height:1.25;margin:0}
+.reg-side-motto{font-size:.8rem;font-style:italic;line-height:1.5;color:#f0dfc6;margin:0}
+.reg-benefits{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:12px}
+.reg-benefits li{display:flex;align-items:flex-start;gap:10px}
+.reg-benefit-ico{flex:none;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.reg-benefits b{display:block;font-size:.79rem;font-weight:700;line-height:1.35}
+.reg-benefits span{display:block;font-size:.72rem;line-height:1.4;color:#e6d2b8;margin-top:2px}
+.reg-side-note{margin-top:auto;padding-top:14px;font-size:.68rem;line-height:1.5;color:#dcc4a8}
+.reg-main{padding:26px 26px 22px;min-width:0}
+.reg-main-head{margin-bottom:2px}
+.reg-main-head h2{margin:0;font-size:1.32rem;font-weight:800;color:#673d29;letter-spacing:-.01em}
+.reg-main-head p{margin:5px 0 0;font-size:.82rem;color:#8a776a}
+.reg-sec{display:flex;align-items:center;gap:8px;font-size:.74rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#673d29;margin:18px 0 6px}
+.reg-sec-n{flex:none;width:25px;height:25px;border-radius:50%;background:#673d29;color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;letter-spacing:0}
+.reg-grid{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.reg-main label{display:block;font-size:.76rem;font-weight:700;color:#3b261d;margin:9px 0 4px}
+.reg-main input,.reg-main select{width:100%;min-height:44px;padding:9px 12px;font-size:.88rem;color:#3b261d;background:#fff;border:1.5px solid #e6d8c9;border-radius:10px;outline:none;transition:border-color .18s,box-shadow .18s}
+.reg-main select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a776a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+.reg-main input::placeholder{color:#b9a698}
+.reg-main input:focus,.reg-main select:focus{border-color:#b88957;box-shadow:0 0 0 3px rgba(184,137,87,.18)}
+.reg-main input:disabled,.reg-main select:disabled{background:#f3ece4;color:#a3938a;cursor:not-allowed}
+.reg-hint{margin:0;font-size:.74rem;color:#8a776a}
+.reg-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px}
+.reg-chip{min-height:40px;display:inline-flex;align-items:center;gap:5px;padding:8px 13px;font-size:.79rem;font-weight:800;color:#6b584c;background:#fff;border:1.5px solid #e6d8c9;border-radius:999px;cursor:pointer;transition:border-color .18s,background .18s,color .18s,transform .12s}
+.reg-chip:hover{border-color:#b88957;color:#673d29}
+.reg-chip:active{transform:scale(.97)}
+.reg-chip.on{background:#673d29;border-color:#673d29;color:#fff}
+.reg-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;padding:0 22px;font-size:.88rem;font-weight:800;border:0;border-radius:11px;cursor:pointer;transition:transform .16s,box-shadow .16s}
+.reg-btn:active{transform:translateY(1px)}
+.reg-btn-primary{width:100%;color:#fff;background:linear-gradient(135deg,#673d29,#865437);box-shadow:0 10px 22px rgba(103,61,41,.3)}
+.reg-btn-primary:hover{box-shadow:0 14px 28px rgba(103,61,41,.4);transform:translateY(-1px)}
+.reg-btn-primary:disabled{opacity:.6;cursor:progress;box-shadow:none}
+.reg-btn-add{min-height:40px;padding:0 14px;color:#673d29;background:#fff;border:1.5px dashed #b88957;border-radius:10px;font-size:.78rem;font-weight:800;cursor:pointer;transition:background .16s,border-color .16s}
+.reg-btn-add:hover{background:#fdf6ec;border-color:#673d29}
+.reg-err{display:none;color:#b91c1c;font-size:.73rem;font-weight:700;margin-top:4px}
+.reg-err.show{display:block}
+.reg-error-top{display:none;margin-top:12px;padding:9px 11px;font-size:.78rem;font-weight:700;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:9px}
+.reg-error-top.show{display:block}
+.reg-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.reg-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 6px 5px 11px;font-size:.74rem;font-weight:700;color:#5c4436;background:#f6efe6;border:1px solid #e6d8c9;border-radius:999px}
+.reg-tag button{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#991b1b;background:#fff;border:0;border-radius:50%;cursor:pointer}
+.reg-tag button:hover{background:#fee2e2}
+.reg-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+.reg-tab{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:.83rem;font-weight:800;color:#7a6555;background:#fff;border:1.5px solid #e6d8c9;border-radius:11px;cursor:pointer;transition:border-color .18s,background .18s,color .18s}
+.reg-tab:hover{border-color:#b88957}
+.reg-tab.on{color:#673d29;background:#f7efe4;border-color:#b88957}
+.reg-ok{text-align:center;padding:18px 0}
+.reg-ok-ico{font-size:2.5rem;line-height:1}
+.reg-ok h3{margin:8px 0 0;font-size:1.1rem;font-weight:800;color:#673d29}
+.reg-ok p{margin:5px 0 0;font-size:.8rem;color:#8a776a}
+.reg-ok-tel{display:grid;gap:8px;margin-top:14px}
+.reg-ok-tel a{padding:11px;font-size:.82rem;font-weight:800;color:#673d29;background:#fff;border:1px solid #e6d8c9;border-radius:10px;text-decoration:none}
+.reg-hijo{border:1px solid #e6d8c9;border-radius:11px;padding:11px 12px 12px;margin-top:10px;background:#fff}
+.reg-hijo h4{color:#673d29;font-size:.82rem;font-weight:800;display:flex;justify-content:space-between;align-items:center;margin:0 0 4px}
+.reg-hijo h4 button{border:0;background:#fee2e2;color:#991b1b;border-radius:7px;padding:4px 9px;font-size:.7rem;font-weight:800;cursor:pointer}
+@media (max-width:900px){
+.reg-shell{grid-template-columns:1fr}
+.reg-side{padding:16px 14px;gap:10px}
+.reg-side::after{display:none}
+.reg-crest img{width:66px}
+.reg-side-title{font-size:1rem}
+.reg-benefits{grid-template-columns:repeat(2,minmax(0,1fr))}
+.reg-side-note{display:none}
+.reg-main{padding:18px 15px 16px}
+}
+@media (max-width:560px){
+.reg-grid{grid-template-columns:1fr}
+.reg-benefits{grid-template-columns:1fr}
+}
+</style>
 </style>
 </head>
 <body>
@@ -876,77 +953,91 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 </div>
 </div>
 
-<!-- SOLICITUD DE REGISTRO (docentes/tutores: se envía por correo a Dirección) -->
+<!-- SOLICITUD DE REGISTRO (docentes/tutores: la revisa Dirección) -->
 <div id="regModal">
-<div class="login-card" style="width:min(640px,94vw);max-height:92vh;overflow-y:auto">
-<div class="login-head"><div class="lic">📝</div><h3 id="regTitle">Solicitud de registro</h3><p>Tutores y docentes · La revisa Dirección</p></div>
-<div class="login-body">
+<div class="login-card reg-card" style="width:min(1060px,96vw);max-height:92vh;overflow-y:auto">
+<div class="reg-shell">
+<aside class="reg-side">
+<div class="reg-crest"><img src="/images/logo-colegio.png" alt="Escudo del Colegio Nacional E.M.D. Caaguazú" width="104" height="116"></div>
+<h2 class="reg-side-title">Colegio Nacional E.M.D. Caaguazú</h2>
+<p class="reg-side-motto">“Formando jóvenes con valores para un mejor mañana”</p>
+<ul class="reg-benefits">
+<li><span class="reg-benefit-ico">🎓</span><div><b>Acceso a tus clases y recursos</b><span>Plataforma educativa siempre disponible.</span></div></li>
+<li><span class="reg-benefit-ico">📄</span><div><b>Seguimiento de tu progreso</b><span>Consultá tus calificaciones y avances.</span></div></li>
+<li><span class="reg-benefit-ico">👥</span><div><b>Comunidad educativa conectada</b><span>Estudiantes, docentes y familias.</span></div></li>
+<li><span class="reg-benefit-ico">⭐</span><div><b>Construí tu futuro</b><span>Con educación, disciplina y valores.</span></div></li>
+</ul>
+<p class="reg-side-note">Dirección revisa cada solicitud antes de crear la cuenta y te contactará al correo o teléfono indicados.</p>
+</aside>
+<div class="reg-main">
+<div class="reg-main-head"><h2 id="regTitle">Solicitud de registro</h2><p>Completá tus datos para crear tu cuenta en el sistema</p></div>
 <div class="reg-tabs">
 <button type="button" id="regTabT" class="reg-tab on" onclick="regTab('tutor')">👨‍👩‍👧 Soy tutor</button>
 <button type="button" id="regTabD" class="reg-tab" onclick="regTab('docente')">👨‍🏫 Soy docente</button>
 </div>
-<div class="login-err" id="regTopErr" style="display:none"></div>
+<div class="reg-error-top" id="regTopErr" style="display:none"></div>
 <form id="regFormT" onsubmit="return submitRegT(event)">
-<div class="reg-sec">1 · Datos personales</div>
+<div class="reg-sec"><span class="reg-sec-n">1</span> Datos personales</div>
 <label for="rtNom">Nombres *</label>
 <input id="rtNom" type="text" placeholder="Tus nombres" autocomplete="given-name">
 <div class="reg-err" id="e-rtNom">Obligatorio</div>
 <label for="rtApe">Apellidos *</label>
 <input id="rtApe" type="text" placeholder="Tus apellidos" autocomplete="family-name">
 <div class="reg-err" id="e-rtApe">Obligatorio</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="reg-grid">
 <div><label for="rtCi">Cédula *</label><input id="rtCi" type="text" inputmode="numeric" placeholder="Ej. 4567890"><div class="reg-err" id="e-rtCi">Cédula inválida (6 a 10 dígitos)</div></div>
 <div><label for="rtTel">Teléfono *</label><input id="rtTel" type="tel" placeholder="Ej. 0975 123456" autocomplete="tel"><div class="reg-err" id="e-rtTel">Mínimo 6 dígitos</div></div>
 </div>
 <label for="rtMail">Correo *</label>
 <input id="rtMail" type="email" placeholder="tu@correo.com" autocomplete="email">
 <div class="reg-err" id="e-rtMail">Correo inválido</div>
-<div class="reg-sec">2 · Hijos a cargo</div>
+<div class="reg-sec"><span class="reg-sec-n">2</span> Hijos a cargo</div>
 <div id="rtHijos"></div>
-<button type="button" class="reg-add" onclick="rtAddHijo()">＋ Agregar otro hijo</button>
+<button type="button" class="reg-btn-add" onclick="rtAddHijo()">＋ Agregar otro hijo</button>
 <div class="reg-err" id="e-rtHijos"></div>
-<button class="btn btn-gold" id="rtSend" style="width:100%;justify-content:center;margin-top:16px;padding:13px" type="submit">Enviar solicitud →</button>
+<button class="reg-btn reg-btn-primary" id="rtSend" style="margin-top:18px" type="submit">Enviar solicitud →</button>
 </form>
 <form id="regFormD" style="display:none" onsubmit="return submitRegD(event)">
-<div class="reg-sec">1 · Datos personales</div>
+<div class="reg-sec"><span class="reg-sec-n">1</span> Datos personales</div>
 <label for="rdNom">Nombres *</label>
 <input id="rdNom" type="text" placeholder="Tus nombres" autocomplete="given-name">
 <div class="reg-err" id="e-rdNom">Obligatorio</div>
 <label for="rdApe">Apellidos *</label>
 <input id="rdApe" type="text" placeholder="Tus apellidos" autocomplete="family-name">
 <div class="reg-err" id="e-rdApe">Obligatorio</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="reg-grid">
 <div><label for="rdCi">Cédula *</label><input id="rdCi" type="text" inputmode="numeric" placeholder="Ej. 4567890"><div class="reg-err" id="e-rdCi">Cédula inválida (6 a 10 dígitos)</div></div>
 <div><label for="rdTel">Teléfono *</label><input id="rdTel" type="tel" placeholder="Ej. 0975 123456" autocomplete="tel"><div class="reg-err" id="e-rdTel">Mínimo 6 dígitos</div></div>
 </div>
 <label for="rdMail">Correo *</label>
 <input id="rdMail" type="email" placeholder="tu@correo.com" autocomplete="email">
 <div class="reg-err" id="e-rdMail">Correo inválido</div>
-<div class="reg-sec">2 · Materia principal *</div>
+<div class="reg-sec"><span class="reg-sec-n">2</span> Materia principal *</div>
 <label for="rdMP">Materia</label>
 <select id="rdMP" onchange="document.getElementById('rdMPOtraBox').style.display=this.value==='__OTRA__'?'':'none'"><option value="">Seleccionar…</option></select>
 <div class="reg-err" id="e-rdMP">Elegí tu materia principal</div>
 <div id="rdMPOtraBox" style="display:none"><label for="rdMPOtra">¿Cuál?</label><input id="rdMPOtra" type="text" maxlength="80" placeholder="Ej: Física"></div>
-<div class="reg-sec">3 · Otras materias (opcional)</div>
-<p style="font-size:.78rem;color:var(--mut)">Podés completar esta información ahora o agregarla después desde tu perfil.</p>
-<div style="display:flex;gap:8px;margin-top:6px">
-<select id="rdOtraSel" onchange="document.getElementById('rdOtraLibreBox').style.display=this.value==='__OTRA__'?'':'none'" style="flex:1"><option value="">Seleccionar…</option></select>
-<button type="button" class="btn" style="background:var(--paper);border:2px dashed var(--gold);color:var(--inst);font-weight:800;padding:10px 14px" onclick="rdAddOtra()">＋</button>
+<div class="reg-sec"><span class="reg-sec-n">3</span> Otras materias (opcional)</div>
+<p class="reg-hint">Podés completar esta información ahora o agregarla después desde tu perfil.</p>
+<div class="reg-chips" style="align-items:flex-end;gap:.5rem;margin-top:6px">
+<select id="rdOtraSel" onchange="document.getElementById('rdOtraLibreBox').style.display=this.value==='__OTRA__'?'':'none'" style="flex:1 1 auto"><option value="">Seleccionar…</option></select>
+<button type="button" class="reg-btn-add" style="flex:none" onclick="rdAddOtra()">＋</button>
 </div>
 <div id="rdOtraLibreBox" style="display:none;margin-top:6px"><input id="rdOtraLibre" type="text" maxlength="80" placeholder="¿Cuál? Ej: Química"></div>
 <div class="reg-err" id="e-rdOtras"></div>
 <div class="reg-tags" id="rdOtrasTags"></div>
-<div class="reg-sec">4 · Asignación académica</div>
-<b style="font-size:.8rem">Niveles * (podés marcar Básica y Media)</b><div class="reg-chips" id="rdNiveles"><button type="button" class="reg-chip" id="rdNvEEB" onclick="rdToggleNivel('EEB')">Escolar Básica (7.º–9.º)</button><button type="button" class="reg-chip" id="rdNvMEDIA" onclick="rdToggleNivel('MEDIA')">Media (1.º–3.º)</button></div>
+<div class="reg-sec"><span class="reg-sec-n">4</span> Asignación académica</div>
+<label>Niveles * (podés marcar Básica y Media)</label>
+<div class="reg-chips" id="rdNiveles"><button type="button" class="reg-chip" id="rdNvEEB" onclick="rdToggleNivel('EEB')">Escolar Básica (7.º–9.º)</button><button type="button" class="reg-chip" id="rdNvMEDIA" onclick="rdToggleNivel('MEDIA')">Media (1.º–3.º)</button></div>
 <div class="reg-err" id="e-rdNivel">Elegí el nivel</div>
-<div style="margin-top:8px"><b style="font-size:.8rem">Cursos en los que enseña *</b><div class="reg-chips" id="rdCursos"></div><div class="reg-err" id="e-rdCursos">Elegí al menos un curso</div></div>
-<div id="rdBachBox" style="display:none;margin-top:8px"><b style="font-size:.8rem">¿En qué bachiller(es) enseñás? *</b><div class="reg-chips" id="rdBach"></div><div class="reg-err" id="e-rdBach">Indicá al menos un bachiller</div></div>
-<button class="btn btn-gold" id="rdSend" style="width:100%;justify-content:center;margin-top:16px;padding:13px" type="submit">Enviar solicitud →</button>
+<div style="margin-top:10px"><label>Cursos en los que enseña *</label><div class="reg-chips" id="rdCursos"></div><div class="reg-err" id="e-rdCursos">Elegí al menos un curso</div></div>
+<div id="rdBachBox" style="display:none;margin-top:10px"><label>¿En qué bachiller(es) enseñás? *</label><div class="reg-chips" id="rdBach"></div><div class="reg-err" id="e-rdBach">Indicá al menos un bachiller</div></div>
+<button class="reg-btn reg-btn-primary" id="rdSend" style="margin-top:18px" type="submit">Enviar solicitud →</button>
 </form>
-<div id="regOk" style="display:none;text-align:center">
-<div style="font-size:2.6rem">✅</div>
-<h3 style="color:var(--inst);margin-top:8px">¡Solicitud enviada!</h3>
-<p style="font-size:.85rem;color:var(--mut);margin-top:6px">Dirección la revisará y te contactará.<br>También podés escribirnos directo:</p>
+<div id="regOk" style="display:none" class="reg-ok">
+<div class="reg-ok-ico">✅</div>
+<h3>¡Solicitud enviada!</h3>
+<p>Dirección la revisará y te contactará.<br>También podés escribirnos directo:</p>
 <div class="reg-ok-tel">
 <a href="tel:+595975493753">📞 0975 493753</a>
 <a href="tel:+595982296194">📞 0982 296194</a>
@@ -954,6 +1045,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 </div>
 </div>
 <p class="login-foot"><a onclick="closeReg()">← Volver</a> · <a href="/registro">Abrir versión completa →</a></p>
+</div>
 </div>
 </div>
 </div>

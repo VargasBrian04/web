@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import {
-  FieldError, Person, PersonErrors, PersonFields, SectionTitle, SuccessView,
-  inputCls, useCatalog,
+  FieldError, Field, FormError, Person, PersonErrors, PersonFields, RegFoot, RegShell,
+  SectionTitle, SuccessView, inputCls, useCatalog,
 } from "./shared";
 
 /** Formulario de solicitud de cuenta para docentes. */
@@ -154,197 +154,204 @@ export default function DocenteForm() {
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-8" noValidate>
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <SectionTitle n="1" title="Datos personales" desc="Tus datos como docente." />
-        <div className="mt-5">
+    <RegShell>
+      <form onSubmit={submit} noValidate>
+        <section className="reg-block">
+          <SectionTitle n="1" title="Datos personales" desc="Tus datos como docente." icon="👤" />
           <PersonFields
             value={person}
             errors={pErr}
             disabled={sending}
             onChange={(k, v) => setPerson((p) => ({ ...p, [k]: v }))}
           />
-        </div>
-      </section>
+        </section>
 
-      <section className="rounded-2xl border-2 border-[var(--gold)] bg-white p-6 shadow-sm sm:p-8">
-        <SectionTitle n="2" title="Materia principal" desc="La materia que más horas enseñás." />
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <label className="block text-sm font-semibold text-slate-700">
-            Materia <span className="text-red-600">*</span>
-            <select
-              value={materiaPrincipal}
-              onChange={(e) => setMateriaPrincipal(e.target.value)}
-              disabled={sending || !cat}
-              className={`${inputCls} ${mpErr ? "!border-red-500" : ""}`}
-            >
-              <option value="">Seleccionar…</option>
-              {subjectGroups.map(([grupo, lista]) => (
-                <optgroup key={grupo} label={grupo}>
-                  {lista.map((s) => (
-                    <option key={s.code} value={s.code}>{s.name}</option>
-                  ))}
-                </optgroup>
-              ))}
-              <option value="__OTRA__">Otra materia (especificar)…</option>
-            </select>
-            <FieldError msg={mpErr} />
-          </label>
-          {materiaPrincipal === "__OTRA__" && (
-            <label className="block text-sm font-semibold text-slate-700">
-              ¿Cuál? <span className="text-red-600">*</span>
-              <input
-                value={materiaPrincipalOtra}
-                onChange={(e) => setMateriaPrincipalOtra(e.target.value)}
-                disabled={sending}
-                maxLength={80}
-                placeholder="Ej: Física"
-                className={inputCls}
-              />
-            </label>
-          )}
-        </div>
-        {subjects.length === 0 && (
-          <p className="mt-2 text-xs text-slate-500">
-            Aún no hay materias cargadas en el sistema: usá “Otra materia” y Dirección la registrará.
-          </p>
-        )}
-      </section>
-
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <SectionTitle
-          n="3"
-          title="Otras materias que enseña (opcional)"
-          desc="Podés completar esta información ahora o agregarla posteriormente desde tu perfil."
-        />
-        <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-          <label className="block text-sm font-semibold text-slate-700">
-            Materia
-            <select value={otraSel} onChange={(e) => setOtraSel(e.target.value)} disabled={sending || !cat} className={inputCls}>
-              <option value="">Seleccionar…</option>
-              {subjectGroups.map(([grupo, lista]) => (
-                <optgroup key={grupo} label={grupo}>
-                  {lista.map((s) => (
-                    <option key={s.code} value={s.code}>{s.name}</option>
-                  ))}
-                </optgroup>
-              ))}
-              <option value="__OTRA__">Otra materia (especificar)…</option>
-            </select>
-          </label>
-          {otraSel === "__OTRA__" && (
-            <label className="block text-sm font-semibold text-slate-700">
-              ¿Cuál?
-              <input value={otraLibre} onChange={(e) => setOtraLibre(e.target.value)} disabled={sending} maxLength={80} placeholder="Ej: Química" className={inputCls} />
-            </label>
-          )}
-          <button type="button" onClick={addOtra} disabled={sending}
-            className="rounded-lg border-2 border-dashed border-[var(--gold)] px-4 py-2.5 text-sm font-bold text-[var(--institutional)] hover:bg-amber-50 disabled:opacity-40">
-            ＋ Agregar materia
-          </button>
-        </div>
-        <FieldError msg={otrasErr} />
-        {otras.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {otras.map((o) => (
-              <span key={o} className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700">
-                {materiaLabel(o)}
-                <button type="button" disabled={sending} onClick={() => setOtras((l) => l.filter((x) => x !== o))}
-                  className="rounded-full bg-white px-2 text-xs font-bold text-red-600 hover:bg-red-50" aria-label={`Quitar ${o}`}>
-                  ✕
-                </button>
-              </span>
-            ))}
+        <section className="reg-block">
+          <SectionTitle n="2" title="Materia principal" desc="La materia que más horas enseñás." icon="📘" />
+          <div className="reg-grid">
+            <Field label="Materia" required error={mpErr}>
+              <select
+                value={materiaPrincipal}
+                onChange={(e) => setMateriaPrincipal(e.target.value)}
+                disabled={sending || !cat}
+                className="reg-select"
+              >
+                <option value="">Seleccionar…</option>
+                {subjectGroups.map(([grupo, lista]) => (
+                  <optgroup key={grupo} label={grupo}>
+                    {lista.map((s) => (
+                      <option key={s.code} value={s.code}>{s.name}</option>
+                    ))}
+                  </optgroup>
+                ))}
+                <option value="__OTRA__">Otra materia (especificar)…</option>
+              </select>
+            </Field>
+            {materiaPrincipal === "__OTRA__" && (
+              <Field label="¿Cuál?" required>
+                <input
+                  value={materiaPrincipalOtra}
+                  onChange={(e) => setMateriaPrincipalOtra(e.target.value)}
+                  disabled={sending}
+                  maxLength={80}
+                  placeholder="Ej: Física"
+                  className={inputCls}
+                />
+              </Field>
+            )}
           </div>
-        )}
-      </section>
-
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <SectionTitle n="4" title="Asignación académica" desc="Niveles y cursos en los que enseñás. Podés marcar Básica y Media a la vez." />
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div>
-            <p className="text-sm font-semibold text-slate-700">
-              Niveles <span className="text-red-600">*</span>
+          {subjects.length === 0 && (
+            <p className="reg-hint" style={{ marginTop: "0.5rem" }}>
+              Aún no hay materias cargadas en el sistema: usá “Otra materia” y Dirección la registrará.
             </p>
-            <div className="mt-1 flex flex-wrap gap-2">
-              {(["EEB", "MEDIA"] as const).map((n) => {
-                const on = niveles.includes(n);
-                return (
+          )}
+        </section>
+
+        <section className="reg-block">
+          <SectionTitle
+            n="3"
+            title="Otras materias que enseña"
+            desc="Podés completar esta información ahora o agregarla después desde tu perfil."
+            icon="📚"
+          />
+          <div className="reg-chips" style={{ alignItems: "flex-end", gap: "0.5rem" }}>
+            <label className="reg-field" style={{ flex: "1 1 auto" }}>
+              <span>Materia</span>
+              <select
+                value={otraSel}
+                onChange={(e) => setOtraSel(e.target.value)}
+                disabled={sending || !cat}
+                className="reg-select"
+              >
+                <option value="">Seleccionar…</option>
+                {subjectGroups.map(([grupo, lista]) => (
+                  <optgroup key={grupo} label={grupo}>
+                    {lista.map((s) => (
+                      <option key={s.code} value={s.code}>{s.name}</option>
+                    ))}
+                  </optgroup>
+                ))}
+                <option value="__OTRA__">Otra materia (especificar)…</option>
+              </select>
+            </label>
+            {otraSel === "__OTRA__" && (
+              <label className="reg-field" style={{ flex: "0 0 10rem" }}>
+                <span>¿Cuál?</span>
+                <input
+                  value={otraLibre}
+                  onChange={(e) => setOtraLibre(e.target.value)}
+                  disabled={sending}
+                  maxLength={80}
+                  placeholder="Ej: Química"
+                  className={inputCls}
+                />
+              </label>
+            )}
+            <button type="button" onClick={addOtra} disabled={sending} className="reg-btn-add">
+              ＋ Agregar materia
+            </button>
+          </div>
+          <FieldError msg={otrasErr} />
+          {otras.length > 0 && (
+            <div className="reg-tags">
+              {otras.map((o) => (
+                <span key={o} className="reg-tag">
+                  {materiaLabel(o)}
                   <button
-                    key={n}
                     type="button"
                     disabled={sending}
-                    onClick={() => {
-                      setNiveles((l) => (l.includes(n) ? l.filter((x) => x !== n) : [...l, n]));
-                      setCursos([]);
-                      setBachilleres([]);
-                    }}
-                    aria-pressed={on}
-                    className={`min-h-[44px] rounded-full border-2 px-4 py-2 text-sm font-bold transition-colors ${on ? "border-[var(--institutional)] bg-[var(--institutional)] text-white" : "border-slate-300 text-slate-600 hover:border-[var(--institutional)]"}`}
+                    onClick={() => setOtras((l) => l.filter((x) => x !== o))}
+                    aria-label={`Quitar ${o}`}
                   >
-                    {on ? "✓ " : ""}{n === "EEB" ? "Escolar Básica (7.º–9.º)" : "Media (1.º–3.º)"}
+                    ✕
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="reg-block">
+          <SectionTitle
+            n="4"
+            title="Asignación académica"
+            desc="Niveles y cursos en los que enseñás. Podés marcar Básica y Media a la vez."
+            icon="🎓"
+          />
+          <p className="reg-hint" style={{ marginBottom: "0.5rem" }}>
+            Niveles <em className="req not-italic" style={{ color: "var(--reg-err)" }}>*</em> (podés marcar Básica y Media)
+          </p>
+          <div className="reg-chips">
+            {(["EEB", "MEDIA"] as const).map((n) => {
+              const on = niveles.includes(n);
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  disabled={sending}
+                  onClick={() => {
+                    setNiveles((l) => (l.includes(n) ? l.filter((x) => x !== n) : [...l, n]));
+                    setCursos([]);
+                    setBachilleres([]);
+                  }}
+                  aria-pressed={on}
+                  className={`reg-chip${on ? " on" : ""}`}
+                >
+                  {on ? "✓ " : ""}{n === "EEB" ? "Escolar Básica (7.º–9.º)" : "Media (1.º–3.º)"}
+                </button>
+              );
+            })}
+          </div>
+
+          <p className="reg-hint" style={{ margin: "0.9rem 0 0.5rem" }}>
+            Cursos en los que enseña <em className="req not-italic" style={{ color: "var(--reg-err)" }}>*</em>
+          </p>
+          {niveles.length === 0 ? (
+            <p className="reg-hint">Primero elegí al menos un nivel.</p>
+          ) : (
+            <div className="reg-chips">
+              {niveles.includes("EEB") && eeb.map((c) => {
+                const on = cursos.includes(`${c}`);
+                return (
+                  <button
+                    key={`EEB-${c}`}
+                    type="button"
+                    disabled={sending}
+                    onClick={() => setCursos((l) => toggle(l, `${c}`))}
+                    aria-pressed={on}
+                    title="Escolar Básica"
+                    className={`reg-chip${on ? " on" : ""}`}
+                  >
+                    {on ? "✓ " : ""}{c} EEB
+                  </button>
+                );
+              })}
+              {niveles.includes("MEDIA") && media.map((c) => {
+                const on = cursos.includes(`${c}`);
+                return (
+                  <button
+                    key={`MEDIA-${c}`}
+                    type="button"
+                    disabled={sending}
+                    onClick={() => setCursos((l) => toggle(l, `${c}`))}
+                    aria-pressed={on}
+                    title="Educación Media"
+                    className={`reg-chip${on ? " on" : ""}`}
+                  >
+                    {on ? "✓ " : ""}{c} Media
                   </button>
                 );
               })}
             </div>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-slate-700">
-              Cursos en los que enseña <span className="text-red-600">*</span>
-            </p>
-            {niveles.length === 0 ? (
-              <p className="mt-1 text-sm text-slate-400">Primero elegí al menos un nivel.</p>
-            ) : (
-              <div className="mt-1 flex flex-wrap gap-2">
-                {niveles.includes("EEB") && (
-                  <>
-                    {eeb.map((c) => {
-                      const on = cursos.includes(`${c}`);
-                      return (
-                        <button
-                          key={`EEB-${c}`}
-                          type="button"
-                          disabled={sending}
-                          onClick={() => setCursos((l) => toggle(l, `${c}`))}
-                          aria-pressed={on}
-                          title="Escolar Básica"
-                          className={`min-h-[44px] rounded-full border-2 px-4 py-2 text-sm font-bold transition-colors ${on ? "border-[var(--institutional)] bg-[var(--institutional)] text-white" : "border-slate-300 text-slate-600 hover:border-[var(--institutional)]"}`}
-                        >
-                          {on ? "✓ " : ""}{c} EEB
-                        </button>
-                      );
-                    })}
-                  </>
-                )}
-                {niveles.includes("MEDIA") && (
-                  <>
-                    {media.map((c) => {
-                      const on = cursos.includes(`${c}`);
-                      return (
-                        <button
-                          key={`MEDIA-${c}`}
-                          type="button"
-                          disabled={sending}
-                          onClick={() => setCursos((l) => toggle(l, `${c}`))}
-                          aria-pressed={on}
-                          title="Educación Media"
-                          className={`min-h-[44px] rounded-full border-2 px-4 py-2 text-sm font-bold transition-colors ${on ? "border-[var(--institutional)] bg-[var(--institutional)] text-white" : "border-slate-300 text-slate-600 hover:border-[var(--institutional)]"}`}
-                        >
-                          {on ? "✓ " : ""}{c} Media
-                        </button>
-                      );
-                    })}
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+          )}
+
           {niveles.includes("MEDIA") && (
-            <div className="sm:col-span-2">
-              <p className="text-sm font-semibold text-slate-700">
-                ¿En qué bachiller(es) enseñás? <span className="text-red-600">*</span>
+            <div style={{ marginTop: "0.9rem" }}>
+              <p className="reg-hint" style={{ marginBottom: "0.5rem" }}>
+                ¿En qué bachiller(es) enseñás?{" "}
+                <em className="req not-italic" style={{ color: "var(--reg-err)" }}>*</em>
               </p>
-              <div className="mt-1 flex flex-wrap gap-2">
+              <div className="reg-chips">
                 {(cat?.bachilleratos ?? []).map((b) => {
                   const on = bachilleres.includes(b.code);
                   return (
@@ -355,7 +362,7 @@ export default function DocenteForm() {
                       onClick={() => setBachilleres((l) => toggle(l, b.code))}
                       aria-pressed={on}
                       title={b.name}
-                      className={`min-h-[44px] rounded-full border-2 px-4 py-2 text-sm font-bold transition-colors ${on ? "border-[var(--gold)] bg-[var(--gold)] text-white" : "border-slate-300 text-slate-600 hover:border-[var(--gold)]"}`}
+                      className={`reg-chip${on ? " on" : ""}`}
                     >
                       {on ? "✓ " : ""}{b.shortName}
                     </button>
@@ -363,29 +370,22 @@ export default function DocenteForm() {
                 })}
               </div>
               {(cat?.bachilleratos.length ?? 0) === 0 && (
-                <p className="mt-1 text-xs text-slate-500">Aún no hay bachilleratos cargados.</p>
+                <p className="reg-hint">Aún no hay bachilleratos cargados.</p>
               )}
             </div>
           )}
-        </div>
-        <FieldError msg={asigErr} />
-        {catError && <p className="mt-2 text-sm font-semibold text-red-600">{catError}</p>}
-        <p className="mt-3 text-xs text-slate-500">
-          Podés completar o modificar materias y asignaciones después desde tu perfil, sin nueva solicitud.
-        </p>
-      </section>
+        </section>
 
-      {serverError && (
-        <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{serverError}</p>
-      )}
-      <div>
-        <button type="submit" disabled={sending} className="btn-primary w-full justify-center sm:w-auto">
-          {sending ? "Enviando…" : "Enviar solicitud"}
-        </button>
-        <p className="mt-2 text-xs text-slate-500">
-          Los campos con * son obligatorios.
-        </p>
-      </div>
-    </form>
+        <FormError msg={serverError} />
+        {catError && <p className="reg-field-err show" style={{ marginTop: "0.6rem" }}>{catError}</p>}
+
+        <div style={{ marginTop: "1.2rem" }}>
+          <button type="submit" disabled={sending} className="reg-btn reg-btn-primary">
+            {sending ? "Enviando…" : "Enviar solicitud →"}
+          </button>
+        </div>
+        <RegFoot note="Podés completar o modificar materias y asignaciones después desde tu perfil, sin nueva solicitud." />
+      </form>
+    </RegShell>
   );
 }

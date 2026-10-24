@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export const inputCls =
-  "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-[var(--institutional)] disabled:bg-slate-100 min-h-[44px]";
+export const inputCls = "reg-input";
 
 export type Catalog = {
   eebGrades: string[];
@@ -50,25 +49,53 @@ export function useCatalog() {
 
 export function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
-  return <p className="mt-1 text-xs font-semibold text-red-600">{msg}</p>;
+  return <p className="reg-field-err show">{msg}</p>;
 }
 
-export function SectionTitle({ n, title, desc }: { n: string; title: string; desc?: string }) {
+/** Título de sección numerada, con icono discreto. */
+export function SectionTitle({
+  n, title, desc, icon,
+}: {
+  n: string;
+  title: string;
+  desc?: string;
+  icon?: string;
+}) {
   return (
-    <div className="flex items-start gap-3">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--institutional)] text-sm font-extrabold text-white">
-        {n}
+    <div className="reg-block-head">
+      <span className="reg-block-num" aria-hidden="true">{n}</span>
+      {icon && <span className="reg-block-ico" aria-hidden="true">{icon}</span>}
+      <span>
+        <b>{title}</b>
+        {desc && <small>{desc}</small>}
       </span>
-      <div>
-        <h3 className="font-extrabold text-[var(--institutional)]">{title}</h3>
-        {desc && <p className="mt-0.5 text-sm text-slate-500">{desc}</p>}
-      </div>
     </div>
   );
 }
 
 export type Person = { ci: string; firstName: string; lastName: string; phone: string; email: string };
 export type PersonErrors = Partial<Record<keyof Person, string>>;
+
+/** Campo con etiqueta visible, altura uniforme y error junto al control. */
+export function Field({
+  label, required, error, children, className = "",
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <label className={`reg-field ${className}`}>
+      <span>
+        {label} {required && <em className="req not-italic">*</em>}
+      </span>
+      {children}
+      <FieldError msg={error} />
+    </label>
+  );
+}
 
 export function PersonFields({
   value, errors, onChange, disabled,
@@ -78,54 +105,190 @@ export function PersonFields({
   onChange: (k: keyof Person, v: string) => void;
   disabled?: boolean;
 }) {
-  const f = (
-    k: keyof Person, label: string, extra?: Partial<React.InputHTMLAttributes<HTMLInputElement>>
-  ) => (
-    <label className="block text-sm font-semibold text-slate-700">
-      {label} <span className="text-red-600">*</span>
-      <input
-        value={value[k]}
-        onChange={(e) => onChange(k, e.target.value)}
-        disabled={disabled}
-        className={`${inputCls} ${errors[k] ? "!border-red-500" : ""}`}
-        {...extra}
-      />
-      <FieldError msg={errors[k]} />
-    </label>
-  );
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      {f("ci", "Número de cédula", { inputMode: "numeric", placeholder: "Ej: 4567890" })}
-      {f("phone", "Número de teléfono", { inputMode: "tel", placeholder: "Ej: 0981 123 456" })}
-      {f("firstName", "Nombres", { placeholder: "Ej: María" })}
-      {f("lastName", "Apellidos", { placeholder: "Ej: Ayala" })}
-      <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
-        Correo electrónico <span className="text-red-600">*</span>
+    <div className="reg-grid">
+      <Field label="Nombres" required error={errors.firstName}>
+        <input
+          value={value.firstName}
+          onChange={(e) => onChange("firstName", e.target.value)}
+          disabled={disabled}
+          placeholder="Ej: María"
+          autoComplete="given-name"
+          className={inputCls}
+        />
+      </Field>
+      <Field label="Apellidos" required error={errors.lastName}>
+        <input
+          value={value.lastName}
+          onChange={(e) => onChange("lastName", e.target.value)}
+          disabled={disabled}
+          placeholder="Ej: Ayala"
+          autoComplete="family-name"
+          className={inputCls}
+        />
+      </Field>
+      <Field label="Cédula" required error={errors.ci}>
+        <input
+          value={value.ci}
+          onChange={(e) => onChange("ci", e.target.value)}
+          disabled={disabled}
+          inputMode="numeric"
+          placeholder="Ej: 4567890"
+          className={inputCls}
+        />
+      </Field>
+      <Field label="Teléfono" required error={errors.phone}>
+        <input
+          value={value.phone}
+          onChange={(e) => onChange("phone", e.target.value)}
+          disabled={disabled}
+          inputMode="tel"
+          placeholder="Ej: 0975 123456"
+          autoComplete="tel"
+          className={inputCls}
+        />
+      </Field>
+      <Field label="Correo electrónico" required error={errors.email} className="reg-col-full">
         <input
           type="email"
           value={value.email}
           onChange={(e) => onChange("email", e.target.value)}
           disabled={disabled}
-          placeholder="correo@ejemplo.com"
-          className={`${inputCls} ${errors.email ? "!border-red-500" : ""}`}
+          placeholder="tu@correo.com"
+          autoComplete="email"
+          className={inputCls}
         />
-        <FieldError msg={errors.email} />
-      </label>
+      </Field>
     </div>
   );
 }
 
+/**
+ * Contenedor del registro: panel institucional a la izquierda y
+ * formulario a la derecha. En móvil pasa a una sola columna.
+ */
+export function RegShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="reg-shell">
+      <aside className="reg-side">
+        <div className="reg-crest">
+          {/* Escudo oficial del Colegio Nacional E.M.D. Caaguazú */}
+          <img
+            src="/images/logo-colegio.png"
+            alt="Escudo del Colegio Nacional E.M.D. Caaguazú"
+            width={104}
+            height={116}
+          />
+        </div>
+        <h2 className="reg-side-title">Colegio Nacional E.M.D. Caaguazú</h2>
+        <p className="reg-side-motto">“Formando jóvenes con valores para un mejor mañana”</p>
+        <ul className="reg-benefits">
+          <li>
+            <span className="reg-benefit-ico" aria-hidden="true">🎓</span>
+            <div>
+              <b>Acceso a tus clases y recursos</b>
+              <span>Plataforma educativa siempre disponible.</span>
+            </div>
+          </li>
+          <li>
+            <span className="reg-benefit-ico" aria-hidden="true">📄</span>
+            <div>
+              <b>Seguimiento de tu progreso</b>
+              <span>Consultá tus calificaciones y avances.</span>
+            </div>
+          </li>
+          <li>
+            <span className="reg-benefit-ico" aria-hidden="true">👥</span>
+            <div>
+              <b>Comunidad educativa conectada</b>
+              <span>Estudiantes, docentes y familias.</span>
+            </div>
+          </li>
+          <li>
+            <span className="reg-benefit-ico" aria-hidden="true">⭐</span>
+            <div>
+              <b>Construí tu futuro</b>
+              <span>Con educación, disciplina y valores.</span>
+            </div>
+          </li>
+        </ul>
+        <p className="reg-side-note">
+          Dirección revisa cada solicitud antes de crear la cuenta y te
+          contactará al correo o teléfono indicados.
+        </p>
+      </aside>
+      <div className="reg-main">
+        <div className="reg-main-head">
+          <h2>Solicitud de registro</h2>
+          <p>Completá tus datos para crear tu cuenta en el sistema</p>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** Pie del formulario: aviso de obligatorios y acceso al login. */
+export function RegFoot({ note }: { note?: string }) {
+  return (
+    <p className="reg-foot">
+      {note ?? "Los campos con * son obligatorios."} ·{" "}
+      <a href="/login">Iniciá sesión</a>
+    </p>
+  );
+}
+
+/** Aviso de error general del formulario. */
+export function FormError({ msg }: { msg?: string | null }) {
+  if (!msg) return null;
+  return <p className="reg-error-top show">{msg}</p>;
+}
+
 export function SuccessView({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-2xl rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center">
-      <p className="text-5xl">✅</p>
-      <h2 className="mt-3 text-2xl font-extrabold text-emerald-900">{title}</h2>
-      <div className="mt-3 text-sm text-emerald-800">{children}</div>
-      <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
-        <a href="/" className="btn-primary justify-center">Volver al inicio</a>
-        <a href="/#contacto" className="rounded-lg border border-emerald-300 px-5 py-3 text-sm font-bold text-emerald-900 hover:bg-emerald-100">
-          Contactar a Secretaría
-        </a>
+    <div className="reg-shell">
+      <aside className="reg-side">
+        <div className="reg-crest">
+          <img
+            src="/images/logo-colegio.png"
+            alt="Escudo del Colegio Nacional E.M.D. Caaguazú"
+            width={104}
+            height={116}
+          />
+        </div>
+        <h2 className="reg-side-title">Colegio Nacional E.M.D. Caaguazú</h2>
+        <p className="reg-side-motto">“Formando jóvenes con valores para un mejor mañana”</p>
+        <ul className="reg-benefits">
+          <li>
+            <span className="reg-benefit-ico" aria-hidden="true">🎓</span>
+            <div>
+              <b>Acceso a tus clases y recursos</b>
+              <span>Plataforma educativa siempre disponible.</span>
+            </div>
+          </li>
+          <li>
+            <span className="reg-benefit-ico" aria-hidden="true">📄</span>
+            <div>
+              <b>Seguimiento de tu progreso</b>
+              <span>Consultá tus calificaciones y avances.</span>
+            </div>
+          </li>
+          <li>
+            <span className="reg-benefit-ico" aria-hidden="true">👥</span>
+            <div>
+              <b>Comunidad educativa conectada</b>
+              <span>Estudiantes, docentes y familias.</span>
+            </div>
+          </li>
+        </ul>
+        <p className="reg-side-note">Gracias por formar parte de la comunidad educativa.</p>
+      </aside>
+      <div className="reg-main">
+        <div className="reg-ok">
+          <div className="reg-ok-ico" aria-hidden="true">✅</div>
+          <h3>{title}</h3>
+          {children}
+        </div>
       </div>
     </div>
   );
