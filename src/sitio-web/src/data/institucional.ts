@@ -143,7 +143,32 @@ export const galleryItems: { src: string; category: GalleryCategory; caption: st
   { src: "/images/galeria/despedida-4.jpg", category: "Actos escolares", caption: "Despedida a Liz Sosa 4 de 6" },
   { src: "/images/galeria/despedida-5.jpg", category: "Actos escolares", caption: "Despedida a Liz Sosa 5 de 6" },
   { src: "/images/galeria/despedida-6.jpg", category: "Actos escolares", caption: "Despedida a Liz Sosa 6 de 6" },
-];
+  { src: "/images/landing/grupal-basicas-1ro.webp", category: "Actividades académicas", caption: "Ciencias Básicas · 1.º curso" },
+  { src: "/images/landing/grupal-basicas-2do.webp", category: "Actividades académicas", caption: "Ciencias Básicas · 2.º curso" },
+  { src: "/images/landing/grupal-basicas-3ro.webp", category: "Actividades académicas", caption: "Ciencias Básicas · 3.º curso" },
+  { src: "/images/landing/grupal-basicas-general.webp", category: "Actividades académicas", caption: "Ciencias Básicas · grupo general" },
+  { src: "/images/landing/grupal-basicas-3ro-varones.webp", category: "Actividades académicas", caption: "Ciencias Básicas · 3.º (varones)" },
+  { src: "/images/landing/grupal-basicas-2do-mujeres.webp", category: "Actividades académicas", caption: "Ciencias Básicas · 2.º (mujeres)" },
+  { src: "/images/landing/grupal-basicas-3ro-mujeres.webp", category: "Actividades académicas", caption: "Ciencias Básicas · 3.º (mujeres)" },
+  { src: "/images/landing/grupal-sociales-1ro.webp", category: "Actividades académicas", caption: "Ciencias Sociales · 1.º curso" },
+  { src: "/images/landing/grupal-salud-1ro.webp", category: "Actividades académicas", caption: "Bachillerato en Salud · 1.º curso" },
+  { src: "/images/landing/grupal-salud-2do.webp", category: "Actividades académicas", caption: "Bachillerato en Salud · 2.º curso" },
+  { src: "/images/landing/grupal-salud-3ro.webp", category: "Actividades académicas", caption: "Bachillerato en Salud · 3.º curso" },
+  { src: "/images/landing/grupal-salud-general.webp", category: "Actividades académicas", caption: "Bachillerato en Salud · grupo general" },
+  { src: "/images/landing/grupal-salud-clase-1ro.webp", category: "Actividades académicas", caption: "Bachillerato en Salud · clase 1.º" },
+  { src: "/images/landing/grupal-salud-proyecto.webp", category: "Actividades académicas", caption: "Bachillerato en Salud · proyecto" },
+  { src: "/images/landing/grupal-informatica-clase-1ro.webp", category: "Actividades académicas", caption: "Bachillerato en Informática · clase 1.º" },
+  { src: "/images/landing/grupal-informatica-clase-3ro.webp", category: "Actividades académicas", caption: "Bachillerato en Informática · clase 3.º" },
+  { src: "/images/landing/grupal-informatica-general.webp", category: "Actividades académicas", caption: "Bachillerato en Informática · grupo general" },
+  { src: "/images/landing/grupal-civiles-2do.webp", category: "Actividades académicas", caption: "Construcciones Civiles · 2.º curso" },
+  { src: "/images/landing/grupal-civiles-2do-3ro.webp", category: "Actividades académicas", caption: "Construcciones Civiles · 2.º y 3.º" },
+  { src: "/images/landing/grupal-civiles-3ro.webp", category: "Actividades académicas", caption: "Construcciones Civiles · 3.º curso" },
+  { src: "/images/landing/grupal-civiles-2do-varones.webp", category: "Actividades académicas", caption: "Construcciones Civiles · 2.º (varones)" },
+  { src: "/images/landing/grupal-electro-1ro.webp", category: "Actividades académicas", caption: "Bachillerato en Electricidad · 1.º curso" },
+  { src: "/images/landing/grupal-electro-2do.webp", category: "Actividades académicas", caption: "Bachillerato en Electricidad · 2.º curso" },
+  { src: "/images/landing/grupal-electro-3ro.webp", category: "Actividades académicas", caption: "Bachillerato en Electricidad · 3.º curso" },
+  { src: "/images/landing/grupal-electro-general.webp", category: "Actividades académicas", caption: "Bachillerato en Electricidad · grupo general" },
+  { src: "/images/landing/grupal-agro-general.webp", category: "Actividades académicas", caption: "Bachillerato en Agropecuaria · grupo general" },];
 
 export const teacherAreas = ["Todas", "Ciencias", "Técnica", "Humanidades", "EEB"] as const;
 
