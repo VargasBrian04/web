@@ -522,7 +522,7 @@
 /* ---------- Contenedor: panel institucional + formulario ---------- */
 .reg-shell {
   display: grid;
-  grid-template-columns: 21rem 1fr;
+  grid-template-columns: 21rem minmax(0, 1fr);
   align-items: stretch;
   background: var(--reg-cream);
   border: 1px solid var(--reg-beige);

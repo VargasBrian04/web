@@ -478,7 +478,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 @keyframes shine{0%{left:-80%}60%,100%{left:130%}}
 <style>
 /* ===== Rediseño de la zona de registro (modal de la portada) ===== */
-.reg-shell{display:grid;grid-template-columns:20rem 1fr;background:#fbf7f1;border:1px solid #e6d8c9;border-radius:18px;overflow:hidden}
+.reg-shell{display:grid;grid-template-columns:20rem minmax(0,1fr);background:#fbf7f1;border:1px solid #e6d8c9;border-radius:18px;overflow:hidden}
 .reg-side{position:relative;background:linear-gradient(155deg,#673d29,#4b291b);color:#fff;padding:28px 22px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
 .reg-side::after{content:'';position:absolute;right:-52px;bottom:-52px;width:180px;height:180px;border-radius:50%;background:rgba(184,137,87,.18);pointer-events:none}
 .reg-crest{background:#fff;border-radius:13px;padding:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.28)}
