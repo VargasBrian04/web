@@ -1,0 +1,1512 @@
+{
+  "EEB": {
+    "archivo": "7º GRADO TM",
+    "label": "Educación Escolar Básica",
+    "cursos": {
+      "7º": [
+        "Artes",
+        "Castellano",
+        "Ciencias",
+        "Educación Física",
+        "Formación Ética",
+        "Guaraní",
+        "Historia",
+        "Matemática",
+        "Música",
+        "Proyecto",
+        "Salud",
+        "Trabajo y Tecnología"
+      ]
+    },
+    "docentes": {
+      "Artes": [
+        "Caren Prieto",
+        "Vivi Bàez"
+      ],
+      "Castellano": [
+        "Griselda Samaniego",
+        "Raquel Alvarenga"
+      ],
+      "Ciencias": [
+        "Micaela Espinola",
+        "OSCAR PORTILLO"
+      ],
+      "Educación Física": [
+        "Jorge Navarro",
+        "JORGE NAVARRO",
+        "Julio Ibarrola"
+      ],
+      "Formación Ética": [
+        "EDGAR BENITEZ",
+        "Julio Florentin",
+        "MIRTA PANIAGUA"
+      ],
+      "Guaraní": [
+        "MIRNA GOMEZ",
+        "TEODOLINA SANCHEZ"
+      ],
+      "Historia": [
+        "Mariela Cristaldo",
+        "Mónica Salvioni",
+        "Norma Godoy"
+      ],
+      "Matemática": [
+        "LORENA GALEANO",
+        "Nilda Martínez",
+        "Raul Paniagua"
+      ],
+      "Música": [
+        "Isidro Brítez",
+        "PABLO ARMOA"
+      ],
+      "Proyecto": [
+        "CORINA RODAS",
+        "Mónica Salvioni",
+        "Raquel Alvarenga"
+      ],
+      "Salud": [
+        "Julio Cristaldo",
+        "LAURA MARTINEZ",
+        "Micaela Espinola"
+      ],
+      "Trabajo y Tecnología": [
+        "Fátima Torres",
+        "MANUELA SANABRIA"
+      ]
+    }
+  },
+  "ADN": {
+    "archivo": "Administración",
+    "label": "Administración de Negocios",
+    "cursos": {
+      "1º": [
+        "Administración",
+        "Ciencias",
+        "Contabilidad",
+        "Economía",
+        "Educación Física",
+        "Física",
+        "Formación Ética",
+        "Guaraní",
+        "Historia",
+        "Informática",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Mercadotecnia",
+        "Orientación",
+        "Química",
+        "Sociología"
+      ],
+      "2º": [
+        "Administración",
+        "Ciencias",
+        "Contabilidad",
+        "Economía",
+        "Educación Física",
+        "Educación Vial",
+        "Física",
+        "Guaraní",
+        "Historia",
+        "Informática",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Mercadotecnia",
+        "Química"
+      ],
+      "3º": [
+        "Administración",
+        "Ciencias",
+        "Contabilidad",
+        "Economía",
+        "Educación Física",
+        "Historia",
+        "Informática",
+        "Literatura",
+        "Matemática",
+        "Mercadotecnia",
+        "Orientación",
+        "Plan Optativo",
+        "Psicología"
+      ]
+    },
+    "docentes": {
+      "Administración": [
+        "Daniel Ozorio",
+        "ROLANDO AGUILERA",
+        "Rosanna Rivas"
+      ],
+      "Ciencias": [
+        "Beatriz Fariña",
+        "Beatríz Fariña",
+        "Esther Ojeda"
+      ],
+      "Contabilidad": [
+        "Blas Giménez",
+        "Nadia Cespedes"
+      ],
+      "Economía": [
+        "CELSO VELAZQUEZ",
+        "Micaela Espinola",
+        "Rosana Rivas"
+      ],
+      "Educación Física": [
+        "Samuel Cristaldo"
+      ],
+      "Educación Vial": [
+        "Graciela González"
+      ],
+      "Física": [
+        "Paola Areco",
+        "VICENTE LOPEZ"
+      ],
+      "Formación Ética": [
+        "Mirna Gómez"
+      ],
+      "Guaraní": [
+        "Idelina Jara"
+      ],
+      "Historia": [
+        "Graciela González",
+        "MIRTA PANIAGUA"
+      ],
+      "Informática": [
+        "FREDY GOMEZ",
+        "IGNACIO AMARILLA",
+        "LARIZZA FRETES"
+      ],
+      "Inglés": [
+        "Porfirio Ortíz"
+      ],
+      "Literatura": [
+        "Griselda Samaniego",
+        "Idelina Jara",
+        "LORENA CABRERA"
+      ],
+      "Matemática": [
+        "Adalberto Miranda",
+        "DORA LUGO",
+        "Maria Mendoza"
+      ],
+      "Mercadotecnia": [
+        "Rosana Rivas",
+        "Rosanna Rivas"
+      ],
+      "Orientación": [
+        "Graciela González",
+        "Jorge Navarro"
+      ],
+      "Plan Optativo": [
+        "Rosana Rivas"
+      ],
+      "Psicología": [
+        "Mariline Da Silva"
+      ],
+      "Química": [
+        "EstherOjeda",
+        "EUGENIA LOPEZ"
+      ],
+      "Sociología": [
+        "Mirta Paniagua"
+      ]
+    }
+  },
+  "BTA": {
+    "archivo": "Agropecuario",
+    "label": "Agropecuaria",
+    "cursos": {
+      "1º": [
+        "Administración",
+        "Agricultura",
+        "Biología",
+        "Educación Física",
+        "Física",
+        "Formación Ética",
+        "Fruti-Silvicultura",
+        "Ganado Menor",
+        "Guaraní",
+        "Historia",
+        "Horticultura",
+        "Inglés",
+        "Literatura",
+        "Maquinarias",
+        "Matemática",
+        "Orientación",
+        "Química",
+        "Sociología"
+      ],
+      "2º": [
+        "Administración",
+        "Agricultura",
+        "Educación Física",
+        "Educación Vial",
+        "Física",
+        "Fruti-Silvicultura",
+        "Ganado Mayor",
+        "Ganado Menor",
+        "Guaraní",
+        "Historia",
+        "Horticultura",
+        "Inglés",
+        "Literatura",
+        "Maquinarias",
+        "Matemática",
+        "Orientación",
+        "Química"
+      ],
+      "3º": [
+        "Agroindustria",
+        "Economía",
+        "Educación Física",
+        "Extensión Rural",
+        "Fruti-Silvicultura",
+        "Ganado Mayor",
+        "Historia",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Plan Optativo",
+        "Proyecto Productivo",
+        "Psicología"
+      ]
+    },
+    "docentes": {
+      "Administración": [
+        "Ramón Rodríguez",
+        "Robert Díaz"
+      ],
+      "Agricultura": [
+        "Ramón Rodríguez",
+        "Shirley Rojas"
+      ],
+      "Agroindustria": [
+        "Robert Díaz"
+      ],
+      "Biología": [
+        "Robert Díaz"
+      ],
+      "Economía": [
+        "César Areco"
+      ],
+      "Educación Física": [
+        "Julio Ibarrola",
+        "Samuel Cristaldo"
+      ],
+      "Educación Vial": [
+        "Celso Velázquez"
+      ],
+      "Extensión Rural": [
+        "Miguel Barrios"
+      ],
+      "Física": [
+        "Paola Areco"
+      ],
+      "Formación Ética": [
+        "LILIANA BENITEZ"
+      ],
+      "Fruti-Silvicultura": [
+        "Ramón Rodríguez",
+        "Victor Giménez"
+      ],
+      "Ganado Mayor": [
+        "GUILLERMO GONZALEZ",
+        "LIZ R. SOSA"
+      ],
+      "Ganado Menor": [
+        "Ramón Rodríguez",
+        "Robert Díaz"
+      ],
+      "Guaraní": [
+        "Celina Zaragoza",
+        "Mariline Da Silva"
+      ],
+      "Historia": [
+        "MARIA CASCO",
+        "Mirna Gómez",
+        "Paola Areco"
+      ],
+      "Horticultura": [
+        "Miguel Barrios",
+        "Ramón Rodríguez"
+      ],
+      "Inglés": [
+        "Zunilda Ramírez"
+      ],
+      "Literatura": [
+        "Idelia Jara",
+        "Idelina Jara",
+        "ISAAC CABRERA"
+      ],
+      "Maquinarias": [
+        "Narcizo Franco",
+        "Victor Giménez"
+      ],
+      "Matemática": [
+        "Adalberto Miranda",
+        "DORA LUGO",
+        "Raúl Paniagua"
+      ],
+      "Orientación": [
+        "Bláz López",
+        "MABEL DAVALOS",
+        "Mariline Da Silva"
+      ],
+      "Plan Optativo": [
+        "Robert Díaz"
+      ],
+      "Proyecto Productivo": [
+        "Miguel Barrios"
+      ],
+      "Psicología": [
+        "TEODOLINA SANCHEZ"
+      ],
+      "Química": [
+        "EUGENIA LOPEZ"
+      ],
+      "Sociología": [
+        "Beatríz Fariña"
+      ]
+    }
+  },
+  "CCB": {
+    "archivo": "C. BÁSICAS, sección A",
+    "label": "Ciencias Básicas",
+    "cursos": {
+      "1º": [
+        "Antropología",
+        "Artes",
+        "Ciencias",
+        "Educación Ambiental",
+        "Educación Física",
+        "Geología",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Literatura",
+        "Lógica",
+        "Matemática",
+        "Psicología"
+      ],
+      "2º": [
+        "Artes",
+        "Ciencias",
+        "Educación Física",
+        "Estadística",
+        "Filosofía",
+        "Física",
+        "Formación Ética",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Química"
+      ],
+      "3º": [
+        "Biología",
+        "Economía",
+        "Educación Física",
+        "Física",
+        "Física II",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Laboratorio de Química",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Plan Optativo",
+        "Química I"
+      ]
+    },
+    "docentes": {
+      "Antropología": [
+        "Rosa López"
+      ],
+      "Artes": [
+        "Luci Torales",
+        "Manuela Sanabria"
+      ],
+      "Biología": [
+        "Raul Espinola"
+      ],
+      "Ciencias": [
+        "MABEL DAVALOS",
+        "MANUELA SANABRIA"
+      ],
+      "Economía": [
+        "Graciela González"
+      ],
+      "Educación Física": [
+        "Juilio Ibarrola",
+        "Julio Ibarrola",
+        "Samuel Cristaldo"
+      ],
+      "Estadística": [
+        "Adalberto Miranda"
+      ],
+      "Filosofía": [
+        "Rosa López"
+      ],
+      "Física": [
+        "CARLOS GARCIA",
+        "Vicente Lopez"
+      ],
+      "Física II": [
+        "Esther Ojeda"
+      ],
+      "Formación Ética": [
+        "GUILLERMO GONZALEZ"
+      ],
+      "Geología": [
+        "Esther Ojeda"
+      ],
+      "Guaraní": [
+        "Esther Ojeda",
+        "Julio Florentin"
+      ],
+      "Historia": [
+        "Cristina Ayala",
+        "CRISTINA AYALA",
+        "Guillermo González"
+      ],
+      "Inglés": [
+        "Luisa López"
+      ],
+      "Laboratorio de Química": [
+        "LORENA CABRERA"
+      ],
+      "Literatura": [
+        "Alba Benitez",
+        "Ma. Viviana Silva",
+        "Rossana Riquelme"
+      ],
+      "Lógica": [
+        "Corina Rodas"
+      ],
+      "Matemática": [
+        "Adalberto Miranda",
+        "IGNACIO AMARILLA",
+        "Raúl Paniagua"
+      ],
+      "Orientación": [
+        "Luisa López",
+        "Mario Rolon"
+      ],
+      "Plan Optativo": [
+        "Rosa López"
+      ],
+      "Psicología": [
+        "Raquel Alvarenga"
+      ],
+      "Química": [
+        "Paola Areco"
+      ],
+      "Química I": [
+        "LORENA CABRERA"
+      ]
+    }
+  },
+  "BTCC": {
+    "archivo": "C. Civiles",
+    "label": "Construcciones Civiles",
+    "cursos": {
+      "1º": [
+        "Ciencias",
+        "Educación Física",
+        "Física",
+        "Formación Ética",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Laboratorio",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Proyecto",
+        "Química",
+        "Sociología",
+        "Taller",
+        "Técnicas"
+      ],
+      "2º": [
+        "Ciencias",
+        "Educación Física",
+        "Educación Vial",
+        "Estabilidad",
+        "Física",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Laboratorio",
+        "Literatura",
+        "Matemática",
+        "Proyecto",
+        "Química",
+        "Taller",
+        "Técnicas",
+        "Topografía"
+      ],
+      "3º": [
+        "Ciencias",
+        "Economía",
+        "Educación Física",
+        "Estabilidad",
+        "Historia",
+        "Laboratorio",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Plan Optativo",
+        "Proyecto",
+        "Psicología",
+        "Taller",
+        "Técnicas"
+      ]
+    },
+    "docentes": {
+      "Ciencias": [
+        "LORENA CABRERA",
+        "Manuela Sanabria"
+      ],
+      "Economía": [
+        "FREDY GOMEZ"
+      ],
+      "Educación Física": [
+        "Samuel Cristaldo"
+      ],
+      "Educación Vial": [
+        "Celso Velazquez"
+      ],
+      "Estabilidad": [
+        "Raúl Espínola"
+      ],
+      "Física": [
+        "Esther Ojeda",
+        "VICENTE LOPEZ"
+      ],
+      "Formación Ética": [
+        "Celso Velazquez"
+      ],
+      "Guaraní": [
+        "Celina Zaragoza"
+      ],
+      "Historia": [
+        "Ignacia Mendoza",
+        "MARIA CASCO"
+      ],
+      "Inglés": [
+        "Zunilda Ramírez"
+      ],
+      "Laboratorio": [
+        "Albert Fernández",
+        "Raúl Espínola"
+      ],
+      "Literatura": [
+        "Griselda Samaniego",
+        "Rossana Riquelme"
+      ],
+      "Matemática": [
+        "Adalberto Miranda",
+        "Luis Velázquez"
+      ],
+      "Orientación": [
+        "Blas Giménez",
+        "Raúl Espínola"
+      ],
+      "Plan Optativo": [
+        "FREDY GOMEZ"
+      ],
+      "Proyecto": [
+        "Albert Fernández",
+        "FATIMA RODRIGUEZ",
+        "Juan Bertolini"
+      ],
+      "Psicología": [
+        "FREDY GOMEZ"
+      ],
+      "Química": [
+        "EUGENIA LEIVA",
+        "EUGENIA LOPEZ"
+      ],
+      "Sociología": [
+        "Blas Giménez"
+      ],
+      "Taller": [
+        "FATIMA RODRIGUEZ",
+        "LORENA GALEANO"
+      ],
+      "Técnicas": [
+        "FATIMA RODRIGUEZ"
+      ],
+      "Topografía": [
+        "Raúl Espínola"
+      ]
+    }
+  },
+  "CCS": {
+    "archivo": "C. Sociales",
+    "label": "Ciencias Sociales",
+    "cursos": {
+      "1º": [
+        "Antropología",
+        "Antropología Social",
+        "Artes",
+        "Ciencias",
+        "Educación Física",
+        "Educación Vial",
+        "Estadística",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Psicología"
+      ],
+      "2º": [
+        "Artes",
+        "Ciencias",
+        "Educación Física",
+        "Filosofía",
+        "Física",
+        "Formación Ética",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Investigación",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Química"
+      ],
+      "3º": [
+        "Economía",
+        "Educación Financiera",
+        "Educación Física",
+        "Física",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Plan Optativo",
+        "Política",
+        "Química",
+        "Sociología"
+      ]
+    },
+    "docentes": {
+      "Antropología": [
+        "ROLANDO AGUILERA"
+      ],
+      "Antropología Social": [
+        "FREDY GOMEZ"
+      ],
+      "Artes": [
+        "Caren Prieto",
+        "Manuela Sanabria"
+      ],
+      "Ciencias": [
+        "Ananias Cáceres",
+        "Paola Areco"
+      ],
+      "Economía": [
+        "ESTELA CABALLERO"
+      ],
+      "Educación Financiera": [
+        "ESTELA CABALLERO"
+      ],
+      "Educación Física": [
+        "Celso Velazquez",
+        "Jorge Navarro"
+      ],
+      "Educación Vial": [
+        "Mirta Paniagua"
+      ],
+      "Estadística": [
+        "Lorena Samaniego"
+      ],
+      "Filosofía": [
+        "ANDREA IBAÑEZ"
+      ],
+      "Física": [
+        "Alfirio Benítez",
+        "Alfirio Benìtez",
+        "FATIMA SANABRIA"
+      ],
+      "Formación Ética": [
+        "JOSE NUÑEZ"
+      ],
+      "Guaraní": [
+        "Leslie Oviedo",
+        "LORENA CABRERA",
+        "Manuela Sanabria"
+      ],
+      "Historia": [
+        "MIRNA GOMEZ",
+        "MIRTA PANIAGUA",
+        "ROLANDO AGUILERA"
+      ],
+      "Inglés": [
+        "FRANCISCA CORONEL",
+        "Rosa López"
+      ],
+      "Investigación": [
+        "Jorge Navarro"
+      ],
+      "Literatura": [
+        "Griselda Samaniego",
+        "ISAAC CABRERA",
+        "Ma. Viviana Silva"
+      ],
+      "Matemática": [
+        "Adalberto Miranda",
+        "Lorena Samaniego",
+        "Raúl Paniagua"
+      ],
+      "Orientación": [
+        "BLAZ LOPEZ",
+        "MARIO ROLON"
+      ],
+      "Plan Optativo": [
+        "BLAZ LOPEZ"
+      ],
+      "Política": [
+        "LIDIA ARZAMENDIA"
+      ],
+      "Psicología": [
+        "GUILLERMO GONZALEZ"
+      ],
+      "Química": [
+        "Liz Delgado",
+        "Paola Areco"
+      ],
+      "Sociología": [
+        "FREDY GOMEZ"
+      ]
+    }
+  },
+  "BTC": {
+    "archivo": "Contabilidad TM",
+    "label": "Contabilidad",
+    "cursos": {
+      "1º": [
+        "Cálculo",
+        "Ciencias",
+        "Contabilidad",
+        "Educación Física",
+        "Física",
+        "Formación Ética",
+        "Guaraní",
+        "Historia",
+        "Informática",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Química",
+        "Seminario",
+        "Sociología"
+      ],
+      "2º": [
+        "Administración",
+        "Cálculo",
+        "Ciencias",
+        "Contabilidad",
+        "Educación Física",
+        "Educación Vial",
+        "Física",
+        "Guaraní",
+        "Historia",
+        "Informática",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Química",
+        "Seminario"
+      ],
+      "3º": [
+        "Administración",
+        "Cálculo",
+        "Ciencias",
+        "Contabilidad y Legislación",
+        "Educación Física",
+        "Historia",
+        "Informática",
+        "Introducción",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Psicología",
+        "PyMEs",
+        "Seminario"
+      ]
+    },
+    "docentes": {
+      "Administración": [
+        "Daniel Ozorio",
+        "Rosanna Rivas"
+      ],
+      "Cálculo": [
+        "Rosanna Rivas"
+      ],
+      "Ciencias": [
+        "LORENA CABRERA"
+      ],
+      "Contabilidad": [
+        "ROLANDO AGUILERA"
+      ],
+      "Contabilidad y Legislación": [
+        "ROLANDO AGUILERA"
+      ],
+      "Educación Física": [
+        "Melany Goriri",
+        "Natalia Cristaldo",
+        "Samuel Cristaldo"
+      ],
+      "Educación Vial": [
+        "Idelina Jara"
+      ],
+      "Física": [
+        "Alfirio Benítez",
+        "VICENTE LOPEZ"
+      ],
+      "Formación Ética": [
+        "JOSE NUÑEZ"
+      ],
+      "Guaraní": [
+        "Julio Florentín",
+        "Rossana Riquelme"
+      ],
+      "Historia": [
+        "GUILLERMO GONZALEZ",
+        "Mirta Paniagua",
+        "Raùl Espínola"
+      ],
+      "Informática": [
+        "Estela Caballero",
+        "ESTELA CABALLERO",
+        "RUBEN MERCADO"
+      ],
+      "Inglés": [
+        "Zunilda Ramirez",
+        "Zunilda Ramírez"
+      ],
+      "Introducción": [
+        "Mónica Salvioni"
+      ],
+      "Literatura": [
+        "Idelina Jara",
+        "Javier Castro"
+      ],
+      "Matemática": [
+        "ANTONIA RIOS"
+      ],
+      "Orientación": [
+        "BLAZ LOPEZ",
+        "Mónica Salvioni"
+      ],
+      "Psicología": [
+        "Cristina Ayala"
+      ],
+      "PyMEs": [
+        "Rosanna Rivas"
+      ],
+      "Química": [
+        "EUGENIA LOPEZ",
+        "Liz Delgado"
+      ],
+      "Seminario": [
+        "ESTELA CABALLERO",
+        "Perla Brítez"
+      ],
+      "Sociología": [
+        "JULIO CRISTALDO"
+      ]
+    }
+  },
+  "BTE": {
+    "archivo": "Electricidad",
+    "label": "Electricidad",
+    "cursos": {
+      "1º": [
+        "Ciencias",
+        "Educación Física",
+        "Electrónica",
+        "Física",
+        "Formación Ética",
+        "Guaraní",
+        "Historia",
+        "Informática",
+        "Inglés",
+        "Instalaciones",
+        "Laboratorio",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Química",
+        "Sociología",
+        "Taller de Mecánica"
+      ],
+      "2º": [
+        "Ciencias",
+        "Educación Física",
+        "Educación Vial",
+        "Electrónica",
+        "Física",
+        "Guaraní",
+        "Historia",
+        "Informática",
+        "Inglés",
+        "Instalaciones",
+        "Laboratorio de Electrónica",
+        "Literatura",
+        "Matemática",
+        "Química"
+      ],
+      "3º": [
+        "Ciencias",
+        "Economía",
+        "Educación Física",
+        "Electrónica",
+        "Historia",
+        "Instalaciones",
+        "Laboratorio de Electrónica",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Plan Optativo",
+        "Psicología"
+      ]
+    },
+    "docentes": {
+      "Ciencias": [
+        "Beatríz Fariña",
+        "FRANCISCA CORONEL",
+        "Mirta Paniagua"
+      ],
+      "Economía": [
+        "SERGIO VILLALBA"
+      ],
+      "Educación Física": [
+        "Samuel Cristaldo"
+      ],
+      "Educación Vial": [
+        "ANDREA YBAÑEZ"
+      ],
+      "Electrónica": [
+        "ANGEL SANABRIA"
+      ],
+      "Física": [
+        "Luis Velázquez",
+        "VICENTE LOPEZ"
+      ],
+      "Formación Ética": [
+        "Jorge Navarro"
+      ],
+      "Guaraní": [
+        "JESUS ROLON",
+        "Mario Rolon"
+      ],
+      "Historia": [
+        "Jorge Navarro",
+        "LUIS LEIVA"
+      ],
+      "Informática": [
+        "DANY CERDAN",
+        "DERLIS ORTIZ"
+      ],
+      "Inglés": [
+        "Porfirio Ortíz",
+        "Zunilda Ramírez"
+      ],
+      "Instalaciones": [
+        "ANGEL SANABRIA",
+        "GUILLERMO GONZALEZ"
+      ],
+      "Laboratorio": [
+        "BLAZ LOPEZ"
+      ],
+      "Laboratorio de Electrónica": [
+        "ANGEL SANABRIA"
+      ],
+      "Literatura": [
+        "Griselda Samnaiego",
+        "SEBASTIANA AGUILERA"
+      ],
+      "Matemática": [
+        "Adalberto Miranda",
+        "LORENA GALEANO"
+      ],
+      "Orientación": [
+        "Edgar Samudio",
+        "Zunilda Ramírez"
+      ],
+      "Plan Optativo": [
+        "MANUELA SANABRIA"
+      ],
+      "Psicología": [
+        "AGRIPINO PRESENTADO"
+      ],
+      "Química": [
+        "Paola Areco"
+      ],
+      "Sociología": [
+        "JULIO FLORENTIN"
+      ],
+      "Taller de Mecánica": [
+        "César Areco"
+      ]
+    }
+  },
+  "BTI": {
+    "archivo": "Informática",
+    "label": "Informática",
+    "cursos": {
+      "1º": [
+        "Algorítmica",
+        "Ciencias",
+        "Dibujo Técnico",
+        "Educación Física",
+        "Física",
+        "Formación Ética",
+        "Gabinete",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Matemática Aplicada",
+        "Orientación",
+        "Química",
+        "Sociología",
+        "Software"
+      ],
+      "2º": [
+        "Administración",
+        "Algorítmica",
+        "Ciencias",
+        "Educación Física",
+        "Educación Vial",
+        "Física",
+        "Guaraní",
+        "Hardware",
+        "Historia",
+        "Inglés",
+        "Laboratorio",
+        "Literatura",
+        "Matemática",
+        "Matemática Aplicada",
+        "Química",
+        "Software"
+      ],
+      "3º": [
+        "Administración Financiera",
+        "Algorítmica",
+        "Ciencias",
+        "Economía",
+        "Educación Física",
+        "Historia",
+        "Laboratorio",
+        "Literatura",
+        "Matemática",
+        "Matemática Aplicada",
+        "Orientación",
+        "Plan Optativo",
+        "Psicología"
+      ]
+    },
+    "docentes": {
+      "Administración": [
+        "ROSANNA RIVAS"
+      ],
+      "Administración Financiera": [
+        "Rosanna Rivas"
+      ],
+      "Algorítmica": [
+        "DANY CERDAN",
+        "Luis Velázquez",
+        "Rubén Mercado"
+      ],
+      "Ciencias": [
+        "Laura Martínez",
+        "Vanessa Espinoza"
+      ],
+      "Dibujo Técnico": [
+        "ESTELA CABALLERO"
+      ],
+      "Economía": [
+        "Rosanna Rivas"
+      ],
+      "Educación Física": [
+        "Alfirio Vera",
+        "Samuel Cristaldo"
+      ],
+      "Educación Vial": [
+        "Idelina Jara"
+      ],
+      "Física": [
+        "Porfirio Ortíz",
+        "VICENTE LOPEZ"
+      ],
+      "Formación Ética": [
+        "Idelina Jara"
+      ],
+      "Gabinete": [
+        "MARIO GUERRERO"
+      ],
+      "Guaraní": [
+        "Idelina Jara",
+        "Laura Martínez"
+      ],
+      "Hardware": [
+        "DANY CERDAN"
+      ],
+      "Historia": [
+        "GUILLERMO GONZALEZ",
+        "LIDIA ARZAMENDIA",
+        "MIRNA GOMEZ"
+      ],
+      "Inglés": [
+        "Zunilda Ramirez",
+        "Zunilda Ramírez"
+      ],
+      "Laboratorio": [
+        "Carlos D. Baez",
+        "CARLOS D. BAEZ"
+      ],
+      "Literatura": [
+        "Griselda Samaniego",
+        "ISAAC CABRERA",
+        "Raquel Alvarenga"
+      ],
+      "Matemática": [
+        "ANTONIA RIOS",
+        "Magin Quintana",
+        "Raúl Paniagua"
+      ],
+      "Matemática Aplicada": [
+        "ANTONIA RIOS",
+        "Luis Velázquez",
+        "Rubén Mercado"
+      ],
+      "Orientación": [
+        "Adalberto Miranda",
+        "MIRTA PANIAGUA"
+      ],
+      "Plan Optativo": [
+        "Rubén Mercado"
+      ],
+      "Química": [
+        "Esther Ojeda",
+        "LORENA CABRERA"
+      ],
+      "Sociología": [
+        "Idelina Jara"
+      ],
+      "Software": [
+        "Carlos D. Baez",
+        "MARIO GUERRERO"
+      ]
+    }
+  },
+  "BTM": {
+    "archivo": "Mecánica",
+    "label": "Mecánica",
+    "cursos": {
+      "1º": [
+        "Ciencias",
+        "Dibujo Técnico",
+        "Educación Física",
+        "Electrotecnia",
+        "Física",
+        "Formación Ética",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Laboratorio",
+        "Literatura",
+        "Matemática",
+        "Mecánica Aplicada",
+        "Orientación",
+        "Química",
+        "Sociología",
+        "Taller",
+        "Trabajo y Tecnología"
+      ],
+      "2º": [
+        "Ciencias",
+        "Diseño",
+        "Educación Física",
+        "Educación Vial",
+        "Electrotecnia",
+        "Física",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Laboratorio",
+        "Literatura",
+        "Matemática",
+        "Mecánica Aplicada",
+        "Química",
+        "Taller",
+        "Trabajo y Tecnología"
+      ],
+      "3º": [
+        "Ciencias",
+        "Diseño",
+        "Economía",
+        "Educación Física",
+        "Electrotecnia",
+        "Historia",
+        "Laboratorio",
+        "Literatura",
+        "Matemática",
+        "Mecánica Aplicada",
+        "Orientación",
+        "Plan Optativo",
+        "Psicología",
+        "Taller",
+        "Trabajo y Tecnología"
+      ]
+    },
+    "docentes": {
+      "Ciencias": [
+        "LORENA CABRERA",
+        "MANUELA SANABRIA"
+      ],
+      "Dibujo Técnico": [
+        "FATIMA RODRIGUEZ"
+      ],
+      "Diseño": [
+        "Augusto Benitez",
+        "César Areco"
+      ],
+      "Economía": [
+        "FREDY GOMEZ"
+      ],
+      "Educación Física": [
+        "MOISES CACERES",
+        "Samuel Cristaldo"
+      ],
+      "Educación Vial": [
+        "GUILLERMO GONZALEZ"
+      ],
+      "Electrotecnia": [
+        "Marcos Almada"
+      ],
+      "Física": [
+        "Paola Areco",
+        "VICENTE LOPEZ"
+      ],
+      "Formación Ética": [
+        "MIRNA GOMEZ"
+      ],
+      "Guaraní": [
+        "Idelina Jara",
+        "Rossana Riquelme"
+      ],
+      "Historia": [
+        "GUILLERMO GONZALEZ",
+        "Jorge Navarro",
+        "MIRNA GOMEZ"
+      ],
+      "Inglés": [
+        "Zunilda Ramírez"
+      ],
+      "Laboratorio": [
+        "César Areco"
+      ],
+      "Literatura": [
+        "Milciades Olazar",
+        "Rossana Riquelme"
+      ],
+      "Matemática": [
+        "Adalberto Miranda",
+        "Dora Lugo"
+      ],
+      "Mecánica Aplicada": [
+        "Narcizo Franco"
+      ],
+      "Orientación": [
+        "Blas Giménez",
+        "Fátima Torres"
+      ],
+      "Plan Optativo": [
+        "Oscar Barrios"
+      ],
+      "Psicología": [
+        "César Areco"
+      ],
+      "Química": [
+        "Paola Areco"
+      ],
+      "Sociología": [
+        "Jorge Navarro"
+      ],
+      "Taller": [
+        "César Areco",
+        "Narcizo Franco"
+      ],
+      "Trabajo y Tecnología": [
+        "César Areco"
+      ]
+    }
+  },
+  "BTS": {
+    "archivo": "Salud",
+    "label": "Salud",
+    "cursos": {
+      "1º": [
+        "Anatomía",
+        "Atención Básica de Salud",
+        "Ciencias",
+        "Educación Física",
+        "Educación para la Salud",
+        "Farmacología",
+        "Física",
+        "Formación Ética",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Orientación",
+        "Práctica",
+        "Química",
+        "Salud Comunitaria",
+        "Salud Pública",
+        "Sociología"
+      ],
+      "2º": [
+        "Atención Básica de Salud",
+        "Biología",
+        "Ciencias",
+        "Educación Física",
+        "Educación para la Salud",
+        "Educación Vial",
+        "Física",
+        "Guaraní",
+        "Historia",
+        "Inglés",
+        "Literatura",
+        "Matemática",
+        "Nutrición",
+        "Orientación",
+        "Práctica",
+        "Química",
+        "Salud Comunitaria",
+        "Salud Pública"
+      ],
+      "3º": [
+        "Atención Básica de Salud",
+        "Ciencias",
+        "Economía",
+        "Educación Física",
+        "Educación para la Salud",
+        "Historia",
+        "Literatura",
+        "Matemática",
+        "Nutrición",
+        "Patología",
+        "Plan Optativo",
+        "Práctica",
+        "Psicología",
+        "Salud Comunitaria",
+        "Salud Pública"
+      ]
+    },
+    "docentes": {
+      "Anatomía": [
+        "Zady Colmán"
+      ],
+      "Atención Básica de Salud": [
+        "Lisa Campos"
+      ],
+      "Biología": [
+        "Lisa Campos"
+      ],
+      "Ciencias": [
+        "CARLOS GARCIA",
+        "FANY MARTINEZ",
+        "MACAELA ESPINOLA"
+      ],
+      "Economía": [
+        "Mónica Salvioni"
+      ],
+      "Educación Física": [
+        "Jorge Navarro",
+        "PEDRO FLORES"
+      ],
+      "Educación para la Salud": [
+        "Teresa Salinas"
+      ],
+      "Educación Vial": [
+        "Idelina Jara"
+      ],
+      "Farmacología": [
+        "Zady Colmán"
+      ],
+      "Física": [
+        "EUGENIA LEIVA",
+        "Porfirio Ortíz"
+      ],
+      "Formación Ética": [
+        "Mirta Paniagua"
+      ],
+      "Guaraní": [
+        "Julio Florentin",
+        "Rossana Riquelme"
+      ],
+      "Historia": [
+        "GUILLERMO GONZALEZ",
+        "ROLANDO AGUILERA"
+      ],
+      "Inglés": [
+        "Zunilda Ramírez"
+      ],
+      "Literatura": [
+        "Griselda Samaniego"
+      ],
+      "Matemática": [
+        "Luis Velázquez"
+      ],
+      "Nutrición": [
+        "Teresa Salinas"
+      ],
+      "Orientación": [
+        "Beatríz Fariña",
+        "Richar Díaz"
+      ],
+      "Patología": [
+        "Zady Colmán"
+      ],
+      "Plan Optativo": [
+        "Lisa Campos"
+      ],
+      "Práctica": [
+        "Lisa Campos"
+      ],
+      "Psicología": [
+        "Raquel Alvarenga"
+      ],
+      "Química": [
+        "EUGENIA LOPEZ",
+        "LORENA CABRERA"
+      ],
+      "Salud Comunitaria": [
+        "Alejandra Ruiz Diaz",
+        "Lisa Campos"
+      ],
+      "Salud Pública": [
+        "Teresa Salinas"
+      ],
+      "Sociología": [
+        "Julio Florentin"
+      ]
+    }
+  }
+}

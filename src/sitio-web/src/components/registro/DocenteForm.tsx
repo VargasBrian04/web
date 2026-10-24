@@ -31,6 +31,17 @@ export default function DocenteForm() {
   const media = cat?.mediaCourses ?? [];
   const courses = [...(niveles.includes("EEB") ? eeb : []), ...(niveles.includes("MEDIA") ? media : [])];
 
+  // Materias reales agrupadas por bachiller y curso (selector navegable)
+  const subjectGroups = (() => {
+    const map = new Map<string, typeof subjects>();
+    for (const s of subjects) {
+      const key = `${s.academicShort} · ${s.gradeYear}º`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(s);
+    }
+    return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0], "es"));
+  })();
+
   const toggle = (list: string[], v: string) =>
     list.includes(v) ? list.filter((x) => x !== v) : [...list, v];
 
@@ -168,10 +179,12 @@ export default function DocenteForm() {
               className={`${inputCls} ${mpErr ? "!border-red-500" : ""}`}
             >
               <option value="">Seleccionar…</option>
-              {subjects.map((s) => (
-                <option key={s.code} value={s.code}>
-                  {s.name} ({s.code})
-                </option>
+              {subjectGroups.map(([grupo, lista]) => (
+                <optgroup key={grupo} label={grupo}>
+                  {lista.map((s) => (
+                    <option key={s.code} value={s.code}>{s.name}</option>
+                  ))}
+                </optgroup>
               ))}
               <option value="__OTRA__">Otra materia (especificar)…</option>
             </select>
@@ -209,8 +222,12 @@ export default function DocenteForm() {
             Materia
             <select value={otraSel} onChange={(e) => setOtraSel(e.target.value)} disabled={sending || !cat} className={inputCls}>
               <option value="">Seleccionar…</option>
-              {subjects.map((s) => (
-                <option key={s.code} value={s.code}>{s.name} ({s.code})</option>
+              {subjectGroups.map(([grupo, lista]) => (
+                <optgroup key={grupo} label={grupo}>
+                  {lista.map((s) => (
+                    <option key={s.code} value={s.code}>{s.name}</option>
+                  ))}
+                </optgroup>
               ))}
               <option value="__OTRA__">Otra materia (especificar)…</option>
             </select>
