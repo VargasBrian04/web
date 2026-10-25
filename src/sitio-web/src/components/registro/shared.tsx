@@ -117,42 +117,71 @@ const I = {
 /** Iconos disponibles para títulos de sección y controles. */
 export const Icon = I;
 
-/** Ilustración decorativa (dibujo de línea) de la institución. */
+/** Ilustración decorativa (dibujo de línea) de la institución: fachada clásica. */
 function SchoolArt() {
   return (
-    <svg className="reg-side-art" viewBox="0 0 260 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg className="reg-side-art" viewBox="0 0 320 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       {/* suelo */}
-      <line x1="14" y1="92" x2="246" y2="92" />
-      {/* ala izquierda */}
-      <path d="M34 92V66h48v26" />
-      <rect x="44" y="72" width="12" height="10" />
-      <rect x="60" y="72" width="12" height="10" />
-      {/* ala derecha */}
-      <path d="M178 92V66h48v26" />
-      <rect x="188" y="72" width="12" height="10" />
-      <rect x="204" y="72" width="12" height="10" />
-      {/* bloque central */}
-      <path d="M86 92V50h88v42" />
-      {/* frontón triangular */}
-      <path d="M82 50 130 26 178 50Z" />
-      <circle cx="130" cy="45" r="6.5" />
-      {/* columnas */}
-      <line x1="101" y1="58" x2="101" y2="92" />
-      <line x1="159" y1="58" x2="159" y2="92" />
+      <line x1="16" y1="122" x2="304" y2="122" />
+      {/* árbol izquierdo */}
+      <g>
+        <line x1="30" y1="122" x2="30" y2="100" />
+        <circle cx="30" cy="80" r="13" />
+        <circle cx="18" cy="89" r="9.5" />
+        <circle cx="42" cy="89" r="9.5" />
+        <path d="M20 84c6-5 18-5 24 0" />
+      </g>
+      {/* árbol derecho (espejo del izquierdo) */}
+      <g transform="translate(320,0) scale(-1,1)">
+        <line x1="30" y1="122" x2="30" y2="100" />
+        <circle cx="30" cy="80" r="13" />
+        <circle cx="18" cy="89" r="9.5" />
+        <circle cx="42" cy="89" r="9.5" />
+        <path d="M20 84c6-5 18-5 24 0" />
+      </g>
+      {/* ala izquierda con cornisa y ventanas de 4 paños */}
+      <path d="M52 122V82h70v40" />
+      <path d="M46 76h82M46 83h82" />
+      <rect x="62" y="94" width="20" height="20" />
+      <path d="M72 94v20M62 104h20" />
+      <rect x="92" y="94" width="20" height="20" />
+      <path d="M102 94v20M92 104h20" />
+      {/* ala derecha con cornisa y ventanas de 4 paños */}
+      <path d="M198 122V82h70v40" />
+      <path d="M192 76h82M192 83h82" />
+      <rect x="208" y="94" width="20" height="20" />
+      <path d="M218 94v20M208 104h20" />
+      <rect x="238" y="94" width="20" height="20" />
+      <path d="M248 94v20M238 104h20" />
+      {/* bloque central con frontón triangular */}
+      <path d="M122 122V62h76v60" />
+      <path d="M118 56L160 34L202 56Z" />
+      <path d="M114 56h92M114 62h92" />
+      {/* óculo redondo con cruz */}
+      <circle cx="160" cy="46" r="8" />
+      <path d="M160 38v16M152 46h16" />
+      {/* columnas con capitel y basa */}
+      <path d="M136 69v49M184 69v49" />
+      <path d="M131 69h10M179 69h10M131 118h10M179 118h10" />
       {/* ventanas superiores */}
-      <rect x="109" y="59" width="11" height="11" />
-      <rect x="140" y="59" width="11" height="11" />
-      {/* puerta de arco y escalón */}
-      <path d="M118 92V75c0-6 5.5-11 12-11s12 5 12 11v17" />
-      <line x1="112" y1="92" x2="148" y2="92" />
-      {/* mástil y bandera */}
-      <line x1="130" y1="26" x2="130" y2="9" />
-      <path d="M130 9 152 14 130 19Z" />
-      {/* árboles */}
-      <line x1="22" y1="92" x2="22" y2="80" />
-      <circle cx="22" cy="74" r="8" />
-      <line x1="238" y1="92" x2="238" y2="80" />
-      <circle cx="238" cy="74" r="8" />
+      <rect x="146" y="76" width="12" height="12" />
+      <path d="M152 76v12M146 82h12" />
+      <rect x="162" y="76" width="12" height="12" />
+      <path d="M168 76v12M162 82h12" />
+      {/* puerta de arco doble */}
+      <path d="M144 122V96a16 16 0 0 1 32 0v26" />
+      <path d="M148 122V98a12 12 0 0 1 24 0v24" />
+      <path d="M160 98v24" />
+      {/* escalones */}
+      <path d="M140 118h40M134 122h52" />
+      {/* mástil con bandera ondeando */}
+      <line x1="160" y1="34" x2="160" y2="16" />
+      <path d="M162 17c8-3 16-3 24 0-8 3-16 3-24 0Z" />
+      <path d="M163 22c8-3 16-3 22 1" />
+      {/* arbustos y césped */}
+      <path d="M106 122c0-10 7-15 15-15s15 5 15 15" />
+      <path d="M184 122c0-10 7-15 15-15s15 5 15 15" />
+      <path d="M62 122v-5M68 122v-4M76 122v-5M238 122v-5M244 122v-4M252 122v-5" />
     </svg>
   );
 }
@@ -170,10 +199,14 @@ function Crest() {
   return (
     <div className="reg-crest">
       <img
-        src="/images/logo-colegio.png"
+        src="/images/escudo-nuevo.webp"
         alt="Escudo del Colegio Nacional E.M.D. Caaguazú"
         width={93}
-        height={104}
+        height={110}
+        onError={(e) => {
+          e.currentTarget.onerror = null;
+          e.currentTarget.src = "/images/logo-colegio.png";
+        }}
       />
     </div>
   );
@@ -322,7 +355,7 @@ export function RegShell({ children }: { children: React.ReactNode }) {
         <ul className="reg-benefits">
           {BENEFICIOS.map((b) => (
             <li key={b.titulo}>
-              <span className="reg-benefit-ico">{b.icon}</span>
+              <div className="reg-benefit-ico">{b.icon}</div>
               <div>
                 <b>{b.titulo}</b>
                 <span>{b.texto}</span>
@@ -386,7 +419,7 @@ export function SuccessView({ title, children }: { title: string; children: Reac
         <ul className="reg-benefits">
           {BENEFICIOS.slice(0, 3).map((b) => (
             <li key={b.titulo}>
-              <span className="reg-benefit-ico">{b.icon}</span>
+              <div className="reg-benefit-ico">{b.icon}</div>
               <div>
                 <b>{b.titulo}</b>
                 <span>{b.texto}</span>
