@@ -120,26 +120,39 @@ export const Icon = I;
 /** Ilustración decorativa (dibujo de línea) de la institución. */
 function SchoolArt() {
   return (
-    <svg className="reg-side-art" viewBox="0 0 260 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <line x1="10" y1="88" x2="250" y2="88" />
-      <path d="M100 88V46l30-16 30 16v42" />
-      <path d="M94 48 130 26l36 22" />
-      <line x1="130" y1="30" x2="130" y2="12" />
-      <path d="M130 12l16 4-16 4" />
-      <path d="M40 88V60h56v28M164 88V60h56v28" />
-      <rect x="52" y="66" width="12" height="12" />
-      <rect x="72" y="66" width="12" height="12" />
-      <rect x="112" y="54" width="14" height="14" />
-      <rect x="134" y="54" width="14" height="14" />
-      <rect x="112" y="72" width="14" height="12" />
-      <rect x="134" y="72" width="14" height="12" />
-      <rect x="176" y="66" width="12" height="12" />
-      <rect x="196" y="66" width="12" height="12" />
-      <path d="M124 88v-10c0-4 3-6 6-6s6 2 6 6v10" />
-      <line x1="24" y1="88" x2="24" y2="70" />
-      <circle cx="24" cy="65" r="8" />
-      <line x1="236" y1="88" x2="236" y2="70" />
-      <circle cx="236" cy="65" r="8" />
+    <svg className="reg-side-art" viewBox="0 0 260 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* suelo */}
+      <line x1="14" y1="92" x2="246" y2="92" />
+      {/* ala izquierda */}
+      <path d="M34 92V66h48v26" />
+      <rect x="44" y="72" width="12" height="10" />
+      <rect x="60" y="72" width="12" height="10" />
+      {/* ala derecha */}
+      <path d="M178 92V66h48v26" />
+      <rect x="188" y="72" width="12" height="10" />
+      <rect x="204" y="72" width="12" height="10" />
+      {/* bloque central */}
+      <path d="M86 92V50h88v42" />
+      {/* frontón triangular */}
+      <path d="M82 50 130 26 178 50Z" />
+      <circle cx="130" cy="45" r="6.5" />
+      {/* columnas */}
+      <line x1="101" y1="58" x2="101" y2="92" />
+      <line x1="159" y1="58" x2="159" y2="92" />
+      {/* ventanas superiores */}
+      <rect x="109" y="59" width="11" height="11" />
+      <rect x="140" y="59" width="11" height="11" />
+      {/* puerta de arco y escalón */}
+      <path d="M118 92V75c0-6 5.5-11 12-11s12 5 12 11v17" />
+      <line x1="112" y1="92" x2="148" y2="92" />
+      {/* mástil y bandera */}
+      <line x1="130" y1="26" x2="130" y2="9" />
+      <path d="M130 9 152 14 130 19Z" />
+      {/* árboles */}
+      <line x1="22" y1="92" x2="22" y2="80" />
+      <circle cx="22" cy="74" r="8" />
+      <line x1="238" y1="92" x2="238" y2="80" />
+      <circle cx="238" cy="74" r="8" />
     </svg>
   );
 }
@@ -159,8 +172,8 @@ function Crest() {
       <img
         src="/images/logo-colegio.png"
         alt="Escudo del Colegio Nacional E.M.D. Caaguazú"
-        width={90}
-        height={100}
+        width={93}
+        height={104}
       />
     </div>
   );
