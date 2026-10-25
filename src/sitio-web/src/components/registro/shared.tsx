@@ -47,6 +47,125 @@ export function useCatalog() {
   return { cat, error };
 }
 
+/* ------------------------------------------------------------------ */
+/* Iconos SVG (línea, sin emojis como elemento principal)             */
+/* ------------------------------------------------------------------ */
+const I = {
+  user: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+  cap: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M22 10 12 5 2 10l10 5 10-5z" />
+      <path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5" />
+    </svg>
+  ),
+  doc: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6M9 13h6M9 17h6" />
+    </svg>
+  ),
+  people: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  ),
+  star: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </svg>
+  ),
+  send: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z" />
+    </svg>
+  ),
+  child: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="5" r="3" />
+      <path d="M6 21v-2a6 6 0 0 1 12 0v2" />
+    </svg>
+  ),
+  book: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  ),
+  layers: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2 2 7l10 5 10-5-10-5z" />
+      <path d="M2 12l10 5 10-5M2 17l10 5 10-5" />
+    </svg>
+  ),
+  grid: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </svg>
+  ),
+};
+
+/** Iconos disponibles para títulos de sección y controles. */
+export const Icon = I;
+
+/** Ilustración decorativa (dibujo de línea) de la institución. */
+function SchoolArt() {
+  return (
+    <svg className="reg-side-art" viewBox="0 0 260 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="10" y1="88" x2="250" y2="88" />
+      <path d="M100 88V46l30-16 30 16v42" />
+      <path d="M94 48 130 26l36 22" />
+      <line x1="130" y1="30" x2="130" y2="12" />
+      <path d="M130 12l16 4-16 4" />
+      <path d="M40 88V60h56v28M164 88V60h56v28" />
+      <rect x="52" y="66" width="12" height="12" />
+      <rect x="72" y="66" width="12" height="12" />
+      <rect x="112" y="54" width="14" height="14" />
+      <rect x="134" y="54" width="14" height="14" />
+      <rect x="112" y="72" width="14" height="12" />
+      <rect x="134" y="72" width="14" height="12" />
+      <rect x="176" y="66" width="12" height="12" />
+      <rect x="196" y="66" width="12" height="12" />
+      <path d="M124 88v-10c0-4 3-6 6-6s6 2 6 6v10" />
+      <line x1="24" y1="88" x2="24" y2="70" />
+      <circle cx="24" cy="65" r="8" />
+      <line x1="236" y1="88" x2="236" y2="70" />
+      <circle cx="236" cy="65" r="8" />
+    </svg>
+  );
+}
+
+/** Beneficios del panel institucional (icono + texto). */
+const BENEFICIOS: { icon: React.ReactNode; titulo: string; texto: string }[] = [
+  { icon: I.cap, titulo: "Acceso a tus clases y recursos", texto: "Plataforma educativa siempre disponible." },
+  { icon: I.doc, titulo: "Seguimiento de tu progreso académico", texto: "Consultá tus calificaciones y avances." },
+  { icon: I.people, titulo: "Comunidad educativa siempre conectada", texto: "Estudiantes, docentes y familias." },
+  { icon: I.star, titulo: "Construye tu futuro", texto: "Con educación, disciplina y valores." },
+];
+
+/** Escudo oficial (colores y proporciones originales, sin alterar). */
+function Crest() {
+  return (
+    <div className="reg-crest">
+      <img
+        src="/images/logo-colegio.png"
+        alt="Escudo del Colegio Nacional E.M.D. Caaguazú"
+        width={90}
+        height={100}
+      />
+    </div>
+  );
+}
+
 export function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
   return <p className="reg-field-err show">{msg}</p>;
@@ -59,12 +178,12 @@ export function SectionTitle({
   n: string;
   title: string;
   desc?: string;
-  icon?: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <div className="reg-block-head">
       <span className="reg-block-num" aria-hidden="true">{n}</span>
-      {icon && <span className="reg-block-ico" aria-hidden="true">{icon}</span>}
+      {icon && <span className="reg-block-ico">{icon}</span>}
       <span>
         <b>{title}</b>
         {desc && <small>{desc}</small>}
@@ -112,7 +231,7 @@ export function PersonFields({
           value={value.firstName}
           onChange={(e) => onChange("firstName", e.target.value)}
           disabled={disabled}
-          placeholder="Ej: María"
+          placeholder="Ej: Juan Carlos"
           autoComplete="given-name"
           className={inputCls}
         />
@@ -122,7 +241,7 @@ export function PersonFields({
           value={value.lastName}
           onChange={(e) => onChange("lastName", e.target.value)}
           disabled={disabled}
-          placeholder="Ej: Ayala"
+          placeholder="Ej: Pérez López"
           autoComplete="family-name"
           className={inputCls}
         />
@@ -143,7 +262,7 @@ export function PersonFields({
           onChange={(e) => onChange("phone", e.target.value)}
           disabled={disabled}
           inputMode="tel"
-          placeholder="Ej: 0975 123456"
+          placeholder="Ej: 0975 1234567"
           autoComplete="tel"
           className={inputCls}
         />
@@ -164,54 +283,41 @@ export function PersonFields({
 }
 
 /**
- * Contenedor del registro: panel institucional a la izquierda y
- * formulario a la derecha. En móvil pasa a una sola columna.
+ * Contenedor del registro: panel institucional a la IZQUIERDA y formulario a
+ * la DERECHA, en una sola tarjeta centrada.
+ *
+ * El grid también va como estilo inline: garantiza las dos columnas en
+ * escritorio aunque el CSS externo no cargue. El quiebre a una columna en
+ * móvil se hace desde el CSS con `!important` (único del archivo).
  */
 export function RegShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="reg-shell">
+    <div
+      className="reg-shell"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "clamp(18rem, 32%, 24rem) minmax(0, 1fr)",
+        /* el panel marrón cubre TODA la altura de la tarjeta */
+        alignItems: "stretch",
+      }}
+    >
       <aside className="reg-side">
-        <div className="reg-crest">
-          {/* Escudo oficial del Colegio Nacional E.M.D. Caaguazú */}
-          <img
-            src="/images/logo-colegio.png"
-            alt="Escudo del Colegio Nacional E.M.D. Caaguazú"
-            width={104}
-            height={116}
-          />
-        </div>
+        <Crest />
         <h2 className="reg-side-title">Colegio Nacional E.M.D. Caaguazú</h2>
         <p className="reg-side-motto">“Formando jóvenes con valores para un mejor mañana”</p>
+        <hr className="reg-side-rule" />
         <ul className="reg-benefits">
-          <li>
-            <span className="reg-benefit-ico" aria-hidden="true">🎓</span>
-            <div>
-              <b>Acceso a tus clases y recursos</b>
-              <span>Plataforma educativa siempre disponible.</span>
-            </div>
-          </li>
-          <li>
-            <span className="reg-benefit-ico" aria-hidden="true">📄</span>
-            <div>
-              <b>Seguimiento de tu progreso</b>
-              <span>Consultá tus calificaciones y avances.</span>
-            </div>
-          </li>
-          <li>
-            <span className="reg-benefit-ico" aria-hidden="true">👥</span>
-            <div>
-              <b>Comunidad educativa conectada</b>
-              <span>Estudiantes, docentes y familias.</span>
-            </div>
-          </li>
-          <li>
-            <span className="reg-benefit-ico" aria-hidden="true">⭐</span>
-            <div>
-              <b>Construí tu futuro</b>
-              <span>Con educación, disciplina y valores.</span>
-            </div>
-          </li>
+          {BENEFICIOS.map((b) => (
+            <li key={b.titulo}>
+              <span className="reg-benefit-ico">{b.icon}</span>
+              <div>
+                <b>{b.titulo}</b>
+                <span>{b.texto}</span>
+              </div>
+            </li>
+          ))}
         </ul>
+        <SchoolArt />
         <p className="reg-side-note">
           Dirección revisa cada solicitud antes de crear la cuenta y te
           contactará al correo o teléfono indicados.
@@ -219,8 +325,11 @@ export function RegShell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="reg-main">
         <div className="reg-main-head">
-          <h2>Solicitud de registro</h2>
-          <p>Completá tus datos para crear tu cuenta en el sistema</p>
+          <span className="reg-head-ico">{I.user}</span>
+          <div>
+            <h2>Solicitud de registro</h2>
+            <p>Completá tus datos para crear tu cuenta en el sistema</p>
+          </div>
         </div>
         {children}
       </div>
@@ -228,7 +337,16 @@ export function RegShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Pie del formulario: aviso de obligatorios y acceso al login. */
+/** Botón principal de envío. */
+export function SubmitButton({ sending, label = "Enviar solicitud" }: { sending: boolean; label?: string }) {
+  return (
+    <button type="submit" disabled={sending} className="reg-btn reg-btn-primary">
+      {sending ? "Enviando…" : <>{label} <span aria-hidden="true">→</span></>}
+    </button>
+  );
+}
+
+/** Pie del formulario: aviso y acceso al inicio de sesión. */
 export function RegFoot({ note }: { note?: string }) {
   return (
     <p className="reg-foot">
@@ -248,39 +366,22 @@ export function SuccessView({ title, children }: { title: string; children: Reac
   return (
     <div className="reg-shell">
       <aside className="reg-side">
-        <div className="reg-crest">
-          <img
-            src="/images/logo-colegio.png"
-            alt="Escudo del Colegio Nacional E.M.D. Caaguazú"
-            width={104}
-            height={116}
-          />
-        </div>
+        <Crest />
         <h2 className="reg-side-title">Colegio Nacional E.M.D. Caaguazú</h2>
         <p className="reg-side-motto">“Formando jóvenes con valores para un mejor mañana”</p>
+        <hr className="reg-side-rule" />
         <ul className="reg-benefits">
-          <li>
-            <span className="reg-benefit-ico" aria-hidden="true">🎓</span>
-            <div>
-              <b>Acceso a tus clases y recursos</b>
-              <span>Plataforma educativa siempre disponible.</span>
-            </div>
-          </li>
-          <li>
-            <span className="reg-benefit-ico" aria-hidden="true">📄</span>
-            <div>
-              <b>Seguimiento de tu progreso</b>
-              <span>Consultá tus calificaciones y avances.</span>
-            </div>
-          </li>
-          <li>
-            <span className="reg-benefit-ico" aria-hidden="true">👥</span>
-            <div>
-              <b>Comunidad educativa conectada</b>
-              <span>Estudiantes, docentes y familias.</span>
-            </div>
-          </li>
+          {BENEFICIOS.slice(0, 3).map((b) => (
+            <li key={b.titulo}>
+              <span className="reg-benefit-ico">{b.icon}</span>
+              <div>
+                <b>{b.titulo}</b>
+                <span>{b.texto}</span>
+              </div>
+            </li>
+          ))}
         </ul>
+        <SchoolArt />
         <p className="reg-side-note">Gracias por formar parte de la comunidad educativa.</p>
       </aside>
       <div className="reg-main">

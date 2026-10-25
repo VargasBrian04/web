@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import {
-  FieldError, Field, FormError, Person, PersonErrors, PersonFields, RegFoot, RegShell,
-  SectionTitle, SuccessView, inputCls, useCatalog,
+  FieldError, Field, FormError, Icon, Person, PersonErrors, PersonFields, RegFoot,
+  RegShell, SectionTitle, SubmitButton, SuccessView, inputCls, useCatalog,
 } from "./shared";
 
 /** Formulario de solicitud de cuenta para docentes. */
@@ -157,7 +157,7 @@ export default function DocenteForm() {
     <RegShell>
       <form onSubmit={submit} noValidate>
         <section className="reg-block">
-          <SectionTitle n="1" title="Datos personales" desc="Tus datos como docente." icon="👤" />
+          <SectionTitle n="1" title="Datos personales" desc="Tus datos como docente." icon={Icon.user} />
           <PersonFields
             value={person}
             errors={pErr}
@@ -167,7 +167,7 @@ export default function DocenteForm() {
         </section>
 
         <section className="reg-block">
-          <SectionTitle n="2" title="Materia principal" desc="La materia que más horas enseñás." icon="📘" />
+          <SectionTitle n="2" title="Materia principal" desc="La materia que más horas enseñás." icon={Icon.book} />
           <div className="reg-grid">
             <Field label="Materia" required error={mpErr}>
               <select
@@ -212,7 +212,7 @@ export default function DocenteForm() {
             n="3"
             title="Otras materias que enseña"
             desc="Podés completar esta información ahora o agregarla después desde tu perfil."
-            icon="📚"
+            icon={Icon.layers}
           />
           <div className="reg-chips" style={{ alignItems: "flex-end", gap: "0.5rem" }}>
             <label className="reg-field" style={{ flex: "1 1 auto" }}>
@@ -276,7 +276,7 @@ export default function DocenteForm() {
             n="4"
             title="Asignación académica"
             desc="Niveles y cursos en los que enseñás. Podés marcar Básica y Media a la vez."
-            icon="🎓"
+            icon={Icon.cap}
           />
           <p className="reg-hint" style={{ marginBottom: "0.5rem" }}>
             Niveles <em className="req not-italic" style={{ color: "var(--reg-err)" }}>*</em> (podés marcar Básica y Media)
@@ -379,10 +379,8 @@ export default function DocenteForm() {
         <FormError msg={serverError} />
         {catError && <p className="reg-field-err show" style={{ marginTop: "0.6rem" }}>{catError}</p>}
 
-        <div style={{ marginTop: "1.2rem" }}>
-          <button type="submit" disabled={sending} className="reg-btn reg-btn-primary">
-            {sending ? "Enviando…" : "Enviar solicitud →"}
-          </button>
+        <div style={{ marginTop: "0.2rem" }}>
+          <SubmitButton sending={sending} label="Enviar solicitud" />
         </div>
         <RegFoot note="Podés completar o modificar materias y asignaciones después desde tu perfil, sin nueva solicitud." />
       </form>

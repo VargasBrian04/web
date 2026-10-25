@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import {
-  FieldError, Field, FormError, Person, PersonErrors, PersonFields, RegFoot, RegShell,
-  SectionTitle, SuccessView, inputCls, necesitaSeccion, useCatalog,
+  FieldError, Field, FormError, Icon, Person, PersonErrors, PersonFields, RegFoot,
+  RegShell, SectionTitle, SubmitButton, SuccessView, inputCls, necesitaSeccion, useCatalog,
 } from "./shared";
 
 type Hijo = { nombre: string; nivel: "" | "EEB" | "MEDIA"; curso: string; seccion: string; turno: string; bachiller: string };
@@ -127,7 +127,7 @@ export default function TutorForm() {
     <RegShell>
       <form onSubmit={submit} noValidate>
         <section className="reg-block">
-          <SectionTitle n="1" title="Datos personales" desc="Tus datos como tutor o encargado." icon="👤" />
+          <SectionTitle n="1" title="Datos personales" desc="Tus datos como tutor o encargado." icon={Icon.user} />
           <PersonFields
             value={person}
             errors={pErr}
@@ -138,7 +138,7 @@ export default function TutorForm() {
 
         <section className="reg-block">
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: "0.7rem" }}>
-            <SectionTitle n="2" title="Hijos a cargo" desc="Podés registrar varios hijos en la misma solicitud." icon="👨‍👩‍👧" />
+            <SectionTitle n="2" title="Hijos a cargo" desc="Podés registrar varios hijos en la misma solicitud." icon={Icon.child} />
             <button
               type="button"
               disabled={sending || hijos.length >= 8}
@@ -260,10 +260,8 @@ export default function TutorForm() {
 
         <FormError msg={serverError} />
 
-        <div style={{ marginTop: "1.2rem" }}>
-          <button type="submit" disabled={sending} className="reg-btn reg-btn-primary">
-            {sending ? "Enviando…" : "Enviar solicitud →"}
-          </button>
+        <div style={{ marginTop: "0.2rem" }}>
+          <SubmitButton sending={sending} label="Enviar solicitud" />
         </div>
         <RegFoot note="Dirección revisa la solicitud antes de crear tu cuenta." />
       </form>

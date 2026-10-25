@@ -478,26 +478,39 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 @keyframes shine{0%{left:-80%}60%,100%{left:130%}}
 <style>
 /* ===== Rediseño de la zona de registro (modal de la portada) ===== */
-.reg-shell{display:grid;grid-template-columns:20rem minmax(0,1fr);background:#fbf7f1;border:1px solid #e6d8c9;border-radius:18px;overflow:hidden}
-.reg-side{position:relative;background:linear-gradient(155deg,#673d29,#4b291b);color:#fff;padding:28px 22px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
-.reg-side::after{content:'';position:absolute;right:-52px;bottom:-52px;width:180px;height:180px;border-radius:50%;background:rgba(184,137,87,.18);pointer-events:none}
-.reg-crest{background:#fff;border-radius:13px;padding:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.28)}
-.reg-crest img{display:block;width:96px;height:auto;object-fit:contain}
-.reg-side-title{font-size:1.12rem;font-weight:800;line-height:1.25;margin:0}
-.reg-side-motto{font-size:.8rem;font-style:italic;line-height:1.5;color:#f0dfc6;margin:0}
-.reg-benefits{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:12px}
+.reg-shell{display:grid;grid-template-columns:clamp(18rem,32%,24rem) minmax(0,1fr);align-items:stretch;width:100%;max-width:1240px;background:#fbf7f1;border:1px solid #e6d8c9;border-radius:20px;overflow:hidden;box-shadow:0 24px 60px rgba(59,38,29,.14)}
+/* único !important: quiebre móvil (debe pisar el estilo inline de escritorio) */
+@media (max-width:1024px){.reg-shell{grid-template-columns:1fr!important}}
+.reg-side{position:relative;background:radial-gradient(120% 80% at 100% 0%,rgba(184,137,87,.16),transparent 60%),linear-gradient(165deg,#6d4029 0%,#673d29 45%,#4b291b 100%);color:#fff;padding:34px 27px 26px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.reg-side:before{content:'';position:absolute;left:-48px;top:-48px;width:176px;height:176px;border-radius:50%;border:1px solid rgba(255,255,255,.09);pointer-events:none}
+.reg-side:after{content:'';position:absolute;right:-64px;bottom:-72px;width:240px;height:240px;border-radius:50%;background:rgba(184,137,87,.1);pointer-events:none}
+.reg-crest{position:relative;z-index:1;background:#fff;border-radius:14px;padding:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(0,0,0,.28)}
+.reg-crest img{display:block;width:90px;height:auto;object-fit:contain}
+.reg-side-title{position:relative;z-index:1;font-size:1.16rem;font-weight:800;line-height:1.25;margin:0}
+.reg-side-motto{position:relative;z-index:1;font-size:.82rem;font-style:italic;line-height:1.5;color:#f0dfc6;margin:0}
+.reg-side-rule{position:relative;z-index:1;height:1px;border:0;margin:6px 0 3px;background:linear-gradient(90deg,#b88957,rgba(184,137,87,.15))}
+.reg-benefits{position:relative;z-index:1;list-style:none;margin:3px 0 0;padding:0;display:grid;gap:13px}
 .reg-benefits li{display:flex;align-items:flex-start;gap:10px}
-.reg-benefit-ico{flex:none;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.reg-benefit-ico{flex:none;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
+.reg-benefit-ico svg{width:16px;height:16px;stroke:#f3e3cc;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .reg-benefits b{display:block;font-size:.79rem;font-weight:700;line-height:1.35}
-.reg-benefits span{display:block;font-size:.72rem;line-height:1.4;color:#e6d2b8;margin-top:2px}
-.reg-side-note{margin-top:auto;padding-top:14px;font-size:.68rem;line-height:1.5;color:#dcc4a8}
-.reg-main{padding:26px 26px 22px;min-width:0}
-.reg-main-head{margin-bottom:2px}
-.reg-main-head h2{margin:0;font-size:1.32rem;font-weight:800;color:#673d29;letter-spacing:-.01em}
-.reg-main-head p{margin:5px 0 0;font-size:.82rem;color:#8a776a}
+.reg-benefits span{display:block;font-size:.73rem;line-height:1.4;color:#e6d2b8;margin-top:2px}
+.reg-side-art{position:relative;z-index:1;margin-top:auto;padding-top:16px;width:100%;height:auto;display:block;opacity:.75}
+.reg-side-art path,.reg-side-art line,.reg-side-art rect,.reg-side-art circle{stroke:rgba(255,255,255,.55);fill:none;stroke-width:1.4}
+.reg-side-note{position:relative;z-index:1;font-size:.68rem;line-height:1.5;color:#dcc4a8;margin:8px 0 0}
+.reg-main{min-width:0;padding:30px 32px 26px;display:flex;flex-direction:column}
+.reg-main-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:3px}
+.reg-head-ico{flex:none;width:40px;height:40px;border-radius:50%;background:#673d29;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(103,61,41,.28)}
+.reg-head-ico svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.reg-main-head h2{margin:0;font-size:1.32rem;font-weight:800;color:#673d29;letter-spacing:-.01em;line-height:1.25}
+.reg-main-head p{margin:3px 0 0;font-size:.83rem;color:#8a776a}
+.reg-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.reg-tab{min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:.86rem;font-weight:800;color:#7a6555;background:#fff;border:1.5px solid #e6d8c9;border-radius:11px;cursor:pointer;transition:border-color .18s,background .18s,color .18s}
+.reg-tab:hover{border-color:#b88957}
+.reg-tab.on{color:#673d29;background:#f7efe4;border-color:#b88957}
 .reg-sec{display:flex;align-items:center;gap:8px;font-size:.74rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#673d29;margin:18px 0 6px}
 .reg-sec-n{flex:none;width:25px;height:25px;border-radius:50%;background:#673d29;color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;letter-spacing:0}
-.reg-grid{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.reg-grid{display:grid;gap:13px;grid-template-columns:repeat(2,minmax(0,1fr))}
 .reg-main label{display:block;font-size:.76rem;font-weight:700;color:#3b261d;margin:9px 0 4px}
 .reg-main input,.reg-main select{width:100%;min-height:44px;padding:9px 12px;font-size:.88rem;color:#3b261d;background:#fff;border:1.5px solid #e6d8c9;border-radius:10px;outline:none;transition:border-color .18s,box-shadow .18s}
 .reg-main select{appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a776a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
@@ -506,13 +519,13 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 .reg-main input:disabled,.reg-main select:disabled{background:#f3ece4;color:#a3938a;cursor:not-allowed}
 .reg-hint{margin:0;font-size:.74rem;color:#8a776a}
 .reg-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px}
-.reg-chip{min-height:40px;display:inline-flex;align-items:center;gap:5px;padding:8px 13px;font-size:.79rem;font-weight:800;color:#6b584c;background:#fff;border:1.5px solid #e6d8c9;border-radius:999px;cursor:pointer;transition:border-color .18s,background .18s,color .18s,transform .12s}
+.reg-chip{min-height:40px;display:inline-flex;align-items:center;gap:5px;padding:8px 13px;font-size:.79rem;font-weight:700;color:#6b584c;background:#fff;border:1.5px solid #e6d8c9;border-radius:999px;cursor:pointer;transition:border-color .18s,background .18s,color .18s,transform .12s}
 .reg-chip:hover{border-color:#b88957;color:#673d29}
 .reg-chip:active{transform:scale(.97)}
 .reg-chip.on{background:#673d29;border-color:#673d29;color:#fff}
-.reg-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;padding:0 22px;font-size:.88rem;font-weight:800;border:0;border-radius:11px;cursor:pointer;transition:transform .16s,box-shadow .16s}
+.reg-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:48px;padding:0 22px;font-size:.88rem;font-weight:800;border:0;border-radius:12px;cursor:pointer;transition:transform .16s,box-shadow .16s}
 .reg-btn:active{transform:translateY(1px)}
-.reg-btn-primary{width:100%;color:#fff;background:linear-gradient(135deg,#673d29,#865437);box-shadow:0 10px 22px rgba(103,61,41,.3)}
+.reg-btn-primary{width:100%;margin-top:20px;color:#fff;background:linear-gradient(135deg,#865437,#673d29);box-shadow:0 10px 22px rgba(103,61,41,.3)}
 .reg-btn-primary:hover{box-shadow:0 14px 28px rgba(103,61,41,.4);transform:translateY(-1px)}
 .reg-btn-primary:disabled{opacity:.6;cursor:progress;box-shadow:none}
 .reg-btn-add{min-height:40px;padding:0 14px;color:#673d29;background:#fff;border:1.5px dashed #b88957;border-radius:10px;font-size:.78rem;font-weight:800;cursor:pointer;transition:background .16s,border-color .16s}
@@ -525,32 +538,33 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 .reg-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 6px 5px 11px;font-size:.74rem;font-weight:700;color:#5c4436;background:#f6efe6;border:1px solid #e6d8c9;border-radius:999px}
 .reg-tag button{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#991b1b;background:#fff;border:0;border-radius:50%;cursor:pointer}
 .reg-tag button:hover{background:#fee2e2}
-.reg-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
-.reg-tab{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:.83rem;font-weight:800;color:#7a6555;background:#fff;border:1.5px solid #e6d8c9;border-radius:11px;cursor:pointer;transition:border-color .18s,background .18s,color .18s}
-.reg-tab:hover{border-color:#b88957}
-.reg-tab.on{color:#673d29;background:#f7efe4;border-color:#b88957}
 .reg-ok{text-align:center;padding:18px 0}
 .reg-ok-ico{font-size:2.5rem;line-height:1}
 .reg-ok h3{margin:8px 0 0;font-size:1.1rem;font-weight:800;color:#673d29}
 .reg-ok p{margin:5px 0 0;font-size:.8rem;color:#8a776a}
 .reg-ok-tel{display:grid;gap:8px;margin-top:14px}
 .reg-ok-tel a{padding:11px;font-size:.82rem;font-weight:800;color:#673d29;background:#fff;border:1px solid #e6d8c9;border-radius:10px;text-decoration:none}
-.reg-hijo{border:1px solid #e6d8c9;border-radius:11px;padding:11px 12px 12px;margin-top:10px;background:#fff}
+.reg-hijo{border:1px solid #e6d8c9;border-radius:12px;padding:12px 13px 13px;margin-top:10px;background:#fff}
 .reg-hijo h4{color:#673d29;font-size:.82rem;font-weight:800;display:flex;justify-content:space-between;align-items:center;margin:0 0 4px}
 .reg-hijo h4 button{border:0;background:#fee2e2;color:#991b1b;border-radius:7px;padding:4px 9px;font-size:.7rem;font-weight:800;cursor:pointer}
-@media (max-width:900px){
-.reg-shell{grid-template-columns:1fr}
-.reg-side{padding:16px 14px;gap:10px}
-.reg-side::after{display:none}
+.reg-hijo .reg-grid{gap:10px}
+.reg-hijo>div[style*="grid-template-columns"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#regModal.open{overflow-y:auto;align-items:center}
+@media (max-width:1024px){
+.reg-side{padding:22px 18px;gap:12px}
+.reg-side:before,.reg-side:after{display:none}
 .reg-crest img{width:66px}
-.reg-side-title{font-size:1rem}
+.reg-side-title{font-size:1.02rem}
 .reg-benefits{grid-template-columns:repeat(2,minmax(0,1fr))}
+.reg-side-art{max-width:15rem}
 .reg-side-note{display:none}
-.reg-main{padding:18px 15px 16px}
+.reg-main{padding:20px 17px 18px}
 }
-@media (max-width:560px){
+@media (max-width:620px){
 .reg-grid{grid-template-columns:1fr}
 .reg-benefits{grid-template-columns:1fr}
+.reg-tabs{grid-template-columns:1fr}
+.reg-side-art{display:none}
 }
 </style>
 </style>
@@ -955,25 +969,24 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 
 <!-- SOLICITUD DE REGISTRO (docentes/tutores: la revisa Dirección) -->
 <div id="regModal">
-<div class="login-card reg-card" style="width:min(1060px,96vw);max-height:92vh;overflow-y:auto">
-<div class="reg-shell">
+<div class="login-card reg-card" style="width:min(1240px,96vw);margin:auto">
+<div class="reg-shell" style="display:grid;align-items:stretch;grid-template-columns:clamp(18rem,32%,24rem) minmax(0,1fr)">
 <aside class="reg-side">
-<div class="reg-crest"><img src="/images/logo-colegio.png" alt="Escudo del Colegio Nacional E.M.D. Caaguazú" width="104" height="116"></div>
+<div class="reg-crest"><img src="/images/logo-colegio.png" alt="Escudo del Colegio Nacional E.M.D. Caaguazú" width="90" height="100"></div>
 <h2 class="reg-side-title">Colegio Nacional E.M.D. Caaguazú</h2>
 <p class="reg-side-motto">“Formando jóvenes con valores para un mejor mañana”</p>
+<hr class="reg-side-rule">
 <ul class="reg-benefits">
-<li><span class="reg-benefit-ico">🎓</span><div><b>Acceso a tus clases y recursos</b><span>Plataforma educativa siempre disponible.</span></div></li>
-<li><span class="reg-benefit-ico">📄</span><div><b>Seguimiento de tu progreso</b><span>Consultá tus calificaciones y avances.</span></div></li>
-<li><span class="reg-benefit-ico">👥</span><div><b>Comunidad educativa conectada</b><span>Estudiantes, docentes y familias.</span></div></li>
-<li><span class="reg-benefit-ico">⭐</span><div><b>Construí tu futuro</b><span>Con educación, disciplina y valores.</span></div></li>
+<li><span class="reg-benefit-ico"><svg viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg></span><div><b>Acceso a tus clases y recursos</b><span>Plataforma educativa siempre disponible.</span></div></li><li><span class="reg-benefit-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span><div><b>Seguimiento de tu progreso académico</b><span>Consultá tus calificaciones y avances.</span></div></li><li><span class="reg-benefit-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><div><b>Comunidad educativa siempre conectada</b><span>Estudiantes, docentes y familias.</span></div></li><li><span class="reg-benefit-ico"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span><div><b>Construye tu futuro</b><span>Con educación, disciplina y valores.</span></div></li>
 </ul>
+<svg class="reg-side-art" viewBox="0 0 260 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><line x1="10" y1="88" x2="250" y2="88"/><path d="M100 88V46l30-16 30 16v42"/><path d="M94 48 130 26l36 22"/><line x1="130" y1="30" x2="130" y2="12"/><path d="M130 12l16 4-16 4"/><path d="M40 88V60h56v28M164 88V60h56v28"/><rect x="52" y="66" width="12" height="12"/><rect x="72" y="66" width="12" height="12"/><rect x="112" y="54" width="14" height="14"/><rect x="134" y="54" width="14" height="14"/><rect x="112" y="72" width="14" height="12"/><rect x="134" y="72" width="14" height="12"/><rect x="176" y="66" width="12" height="12"/><rect x="196" y="66" width="12" height="12"/><path d="M124 88v-10c0-4 3-6 6-6s6 2 6 6v10"/><line x1="24" y1="88" x2="24" y2="70"/><circle cx="24" cy="65" r="8"/><line x1="236" y1="88" x2="236" y2="70"/><circle cx="236" cy="65" r="8"/></svg>
 <p class="reg-side-note">Dirección revisa cada solicitud antes de crear la cuenta y te contactará al correo o teléfono indicados.</p>
 </aside>
 <div class="reg-main">
-<div class="reg-main-head"><h2 id="regTitle">Solicitud de registro</h2><p>Completá tus datos para crear tu cuenta en el sistema</p></div>
+<div class="reg-main-head"><span class="reg-head-ico"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><div><h2 id="regTitle">Solicitud de registro</h2><p>Completá tus datos para crear tu cuenta en el sistema</p></div></div>
 <div class="reg-tabs">
-<button type="button" id="regTabT" class="reg-tab on" onclick="regTab('tutor')">👨‍👩‍👧 Soy tutor</button>
-<button type="button" id="regTabD" class="reg-tab" onclick="regTab('docente')">👨‍🏫 Soy docente</button>
+<button type="button" id="regTabT" class="reg-tab on" onclick="regTab('tutor')">Soy tutor</button>
+<button type="button" id="regTabD" class="reg-tab" onclick="regTab('docente')">Soy docente</button>
 </div>
 <div class="reg-error-top" id="regTopErr" style="display:none"></div>
 <form id="regFormT" onsubmit="return submitRegT(event)">
@@ -995,7 +1008,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <div id="rtHijos"></div>
 <button type="button" class="reg-btn-add" onclick="rtAddHijo()">＋ Agregar otro hijo</button>
 <div class="reg-err" id="e-rtHijos"></div>
-<button class="reg-btn reg-btn-primary" id="rtSend" style="margin-top:18px" type="submit">Enviar solicitud →</button>
+<button class="reg-btn reg-btn-primary" id="rtSend" type="submit">Enviar solicitud <span aria-hidden="true">→</span></button>
 </form>
 <form id="regFormD" style="display:none" onsubmit="return submitRegD(event)">
 <div class="reg-sec"><span class="reg-sec-n">1</span> Datos personales</div>
@@ -1032,7 +1045,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <div class="reg-err" id="e-rdNivel">Elegí el nivel</div>
 <div style="margin-top:10px"><label>Cursos en los que enseña *</label><div class="reg-chips" id="rdCursos"></div><div class="reg-err" id="e-rdCursos">Elegí al menos un curso</div></div>
 <div id="rdBachBox" style="display:none;margin-top:10px"><label>¿En qué bachiller(es) enseñás? *</label><div class="reg-chips" id="rdBach"></div><div class="reg-err" id="e-rdBach">Indicá al menos un bachiller</div></div>
-<button class="reg-btn reg-btn-primary" id="rdSend" style="margin-top:18px" type="submit">Enviar solicitud →</button>
+<button class="reg-btn reg-btn-primary" id="rdSend" type="submit">Enviar solicitud <span aria-hidden="true">→</span></button>
 </form>
 <div id="regOk" style="display:none" class="reg-ok">
 <div class="reg-ok-ico">✅</div>

@@ -503,8 +503,14 @@
 }
 
 /* ==========================================================================
-   REDISEÑO DE LA ZONA DE REGISTRO (tutores y docentes)
+   REDISEÑO DE LA ZONA DE REGISTRO (tutores y docentes) — v2
    Clases con prefijo reg-. Paleta aislada: NO modifica el resto de la web.
+
+   GARANTÍA DE 2 COLUMNAS EN ESCRITORIO:
+   El grid se aplica también como estilo INLINE en el marcado (RegShell y el
+   modal de la landing), así que no depende de que este CSS cargue. El único
+   `!important` del archivo está en el quiebre móvil, para poder pisar el
+   inline cuando la pantalla es chica.
    ========================================================================== */
 :root {
   --reg-brown-deep: #4b291b;
@@ -519,42 +525,68 @@
   --reg-err: #b91c1c;
 }
 
-/* ---------- Contenedor: panel institucional + formulario ---------- */
+/* ---------- Tarjeta: dos columnas lado a lado ---------- */
 .reg-shell {
   display: grid;
-  grid-template-columns: 21rem minmax(0, 1fr);
+  /* Panel 30–34% · formulario 66–70% */
+  grid-template-columns: clamp(18rem, 32%, 24rem) minmax(0, 1fr);
   align-items: stretch;
+  width: 100%;
+  max-width: 1240px;
+  margin-inline: auto;
   background: var(--reg-cream);
   border: 1px solid var(--reg-beige);
   border-radius: 1.25rem;
   overflow: hidden;
   box-shadow: 0 24px 60px rgba(59, 38, 29, 0.14);
 }
+/* Quiebre móvil: único !important del archivo (debe pisar el estilo inline) */
+@media (max-width: 1024px) {
+  .reg-shell { grid-template-columns: 1fr !important; }
+}
+
+/* ---------- Panel institucional izquierdo ---------- */
 .reg-side {
   position: relative;
-  background: linear-gradient(155deg, var(--reg-brown) 0%, var(--reg-brown-deep) 100%);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(184, 137, 87, 0.16), transparent 60%),
+    linear-gradient(165deg, #6d4029 0%, var(--reg-brown) 45%, var(--reg-brown-deep) 100%);
   color: #fff;
-  padding: 2rem 1.6rem;
+  padding: 2.1rem 1.7rem 1.6rem;
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1rem;
   overflow: hidden;
+}
+/* Elementos geométricos discretos */
+.reg-side::before {
+  content: "";
+  position: absolute;
+  left: -3rem;
+  top: -3rem;
+  width: 11rem;
+  height: 11rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  pointer-events: none;
 }
 .reg-side::after {
   content: "";
   position: absolute;
-  right: -3.5rem;
-  bottom: -3.5rem;
-  width: 12rem;
-  height: 12rem;
+  right: -4rem;
+  bottom: -4.5rem;
+  width: 15rem;
+  height: 15rem;
   border-radius: 50%;
-  background: rgba(184, 137, 87, 0.18);
+  background: rgba(184, 137, 87, 0.1);
   pointer-events: none;
 }
 .reg-crest {
+  position: relative;
+  z-index: 1;
   background: var(--reg-white);
   border-radius: 0.9rem;
-  padding: 0.7rem;
+  padding: 0.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -562,174 +594,278 @@
 }
 .reg-crest img {
   display: block;
-  width: 6.5rem;
+  width: 5.6rem;
   height: auto;
   object-fit: contain;
 }
 .reg-side-title {
-  font-size: 1.22rem;
+  position: relative;
+  z-index: 1;
+  font-size: 1.16rem;
   font-weight: 800;
   line-height: 1.25;
   margin: 0;
 }
 .reg-side-motto {
-  font-size: 0.84rem;
+  position: relative;
+  z-index: 1;
+  font-size: 0.82rem;
   font-style: italic;
   line-height: 1.5;
   color: #f0dfc6;
   margin: 0;
 }
+/* Línea divisoria fina en dorado */
+.reg-side-rule {
+  position: relative;
+  z-index: 1;
+  height: 1px;
+  border: 0;
+  margin: 0.35rem 0 0.15rem;
+  background: linear-gradient(90deg, var(--reg-gold), rgba(184, 137, 87, 0.15));
+}
 .reg-benefits {
+  position: relative;
+  z-index: 1;
   list-style: none;
   margin: 0.2rem 0 0;
   padding: 0;
   display: grid;
-  gap: 0.85rem;
+  gap: 0.8rem;
 }
 .reg-benefits li {
   display: flex;
   align-items: flex-start;
-  gap: 0.7rem;
+  gap: 0.65rem;
 }
 .reg-benefit-ico {
   flex: none;
-  width: 2.2rem;
-  height: 2.2rem;
-  border-radius: 0.7rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.13);
   border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+}
+.reg-benefit-ico svg {
+  width: 1rem;
+  height: 1rem;
+  stroke: #f3e3cc;
+  fill: none;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .reg-benefits b {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   line-height: 1.35;
 }
 .reg-benefits span {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.73rem;
   line-height: 1.4;
   color: #e6d2b8;
   margin-top: 0.1rem;
 }
-.reg-side-note {
+/* Ilustración decorativa de la institución (zona inferior) */
+.reg-side-art {
+  position: relative;
+  z-index: 1;
   margin-top: auto;
   padding-top: 1rem;
-  font-size: 0.7rem;
+  width: 100%;
+  height: auto;
+  display: block;
+  opacity: 0.75;
+}
+.reg-side-art path,
+.reg-side-art line,
+.reg-side-art rect,
+.reg-side-art circle,
+.reg-side-art polyline {
+  stroke: rgba(255, 255, 255, 0.55);
+  fill: none;
+}
+.reg-side-note {
+  position: relative;
+  z-index: 1;
+  font-size: 0.68rem;
   line-height: 1.5;
   color: #dcc4a8;
+  margin: 0.5rem 0 0;
 }
 
-/* ---------- Panel derecho ---------- */
+/* ---------- Panel derecho: formulario ---------- */
 .reg-main {
   min-width: 0;
-  padding: 1.9rem 1.9rem 1.6rem;
+  padding: 1.9rem 2rem 1.6rem;
   display: flex;
   flex-direction: column;
 }
 .reg-main-head {
-  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+.reg-head-ico {
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--reg-brown);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(103, 61, 41, 0.28);
+}
+.reg-head-ico svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .reg-main-head h2 {
   margin: 0;
-  font-size: 1.42rem;
+  font-size: 1.32rem;
   font-weight: 800;
   color: var(--reg-brown);
   letter-spacing: -0.01em;
+  line-height: 1.25;
 }
 .reg-main-head p {
-  margin: 0.35rem 0 0;
-  font-size: 0.85rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.83rem;
   color: var(--reg-mut);
+}
+
+/* ---------- Selector de tipo de usuario ---------- */
+.reg-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.reg-tab {
+  min-height: 2.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #7a6555;
+  background: var(--reg-white);
+  border: 1.5px solid var(--reg-beige);
+  border-radius: 0.7rem;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, color 0.18s;
+}
+.reg-tab:hover {
+  border-color: var(--reg-gold);
+}
+.reg-tab.on {
+  color: var(--reg-brown);
+  background: #f7efe4;
+  border-color: var(--reg-gold);
 }
 
 /* ---------- Secciones numeradas ---------- */
 .reg-block {
-  margin-top: 1.4rem;
+  margin-top: 1.35rem;
 }
 .reg-block-head {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.65rem;
 }
 .reg-block-num {
   flex: none;
-  width: 1.65rem;
-  height: 1.65rem;
+  width: 1.6rem;
+  height: 1.6rem;
   border-radius: 50%;
   background: var(--reg-brown);
   color: #fff;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .reg-block-ico {
-  font-size: 0.95rem;
   line-height: 1;
 }
+.reg-block-ico svg {
+  width: 1rem;
+  height: 1rem;
+  stroke: var(--reg-brown);
+  fill: none;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .reg-block-head b {
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: var(--reg-brown);
+  letter-spacing: 0.01em;
 }
 .reg-block-head small {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.73rem;
   font-weight: 500;
   color: var(--reg-mut);
   margin-top: 0.05rem;
 }
 
-/* ---------- Campos ---------- */
+/* ---------- Campos en dos columnas ---------- */
 .reg-grid {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.8rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+.reg-col-full { grid-column: 1 / -1; }
 .reg-field {
   display: block;
   min-width: 0;
 }
 .reg-field > span {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--reg-ink);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.28rem;
 }
-.reg-field .req {
-  color: var(--reg-err);
-}
+.reg-field .req { color: var(--reg-err); }
 .reg-input,
 .reg-select {
   width: 100%;
   min-height: 2.75rem;
   padding: 0.6rem 0.8rem;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--reg-ink);
   background: var(--reg-white);
   border: 1.5px solid var(--reg-beige);
   border-radius: 0.65rem;
   outline: none;
   transition: border-color 0.18s, box-shadow 0.18s;
-  appearance: none;
 }
 .reg-select {
+  appearance: none;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a776a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.7rem center;
   padding-right: 2rem;
 }
-.reg-input::placeholder {
-  color: #b9a698;
-}
+.reg-input::placeholder { color: #b9a698; }
 .reg-input:focus,
 .reg-select:focus {
   border-color: var(--reg-gold);
@@ -741,28 +877,19 @@
   color: #a3938a;
   cursor: not-allowed;
 }
-.reg-input.bad,
-.reg-select.bad {
-  border-color: var(--reg-err);
-}
 .reg-field-err {
   display: none;
   margin-top: 0.25rem;
-  font-size: 0.74rem;
+  font-size: 0.73rem;
   font-weight: 700;
   color: var(--reg-err);
 }
-.reg-field-err.show {
-  display: block;
-}
+.reg-field-err.show { display: block; }
 .reg-hint {
   margin: 0;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   color: var(--reg-mut);
 }
-
-/* Campo que ocupa toda la fila del grid */
-.reg-col-full { grid-column: 1 / -1; }
 
 /* ---------- Chips de selección múltiple ---------- */
 .reg-chips {
@@ -776,7 +903,7 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.45rem 0.85rem;
-  font-size: 0.8rem;
+  font-size: 0.79rem;
   font-weight: 700;
   color: #6b584c;
   background: var(--reg-white);
@@ -789,18 +916,13 @@
   border-color: var(--reg-gold);
   color: var(--reg-brown);
 }
-.reg-chip:active:not(:disabled) {
-  transform: scale(0.97);
-}
+.reg-chip:active:not(:disabled) { transform: scale(0.97); }
 .reg-chip.on {
   background: var(--reg-brown);
   border-color: var(--reg-brown);
   color: #fff;
 }
-.reg-chip:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
+.reg-chip:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* ---------- Botones ---------- */
 .reg-btn {
@@ -809,25 +931,33 @@
   justify-content: center;
   gap: 0.45rem;
   min-height: 2.9rem;
-  padding: 0 1.35rem;
-  font-size: 0.9rem;
+  padding: 0 1.3rem;
+  font-size: 0.88rem;
   font-weight: 800;
   border: 0;
   border-radius: 0.7rem;
   cursor: pointer;
   transition: transform 0.16s, box-shadow 0.16s, background 0.16s;
 }
-.reg-btn:active:not(:disabled) {
-  transform: translateY(1px);
+.reg-btn:active:not(:disabled) { transform: translateY(1px); }
+.reg-btn svg {
+  width: 1rem;
+  height: 1rem;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .reg-btn-primary {
   width: 100%;
+  margin-top: 1.2rem;
   color: #fff;
-  background: linear-gradient(135deg, var(--reg-brown) 0%, var(--reg-brown-mid) 100%);
-  box-shadow: 0 10px 24px rgba(103, 61, 41, 0.3);
+  background: linear-gradient(135deg, var(--reg-brown-mid) 0%, var(--reg-brown) 100%);
+  box-shadow: 0 10px 22px rgba(103, 61, 41, 0.3);
 }
 .reg-btn-primary:hover:not(:disabled) {
-  box-shadow: 0 14px 30px rgba(103, 61, 41, 0.4);
+  box-shadow: 0 14px 28px rgba(103, 61, 41, 0.4);
   transform: translateY(-1px);
 }
 .reg-btn-primary:disabled {
@@ -842,7 +972,7 @@
   background: var(--reg-white);
   border: 1.5px dashed var(--reg-gold);
   border-radius: 0.65rem;
-  font-size: 0.8rem;
+  font-size: 0.79rem;
   font-weight: 800;
   cursor: pointer;
   transition: background 0.16s, border-color 0.16s;
@@ -851,12 +981,9 @@
   background: #fdf6ec;
   border-color: var(--reg-brown);
 }
-.reg-btn-add:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
+.reg-btn-add:disabled { opacity: 0.45; cursor: not-allowed; }
 .reg-btn-mini {
-  padding: 0.3rem 0.6rem;
+  padding: 0.3rem 0.55rem;
   font-size: 0.7rem;
   font-weight: 800;
   color: #991b1b;
@@ -865,29 +992,25 @@
   border-radius: 0.5rem;
   cursor: pointer;
 }
-.reg-btn-mini:hover {
-  background: #fecaca;
-}
+.reg-btn-mini:hover { background: #fecaca; }
 
 /* ---------- Tarjeta de hijo ---------- */
 .reg-child {
   border: 1px solid var(--reg-beige);
   border-radius: 0.85rem;
   background: var(--reg-white);
-  padding: 0.9rem 1rem 1rem;
+  padding: 0.85rem 0.95rem 0.95rem;
 }
-.reg-child + .reg-child {
-  margin-top: 0.75rem;
-}
+.reg-child + .reg-child { margin-top: 0.7rem; }
 .reg-child-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.65rem;
 }
 .reg-child-head b {
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: var(--reg-brown);
 }
@@ -897,14 +1020,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-top: 0.6rem;
+  margin-top: 0.55rem;
 }
 .reg-tag {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.32rem 0.4rem 0.32rem 0.7rem;
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #5c4436;
   background: #f6efe6;
@@ -924,15 +1047,11 @@
   border-radius: 50%;
   cursor: pointer;
 }
-.reg-tag button:hover {
-  background: #fee2e2;
-}
+.reg-tag button:hover { background: #fee2e2; }
 
 /* ---------- Pie del formulario ---------- */
 .reg-foot {
-  margin-top: 1.3rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--reg-beige);
+  margin-top: 0.7rem;
   font-size: 0.78rem;
   color: var(--reg-mut);
   text-align: center;
@@ -945,62 +1064,23 @@
 }
 .reg-error-top {
   display: none;
-  margin-top: 0.9rem;
-  padding: 0.7rem 0.9rem;
-  font-size: 0.8rem;
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--reg-err);
   background: #fef2f2;
   border: 1px solid #fecaca;
   border-radius: 0.6rem;
 }
-.reg-error-top.show {
-  display: block;
-}
-
-/* ---------- Selector de tipo de usuario ---------- */
-.reg-tabs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-.reg-tab {
-  min-height: 2.85rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #7a6555;
-  background: var(--reg-white);
-  border: 1.5px solid var(--reg-beige);
-  border-radius: 0.7rem;
-  cursor: pointer;
-  transition: border-color 0.18s, background 0.18s, color 0.18s;
-}
-.reg-tab:hover {
-  border-color: var(--reg-gold);
-}
-.reg-tab.on {
-  color: var(--reg-brown);
-  background: #f7efe4;
-  border-color: var(--reg-gold);
-}
+.reg-error-top.show { display: block; }
 
 /* ---------- Pantalla de éxito ---------- */
-.reg-ok {
-  text-align: center;
-  padding: 1rem 0;
-}
-.reg-ok-ico {
-  font-size: 2.6rem;
-  line-height: 1;
-}
+.reg-ok { text-align: center; padding: 1.5rem 0; }
+.reg-ok-ico { font-size: 2.5rem; line-height: 1; }
 .reg-ok h3 {
   margin: 0.6rem 0 0;
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 800;
   color: var(--reg-brown);
 }
@@ -1016,7 +1096,7 @@
 }
 .reg-ok-tel a {
   padding: 0.7rem;
-  font-size: 0.84rem;
+  font-size: 0.83rem;
   font-weight: 800;
   color: var(--reg-brown);
   background: var(--reg-white);
@@ -1026,41 +1106,23 @@
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 900px) {
-  .reg-shell {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 1024px) {
+  .reg-shell { border-radius: 1.1rem; }
   .reg-side {
-    padding: 1.4rem 1.2rem;
-    gap: 0.85rem;
+    padding: 1.35rem 1.2rem;
+    gap: 0.75rem;
   }
-  .reg-side::after {
-    display: none;
-  }
-  .reg-crest img {
-    width: 4.6rem;
-  }
-  .reg-side-title {
-    font-size: 1.05rem;
-  }
-  .reg-benefits {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .reg-side-note {
-    display: none;
-  }
-  .reg-main {
-    padding: 1.3rem 1.1rem 1.2rem;
-  }
+  .reg-side::before, .reg-side::after { display: none; }
+  .reg-crest img { width: 4.2rem; }
+  .reg-side-title { font-size: 1.02rem; }
+  .reg-benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reg-side-art { max-width: 15rem; }
+  .reg-side-note { display: none; }
+  .reg-main { padding: 1.4rem 1.2rem 1.25rem; }
 }
-@media (max-width: 560px) {
-  .reg-grid {
-    grid-template-columns: 1fr;
-  }
-  .reg-benefits {
-    grid-template-columns: 1fr;
-  }
-  .reg-block-head b {
-    font-size: 0.82rem;
-  }
+@media (max-width: 620px) {
+  .reg-grid { grid-template-columns: 1fr; }
+  .reg-benefits { grid-template-columns: 1fr; }
+  .reg-tabs { grid-template-columns: 1fr; }
+  .reg-side-art { display: none; }
 }
