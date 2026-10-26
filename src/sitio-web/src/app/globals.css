@@ -584,20 +584,17 @@
 .reg-crest {
   position: relative;
   z-index: 1;
-  /* el marco blanco abraza el escudo: no se estira a todo el ancho del panel */
+  /* el escudo va directo sobre el panel, sin caja blanca de fondo */
   align-self: center;
   width: fit-content;
-  background: var(--reg-white);
-  border-radius: 0.9rem;
-  padding: 0.6rem 0.8rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.32));
 }
 .reg-crest img {
   display: block;
-  width: 5.8rem;
+  width: 6.4rem;
   height: auto;
   object-fit: contain;
 }
@@ -677,7 +674,7 @@
   color: #e6d2b8;
   margin-top: 0.1rem;
 }
-/* Ilustración decorativa de la institución (zona inferior) */
+/* Ilustración decorativa de la institución (zona inferior): dibujo del colegio */
 .reg-side-art {
   position: relative;
   z-index: 1;
@@ -686,18 +683,8 @@
   width: 100%;
   height: auto;
   display: block;
-  opacity: 0.9;
-}
-.reg-side-art path,
-.reg-side-art line,
-.reg-side-art rect,
-.reg-side-art circle,
-.reg-side-art polyline {
-  stroke: rgba(255, 255, 255, 0.62);
-  fill: none;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  object-fit: contain;
+  opacity: 0.92;
 }
 .reg-side-note {
   position: relative;
@@ -1122,7 +1109,7 @@
     gap: 0.75rem;
   }
   .reg-side::before, .reg-side::after { display: none; }
-  .reg-crest img { width: 4.2rem; }
+  .reg-crest img { width: 4.9rem; }
   .reg-side-title { font-size: 1.02rem; }
   .reg-benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .reg-side-art { max-width: 15rem; }

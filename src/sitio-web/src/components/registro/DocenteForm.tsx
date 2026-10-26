@@ -31,16 +31,50 @@ export default function DocenteForm() {
   const media = cat?.mediaCourses ?? [];
   const courses = [...(niveles.includes("EEB") ? eeb : []), ...(niveles.includes("MEDIA") ? media : [])];
 
-  // Materias reales agrupadas por bachiller y curso (selector navegable)
+  /** Cursos elegidos como número (los catálogos traen "1.º", "2.º", "3.º"). */
+  const cursosNums = cursos
+    .map((c) => Number(c.replace(/\D/g, "")))
+    .filter((n) => Number.isFinite(n) && n > 0);
+
+  /** Códigos de bachillerato de la Media (las materias de EEB no lo son). */
+  const codigosBach = new Set((cat?.bachilleratos ?? []).map((b) => b.code));
+
+  /** ¿La materia corresponde a la asignación académica elegida? */
+  function materiaAlcanzable(s: (typeof subjects)[number], nums: number[], bach: string[]) {
+    if (!nums.includes(s.gradeYear)) return false;
+    if (codigosBach.has(s.academicCode) && bach.length > 0 && !bach.includes(s.academicCode)) return false;
+    return true;
+  }
+
+  /**
+   * Materias reales agrupadas por bachiller y curso, filtradas por la
+   * asignación académica elegida: solo aparecen las materias de los cursos
+   * seleccionados y, en la Media, de los bachiller(es) marcados.
+   */
   const subjectGroups = (() => {
     const map = new Map<string, typeof subjects>();
-    for (const s of subjects) {
-      const key = `${s.academicShort} · ${s.gradeYear}º`;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(s);
+    if (cursosNums.length > 0) {
+      for (const s of subjects) {
+        if (!materiaAlcanzable(s, cursosNums, bachilleres)) continue;
+        const key = `${s.academicShort} · ${s.gradeYear}º`;
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push(s);
+      }
     }
     return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0], "es"));
   })();
+  const sinMaterias = cursosNums.length === 0 || niveles.includes("MEDIA") && bachilleres.length === 0;
+
+  /** Si se cambia la asignación, las materias que ya no aplican se descartan. */
+  function podarSeleccion(cursosNuevos: string[], bachNuevos: string[]) {
+    const nums = cursosNuevos.map((c) => Number(c.replace(/\D/g, ""))).filter((n) => Number.isFinite(n) && n > 0);
+    const sigue = (code: string) => {
+      const s = subjects.find((x) => x.code === code);
+      return !!s && materiaAlcanzable(s, nums, bachNuevos);
+    };
+    setMateriaPrincipal((m) => (m && !m.startsWith("OTRA:") && !sigue(m) ? "" : m));
+    setOtras((o) => o.filter((v) => v.startsWith("OTRA:") || sigue(v)));
+  }
 
   const toggle = (list: string[], v: string) =>
     list.includes(v) ? list.filter((x) => x !== v) : [...list, v];
@@ -167,115 +201,10 @@ export default function DocenteForm() {
         </section>
 
         <section className="reg-block">
-          <SectionTitle n="2" title="Materia principal" desc="La materia que más horas enseñás." icon={Icon.book} />
-          <div className="reg-grid">
-            <Field label="Materia" required error={mpErr}>
-              <select
-                value={materiaPrincipal}
-                onChange={(e) => setMateriaPrincipal(e.target.value)}
-                disabled={sending || !cat}
-                className="reg-select"
-              >
-                <option value="">Seleccionar…</option>
-                {subjectGroups.map(([grupo, lista]) => (
-                  <optgroup key={grupo} label={grupo}>
-                    {lista.map((s) => (
-                      <option key={s.code} value={s.code}>{s.name}</option>
-                    ))}
-                  </optgroup>
-                ))}
-                <option value="__OTRA__">Otra materia (especificar)…</option>
-              </select>
-            </Field>
-            {materiaPrincipal === "__OTRA__" && (
-              <Field label="¿Cuál?" required>
-                <input
-                  value={materiaPrincipalOtra}
-                  onChange={(e) => setMateriaPrincipalOtra(e.target.value)}
-                  disabled={sending}
-                  maxLength={80}
-                  placeholder="Ej: Física"
-                  className={inputCls}
-                />
-              </Field>
-            )}
-          </div>
-          {subjects.length === 0 && (
-            <p className="reg-hint" style={{ marginTop: "0.5rem" }}>
-              Aún no hay materias cargadas en el sistema: usá “Otra materia” y Dirección la registrará.
-            </p>
-          )}
-        </section>
-
-        <section className="reg-block">
           <SectionTitle
-            n="3"
-            title="Otras materias que enseña"
-            desc="Podés completar esta información ahora o agregarla después desde tu perfil."
-            icon={Icon.layers}
-          />
-          <div className="reg-chips" style={{ alignItems: "flex-end", gap: "0.5rem" }}>
-            <label className="reg-field" style={{ flex: "1 1 auto" }}>
-              <span>Materia</span>
-              <select
-                value={otraSel}
-                onChange={(e) => setOtraSel(e.target.value)}
-                disabled={sending || !cat}
-                className="reg-select"
-              >
-                <option value="">Seleccionar…</option>
-                {subjectGroups.map(([grupo, lista]) => (
-                  <optgroup key={grupo} label={grupo}>
-                    {lista.map((s) => (
-                      <option key={s.code} value={s.code}>{s.name}</option>
-                    ))}
-                  </optgroup>
-                ))}
-                <option value="__OTRA__">Otra materia (especificar)…</option>
-              </select>
-            </label>
-            {otraSel === "__OTRA__" && (
-              <label className="reg-field" style={{ flex: "0 0 10rem" }}>
-                <span>¿Cuál?</span>
-                <input
-                  value={otraLibre}
-                  onChange={(e) => setOtraLibre(e.target.value)}
-                  disabled={sending}
-                  maxLength={80}
-                  placeholder="Ej: Química"
-                  className={inputCls}
-                />
-              </label>
-            )}
-            <button type="button" onClick={addOtra} disabled={sending} className="reg-btn-add">
-              ＋ Agregar materia
-            </button>
-          </div>
-          <FieldError msg={otrasErr} />
-          {otras.length > 0 && (
-            <div className="reg-tags">
-              {otras.map((o) => (
-                <span key={o} className="reg-tag">
-                  {materiaLabel(o)}
-                  <button
-                    type="button"
-                    disabled={sending}
-                    onClick={() => setOtras((l) => l.filter((x) => x !== o))}
-                    aria-label={`Quitar ${o}`}
-                  >
-                    ✕
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="reg-block">
-          <SectionTitle
-            n="4"
+            n="2"
             title="Asignación académica"
-            desc="Niveles y cursos en los que enseñás. Podés marcar Básica y Media a la vez."
+            desc="Niveles y cursos en los que enseñás. Con esto filtramos tus materias."
             icon={Icon.cap}
           />
           <p className="reg-hint" style={{ marginBottom: "0.5rem" }}>
@@ -293,6 +222,8 @@ export default function DocenteForm() {
                     setNiveles((l) => (l.includes(n) ? l.filter((x) => x !== n) : [...l, n]));
                     setCursos([]);
                     setBachilleres([]);
+                    setMateriaPrincipal("");
+                    setOtras([]);
                   }}
                   aria-pressed={on}
                   className={`reg-chip${on ? " on" : ""}`}
@@ -317,7 +248,11 @@ export default function DocenteForm() {
                     key={`EEB-${c}`}
                     type="button"
                     disabled={sending}
-                    onClick={() => setCursos((l) => toggle(l, `${c}`))}
+                    onClick={() => {
+                      const nueva = toggle(cursos, `${c}`);
+                      setCursos(nueva);
+                      podarSeleccion(nueva, bachilleres);
+                    }}
                     aria-pressed={on}
                     title="Escolar Básica"
                     className={`reg-chip${on ? " on" : ""}`}
@@ -333,7 +268,11 @@ export default function DocenteForm() {
                     key={`MEDIA-${c}`}
                     type="button"
                     disabled={sending}
-                    onClick={() => setCursos((l) => toggle(l, `${c}`))}
+                    onClick={() => {
+                      const nueva = toggle(cursos, `${c}`);
+                      setCursos(nueva);
+                      podarSeleccion(nueva, bachilleres);
+                    }}
                     aria-pressed={on}
                     title="Educación Media"
                     className={`reg-chip${on ? " on" : ""}`}
@@ -359,7 +298,11 @@ export default function DocenteForm() {
                       key={b.code}
                       type="button"
                       disabled={sending}
-                      onClick={() => setBachilleres((l) => toggle(l, b.code))}
+                      onClick={() => {
+                        const nueva = toggle(bachilleres, b.code);
+                        setBachilleres(nueva);
+                        podarSeleccion(cursos, nueva);
+                      }}
                       aria-pressed={on}
                       title={b.name}
                       className={`reg-chip${on ? " on" : ""}`}
@@ -373,6 +316,135 @@ export default function DocenteForm() {
                 <p className="reg-hint">Aún no hay bachilleratos cargados.</p>
               )}
             </div>
+          )}
+        </section>
+
+        <section className="reg-block">
+          <SectionTitle n="3" title="Materia principal" desc="La materia que más horas enseñás." icon={Icon.book} />
+          {sinMaterias ? (
+            <p className="reg-hint">
+              Primero elegí tus cursos {niveles.includes("MEDIA") ? "y bachiller(es)" : ""} en la sección 2
+              (Asignación académica) y acá aparecerán solo las materias de esos cursos.
+            </p>
+          ) : subjectGroups.length === 0 ? (
+            <p className="reg-hint">
+              No hay materias registradas todavía para esos cursos: usá “Otra materia” y Dirección la cargará.
+            </p>
+          ) : (
+            <div className="reg-grid">
+              <Field label="Materia" required error={mpErr}>
+                <select
+                  value={materiaPrincipal}
+                  onChange={(e) => setMateriaPrincipal(e.target.value)}
+                  disabled={sending || !cat}
+                  className="reg-select"
+                >
+                  <option value="">Seleccionar…</option>
+                  {subjectGroups.map(([grupo, lista]) => (
+                    <optgroup key={grupo} label={grupo}>
+                      {lista.map((s) => (
+                        <option key={s.code} value={s.code}>{s.name}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                  <option value="__OTRA__">Otra materia (especificar)…</option>
+                </select>
+              </Field>
+              {materiaPrincipal === "__OTRA__" && (
+                <Field label="¿Cuál?" required>
+                  <input
+                    value={materiaPrincipalOtra}
+                    onChange={(e) => setMateriaPrincipalOtra(e.target.value)}
+                    disabled={sending}
+                    maxLength={80}
+                    placeholder="Ej: Física"
+                    className={inputCls}
+                  />
+                </Field>
+              )}
+            </div>
+          )}
+          {!sinMaterias && subjectGroups.length > 0 && (
+            <p className="reg-hint" style={{ marginTop: "0.5rem" }}>
+              Se muestran solo las materias de los cursos y bachiller(es) que elegiste arriba.
+              Si enseñás otra cosa, usá “Otra materia”.
+            </p>
+          )}
+          {materiaPrincipal === "__OTRA__" && (
+            <FieldError msg={mpErr} />
+          )}
+        </section>
+
+        <section className="reg-block">
+          <SectionTitle
+            n="4"
+            title="Otras materias que enseña"
+            desc="Podés completar esta información ahora o agregarla después desde tu perfil."
+            icon={Icon.layers}
+          />
+          {sinMaterias || subjectGroups.length === 0 ? (
+            <p className="reg-hint">
+              Aparecerán las materias según la asignación académica de la sección 2. Igual podés
+              agregar una materia distinta con “Otra materia”.
+            </p>
+          ) : (
+            <>
+              <div className="reg-chips" style={{ alignItems: "flex-end", gap: "0.5rem" }}>
+                <label className="reg-field" style={{ flex: "1 1 auto" }}>
+                  <span>Materia</span>
+                  <select
+                    value={otraSel}
+                    onChange={(e) => setOtraSel(e.target.value)}
+                    disabled={sending || !cat}
+                    className="reg-select"
+                  >
+                    <option value="">Seleccionar…</option>
+                    {subjectGroups.map(([grupo, lista]) => (
+                      <optgroup key={grupo} label={grupo}>
+                        {lista.map((s) => (
+                          <option key={s.code} value={s.code}>{s.name}</option>
+                        ))}
+                      </optgroup>
+                    ))}
+                    <option value="__OTRA__">Otra materia (especificar)…</option>
+                  </select>
+                </label>
+                {otraSel === "__OTRA__" && (
+                  <label className="reg-field" style={{ flex: "0 0 10rem" }}>
+                    <span>¿Cuál?</span>
+                    <input
+                      value={otraLibre}
+                      onChange={(e) => setOtraLibre(e.target.value)}
+                      disabled={sending}
+                      maxLength={80}
+                      placeholder="Ej: Química"
+                      className={inputCls}
+                    />
+                  </label>
+                )}
+                <button type="button" onClick={addOtra} disabled={sending} className="reg-btn-add">
+                  ＋ Agregar materia
+                </button>
+              </div>
+              <FieldError msg={otrasErr} />
+              {otras.length > 0 && (
+                <div className="reg-tags">
+                  {otras.map((o) => (
+                    <span key={o} className="reg-tag">
+                      {materiaLabel(o)}
+                      <button
+                        type="button"
+                        disabled={sending}
+                        onClick={() => setOtras((l) => l.filter((x) => x !== o))}
+                        aria-label={`Quitar ${o}`}
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </section>
 
