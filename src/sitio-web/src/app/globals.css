@@ -674,7 +674,7 @@
   color: #e6d2b8;
   margin-top: 0.1rem;
 }
-/* Ilustración decorativa de la institución (zona inferior): dibujo del colegio */
+/* Ilustración decorativa de la institución (zona inferior): fachada del colegio */
 .reg-side-art {
   position: relative;
   z-index: 1;
@@ -685,6 +685,7 @@
   display: block;
   object-fit: contain;
   opacity: 0.92;
+  border-radius: 0.75rem;
 }
 .reg-side-note {
   position: relative;

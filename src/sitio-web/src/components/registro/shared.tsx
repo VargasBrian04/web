@@ -117,15 +117,15 @@ const I = {
 /** Iconos disponibles para títulos de sección y controles. */
 export const Icon = I;
 
-/** Ilustración decorativa institucional (dibujo provisto por el colegio). */
+/** Ilustración decorativa institucional (fachada dibujada provista por el colegio). */
 function SchoolArt() {
   return (
     <img
       className="reg-side-art"
-      src="/images/dibujo-colegio.webp"
+      src="/images/fachada-colegio.webp"
       alt=""
-      width={640}
-      height={324}
+      width={720}
+      height={236}
     />
   );
 }
