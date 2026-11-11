@@ -34,7 +34,6 @@ const groups = [
     links: [
       { href: "/#requisitos", label: "Requisitos" },
       { href: "/registro", label: "Registro" },
-      { href: "/inscripciones", label: "Inscripciones" },
       { href: "/#contacto", label: "Contacto" },
     ],
   },

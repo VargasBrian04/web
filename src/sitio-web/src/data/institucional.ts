@@ -241,10 +241,10 @@ export const newsPosts: {
     category: "Inscripciones",
     author: "Dirección",
     image: "/images/gallery-1.jpg",
-    excerpt: "La inscripción se realiza online desde el portal o presencial en Secretaría, de lunes a viernes de 07:00 a 17:00.",
+    excerpt: "La inscripción se realiza presencialmente en Secretaría, de lunes a viernes de 07:00 a 17:00.",
     content: [
       "El Colegio Nacional Mariscal Francisco Solano López informa que las inscripciones para el ciclo lectivo 2026 se encuentran abiertas para la Educación Escolar Básica (7.º a 9.º) y todas las orientaciones del Nivel Medio.",
-      "El trámite puede iniciarse online desde la sección Inscripciones de este sitio o en forma presencial en la Secretaría del colegio, de lunes a viernes de 07:00 a 17:00, en la ciudad de Caaguazú.",
+      "El trámite se realiza en forma presencial en la Secretaría del colegio, de lunes a viernes de 07:00 a 17:00, en la ciudad de Caaguazú.",
       "Los documentos y requisitos por nivel se detallan en las secciones Requisitos de inscripción y Matrículas. Ante cualquier duda, acercarse a Secretaría.",
     ],
   },
@@ -317,7 +317,7 @@ export const enrollmentInfo = {
   cost: "Institución pública: la enseñanza es gratuita y no se cobra matrícula ni aranceles.",
   dates: PENDING + ": calendario oficial de inscripciones a confirmar por la Dirección.",
   steps: [
-    "Completar la solicitud online en la sección Inscripciones o en Secretaría.",
+    "Acercarse a Secretaría con la documentación del aspirante.",
     "Presentar los documentos requeridos según el nivel (ver Requisitos).",
     "Aguardar la revisión de la solicitud (estado: Pendiente / En revisión / Aprobada).",
     "Confirmar la matriculación en Secretaría una vez aprobada la solicitud.",

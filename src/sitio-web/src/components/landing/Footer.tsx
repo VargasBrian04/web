@@ -32,9 +32,6 @@ export default function Footer() {
           <Link href="/login" className="hover:text-white">
             Acceder
           </Link>
-          <Link href="/inscripciones" className="hover:text-white">
-            Inscripciones
-          </Link>
           <a href="/#historia" className="hover:text-white">
             Institucional
           </a>

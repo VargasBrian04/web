@@ -979,6 +979,33 @@
   border-color: var(--reg-brown);
 }
 .reg-btn-add:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Botón de demostración: completa los campos con datos de ejemplo */
+.reg-demo-fill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  min-height: 2.45rem;
+  padding: 0 1rem;
+  color: var(--reg-brown);
+  background: #fdf6ec;
+  border: 1.5px dashed var(--reg-gold);
+  border-radius: 0.65rem;
+  font-size: 0.79rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.16s, border-color 0.16s, transform 0.16s;
+}
+.reg-demo-fill:hover {
+  background: #f8ecdc;
+  border-color: var(--reg-brown);
+  transform: translateY(-1px);
+}
+.reg-demo-fill:active { transform: translateY(0); }
+.reg-demo-fill svg { flex: 0 0 auto; }
 .reg-btn-mini {
   padding: 0.3rem 0.55rem;
   font-size: 0.7rem;

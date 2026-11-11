@@ -469,6 +469,10 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 [data-theme="oscuro"] .menu{background:#1b1b1b!important;border-color:#2e2e2e!important}
 [data-theme="oscuro"] .menu a{color:#e7e7e7!important}
 .demo-tag{display:inline-block;background:#fef3c7;color:#92400e;font-size:.65rem;font-weight:800;padding:2px 9px;border-radius:99px;text-transform:uppercase}
+.demo-fill{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin:12px 0 2px;min-height:38px;padding:8px 14px;color:#673d29;background:#fdf6ec;border:1.5px dashed #b88957;border-radius:10px;font-size:.79rem;font-weight:800;cursor:pointer;transition:background .16s,border-color .16s,transform .16s}
+.demo-fill:hover{background:#f8ecdc;border-color:#673d29;transform:translateY(-1px)}
+.demo-fill:active{transform:translateY(0)}
+.demo-fill svg{flex:0 0 auto}
 #toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:#2e201b;color:#fff;padding:12px 22px;border-radius:12px;font-size:.86rem;z-index:460;transition:transform .35s;box-shadow:0 12px 30px rgba(0,0,0,.4);border-left:5px solid var(--gold)}
 #toast.show{transform:translate(-50%,0)}
 .pulse{animation:pulseBtn 2.2s infinite}
@@ -693,7 +697,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 <a href="#oferta">Oferta académica</a><a href="#niveles">Niveles</a><a href="#estadisticas">Estadísticas</a><a href="#noticias">Noticias</a><a href="/encuestas">Encuestas</a>
 </div></div>
 <div class="drop"><button>📝 Admisiones ▾</button><div class="menu">
-<a href="#requisitos">Requisitos</a><a href="#matriculas">Inscripciones</a><a href="#contacto">Contacto</a>
+<a href="#requisitos">Requisitos</a><a href="#contacto">Contacto</a>
 </div></div>
 <div class="drop"><button>🖼️ Galería</button><div class="menu"><a href="#galeria">Ver galería</a></div></div>
 </div>
@@ -718,7 +722,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 <a class="l" href="#" onclick="togglePreviewTheme();return false" style="font-weight:800">🌙/☀️ Cambiar apariencia</a>
 <a class="cat">Institución</a><a class="l" href="#historia">Historia</a><a class="l" href="#mision">Misión</a><a class="l" href="#vision">Visión</a><a class="l" href="#docentes">Docentes</a><a class="l" href="#normas">Convivencia</a>
 <a class="cat">Académica</a><a class="l" href="#oferta">Oferta académica</a><a class="l" href="#niveles">Niveles</a><a class="l" href="#estadisticas">Estadísticas</a><a class="l" href="#noticias">Noticias</a><a class="l" href="/encuestas">Encuestas</a>
-<a class="l" href="https://aprendizaje.mec.edu.py/aprendizaje/familia/documentos" target="_blank" rel="noopener">✓ Calificaciones MEC ↗</a><a class="cat">Admisiones</a><a class="l" href="#requisitos">Requisitos</a><a class="l" href="#matriculas">Inscripciones</a><a class="l" href="#galeria">Galería</a><a class="l" href="#contacto">Contacto</a>
+<a class="l" href="https://aprendizaje.mec.edu.py/aprendizaje/familia/documentos" target="_blank" rel="noopener">✓ Calificaciones MEC ↗</a><a class="cat">Admisiones</a><a class="l" href="#requisitos">Requisitos</a><a class="l" href="#galeria">Galería</a><a class="l" href="#contacto">Contacto</a>
 </div>
 <style>
 </style>
@@ -764,7 +768,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <h1>Colegio Nacional Mariscal <span>Francisco Solano López</span></h1>
 <p class="sub">Formamos ciudadanos íntegros y técnicos altamente capacitados en Caaguazú. Educación Escolar Básica y 10 orientaciones del Nivel Medio. Educación pública, gratuita y de calidad.</p>
 <div class="hero-cta">
-<a class="btn btn-gold shine pulse" href="#matriculas">Inscripciones 2026 →</a>
+<a class="btn btn-gold shine pulse" href="/registro">Solicitar registro →</a>
 <a class="btn btn-ghost" href="#oferta">Ver oferta académica</a>
 </div>
 <div class="stats">
@@ -909,8 +913,8 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <div class="hist reveal"><h3>Gratuita y sin aranceles</h3>
 <p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Institución pública: la enseñanza es gratuita y no se cobra matrícula ni aranceles.</p>
 <p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Calendario oficial de inscripciones a confirmar por la Dirección.</p></div>
-<div class="card reveal"><h3 style="color:var(--inst)">Procedimiento</h3><div style="margin-top:14px"><a class="btn btn-gold shine" style="text-decoration:none;justify-content:center;width:100%" href="/inscripciones">Iniciar mi inscripción ✦</a></div><ul style="margin-top:12px;display:grid;gap:10px;font-size:.9rem;color:#57534e;list-style:none">
-<li><b>1.</b> Completar la solicitud online o en Secretaría.</li>
+<div class="card reveal"><h3 style="color:var(--inst)">Procedimiento</h3><div style="margin-top:14px"><a class="btn btn-gold shine" style="text-decoration:none;justify-content:center;width:100%" href="#contacto">Consultar en Secretaría</a></div><ul style="margin-top:12px;display:grid;gap:10px;font-size:.9rem;color:#57534e;list-style:none">
+<li><b>1.</b> Acercarse a Secretaría con la documentación del aspirante.</li>
 <li><b>2.</b> Presentar los documentos del nivel (ver Requisitos).</li>
 <li><b>3.</b> Aguardar la revisión (Pendiente / En revisión / Aprobada).</li>
 <li><b>4.</b> Confirmar la matriculación en Secretaría.</li></ul></div>
@@ -928,11 +932,11 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 
 <!-- CONTACTO -->
 <section id="contacto"><div class="wrap" style="display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:end">
-<div class="reveal"><h2 style="font-size:2rem;font-weight:900">Contacto e inscripciones</h2>
-<p style="color:#e7d5c3;margin-top:10px">Online o presencial en Secretaría.</p>
+<div class="reveal"><h2 style="font-size:2rem;font-weight:900">Contacto</h2>
+<p style="color:#e7d5c3;margin-top:10px">Atención presencial en Secretaría.</p>
 <ul style="margin-top:16px;display:grid;gap:8px;font-size:.9rem;color:#e7d5c3;list-style:none">
 <li>📍 Ciudad de Caaguazú, Paraguay</li><li>🕘 Secretaría: lunes a viernes 07:00 a 17:00</li><li>🌐 Ciclo lectivo 2026</li><li>📌 GPS: -25.46817°, -56.01172° · <a href="https://maps.app.goo.gl/jLyppMbyxBmu9eNn6" target="_blank" rel="noopener" style="color:var(--gold2);font-weight:700">Abrir en Google Maps ↗</a></li></ul></div>
-<div class="reveal" style="text-align:right"><a class="btn btn-gold shine pulse" style="font-size:1rem;padding:16px 28px" href="#matriculas">Iniciar mi inscripción ✦</a></div>
+<div class="reveal" style="text-align:right"><a class="btn btn-gold shine pulse" style="font-size:1rem;padding:16px 28px" href="/registro">Solicitar registro ✦</a></div>
 </div></section>
 
 <footer><div class="foot">
@@ -956,6 +960,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <input id="liUser" type="text" placeholder="Ej. 4.567.890" autocomplete="username">
 <label for="liPass">Contraseña</label>
 <input id="liPass" type="password" placeholder="••••••••" autocomplete="current-password">
+<button type="button" class="demo-fill" onclick="fillDemoLogin()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Rellenar con datos de ejemplo</button>
 <div class="login-err" id="liErr">Completá usuario y contraseña para ingresar.</div>
 <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:16px;padding:13px" type="submit">Ingresar →</button>
 </form>
@@ -978,7 +983,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <ul class="reg-benefits">
 <li><div class="reg-benefit-ico"><svg viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg></div><div><b>Acceso a tus clases y recursos</b><span>Plataforma educativa siempre disponible.</span></div></li><li><div class="reg-benefit-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><div><b>Seguimiento de tu progreso académico</b><span>Consultá tus calificaciones y avances.</span></div></li><li><div class="reg-benefit-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div><b>Comunidad educativa siempre conectada</b><span>Estudiantes, docentes y familias.</span></div></li><li><div class="reg-benefit-ico"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div><b>Construye tu futuro</b><span>Con educación, disciplina y valores.</span></div></li>
 </ul>
-<img class="reg-side-art" src="/images/fachada-colegio.webp" alt="" width="720" height="236">
+<img class="reg-side-art" src="/images/fachada-colegio-trazos.webp" alt="" width="720" height="236">
 <p class="reg-side-note">Dirección revisa cada solicitud antes de crear la cuenta y te contactará al correo o teléfono indicados.</p>
 </aside>
 <div class="reg-main">
@@ -989,6 +994,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 </div>
 <div class="reg-error-top" id="regTopErr" style="display:none"></div>
 <form id="regFormT" onsubmit="return submitRegT(event)">
+<button type="button" class="demo-fill" onclick="fillDemoTutor()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Rellenar con datos de ejemplo</button>
 <div class="reg-sec"><span class="reg-sec-n">1</span> Datos personales</div>
 <label for="rtNom">Nombres *</label>
 <input id="rtNom" type="text" placeholder="Tus nombres" autocomplete="given-name">
@@ -1010,6 +1016,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <button class="reg-btn reg-btn-primary" id="rtSend" type="submit">Enviar solicitud <span aria-hidden="true">→</span></button>
 </form>
 <form id="regFormD" style="display:none" onsubmit="return submitRegD(event)">
+<button type="button" class="demo-fill" onclick="fillDemoDocente()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Rellenar con datos de ejemplo</button>
 <div class="reg-sec"><span class="reg-sec-n">1</span> Datos personales</div>
 <label for="rdNom">Nombres *</label>
 <input id="rdNom" type="text" placeholder="Tus nombres" autocomplete="given-name">
@@ -1138,14 +1145,33 @@ var done=false;function fail(m){if(done)return;done=true;loginVeil(false);if(btn
 var timer=setTimeout(function(){fail('Tardó demasiado (servidor frío). Probá en /login.')},25000);
 realLogin(u,p).then(function(r){if(done)return;if(r.error){clearTimeout(timer);fail(r.code==='wrong_zone'?wrongZoneText():(r.error==='CredentialsSignin'?'Usuario o contraseña incorrectos. Revisá los datos.':'No se pudo ingresar. Probá en /login.'));return}
 fetch('/api/auth/session',{credentials:'same-origin',cache:'no-store'}).then(function(s){return s.json()}).then(function(j){if(!j||!j.user){clearTimeout(timer);fail('No se pudo confirmar la sesión. Probá en /login.');return}var uu=j.user;var allowed=(loginRole==='docente'&&(uu.role==='TEACHER'||uu.role==='ADMIN'))||(loginRole==='padre'&&uu.role==='PARENT')||(loginRole==='alumno'&&uu.role==='STUDENT');if(!allowed){clearTimeout(timer);realSignout(function(){fail(wrongZoneText())});return}realRole=uu.role||'';lastUser=uu.username||uu.email||'Usuario';userRole=(uu.role==='PARENT'?'padre':uu.role==='STUDENT'?'alumno':'docente');profile={name:uu.name||lastUser,avatar:uu.role==='ADMIN'?'🏛️':(typeof roleAvatar!=='undefined'&&roleAvatar[userRole])||'🎒',extra:'',bio:'',color:'var(--gold)',photo:null};paintChip();done=true;clearTimeout(timer);if(btn){btn.disabled=false;btn.textContent='Ingresar →'}loginVeil(true,'¡Bienvenido/a, '+displayName()+'!');if(typeof sfx==='function')sfx('ok');setTimeout(function(){loginVeil(false);closeLogin();hideRoles();try{scrollTo({top:0,behavior:'smooth'})}catch(e){}},800)}).catch(function(){clearTimeout(timer);fail('Error de red. Probá en /login.')})}).catch(function(){fail('Error de red. Probá en /login.')});return false}
-function fillDemo(email){document.getElementById('liUser').value=email;document.getElementById('liErr').style.display='none'}
+/* Credenciales de ejemplo: reemplazar por las reales del colegio. */
+function fillDemoLogin(){document.getElementById('liUser').value='direccion@colegio.edu.py';document.getElementById('liPass').value='Colegio2026';document.getElementById('liErr').style.display='none'}
+function fillDemoTutor(){
+document.getElementById('rtNom').value='María Elena';
+document.getElementById('rtApe').value='Gómez Benítez';
+document.getElementById('rtCi').value='4567890';
+document.getElementById('rtTel').value='0975 1234567';
+document.getElementById('rtMail').value='maria.gomez@correo.com';
+['e-rtNom','e-rtApe','e-rtCi','e-rtTel','e-rtMail'].forEach(function(id){setErr(id,null)});
+rtHijos=[{nombre:'Ana Belén Gómez',nivel:'MEDIA',curso:'2.º',seccion:'A',turno:'MAÑANA',bachiller:'CCB'}];
+regTopErr(null);var tries=0;function paint(){rtPaintHijos();if(!REG_CAT&&tries++<40)setTimeout(paint,200)}paint();if(!REG_CAT)loadRegCat();}
+function fillDemoDocente(){
+document.getElementById('rdNom').value='Carlos Alberto';
+document.getElementById('rdApe').value='Ramírez Ovelar';
+document.getElementById('rdCi').value='3456789';
+document.getElementById('rdTel').value='0981 456789';
+document.getElementById('rdMail').value='carlos.ramirez@correo.com';
+['e-rdNom','e-rdApe','e-rdCi','e-rdTel','e-rdMail'].forEach(function(id){setErr(id,null)});
+rdNiveles=['MEDIA'];rdCursosSel=['3.º Media'];rdBachSel=['AGR'];
+regTopErr(null);var tries=0;function paint(){paintRegChips();paintRegSubj();if(REG_CAT){var agr=rdSubjVisibles().filter(function(s){return s.gradeYear===3&&s.academicCode==='AGR'});if(agr.length){document.getElementById('rdMP').value=agr[0].code;rdOtras=agr[1]?[agr[1].code]:[]}rdPaintOtras()}if(!REG_CAT&&tries++<40)setTimeout(paint,200)}paint();if(!REG_CAT)loadRegCat();}
 /* Solicitudes reales a la base de datos (POST /api/solicitudes + catálogo). */
 var REG_CAT=null,REG_TAB='tutor',REG_SENDING=false;
 function openReg(tab){closeLogin();regTab(tab||'tutor');if(!rtHijos.length)rtAddHijo();document.getElementById('regTopErr').style.display='none';document.getElementById('regModal').classList.add('open');loadRegCat()}
 var rdNiveles=[];function rdToggleNivel(n){var i=rdNiveles.indexOf(n);if(i>=0)rdNiveles.splice(i,1);else rdNiveles.push(n);rdCursosSel=[];rdBachSel=[];rdNivelChange()}
 function closeReg(){document.getElementById('regModal').classList.remove('open')}
 function regTab(t){REG_TAB=t;document.getElementById('regTabT').classList.toggle('on',t==='tutor');document.getElementById('regTabD').classList.toggle('on',t==='docente');document.getElementById('regFormT').style.display=t==='tutor'?'':'none';document.getElementById('regFormD').style.display=t==='docente'?'':'none';document.getElementById('regOk').style.display='none'}
-function loadRegCat(){if(REG_CAT){paintRegCat();return}fetch('/api/catalogo').then(function(r){return r.json()}).then(function(j){if(j.data){REG_CAT=j.data;paintRegCat()}else{regTopErr('No se pudo cargar la oferta académica')}}).catch(function(){regTopErr('No se pudo completar. Intentá de nuevo.')})}
+function loadRegCat(){function paint(){paintRegCat();if(typeof rtPaintHijos==='function')rtPaintHijos()}if(REG_CAT){paint();return}fetch('/api/catalogo').then(function(r){return r.json()}).then(function(j){if(j.data){REG_CAT=j.data;paint()}else{regTopErr('No se pudo cargar la oferta académica')}}).catch(function(){regTopErr('No se pudo completar. Intentá de nuevo.')})}
 function regTopErr(m){var e=document.getElementById('regTopErr');if(!m){e.style.display='none';return}e.textContent=m;e.style.display='block'}
 function setErr(id,msg){var e=document.getElementById(id);if(!e)return;if(msg){e.textContent=msg;e.classList.add('show')}else{e.classList.remove('show')}}
 function valPerson(p){var e={};if(!/^\d{6,10}$/.test(p.ci))e.ci='Cédula inválida (6 a 10 dígitos)';if(!p.firstName)e.firstName='Obligatorio';if(!p.lastName)e.lastName='Obligatorio';if(p.phone.replace(/\D/g,'').length<6)e.phone='Mínimo 6 dígitos';if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email))e.email='Correo inválido';return e}
@@ -1226,15 +1252,15 @@ function paintPfPhoto(){var im=document.getElementById('pfPhotoPrev'),del=docume
 document.getElementById('profileModal').addEventListener('click',function(e){if(e.target===this)closeProfile()});
 function openDirectorDash(user){document.getElementById('dIcon').textContent='🏛️';document.getElementById('dHello').textContent='Hola, '+user;document.getElementById('dRole').textContent='Panel de Direcci\u00f3n';
 var s='<div class="dash-sec">📥 Solicitudes pendientes</div><p id="dirCounts" style="font-size:.82rem;color:var(--mut)">Cargando de la base de datos\u2026</p>';
-s+='<div class="dash-sec">🛠️ Gesti\u00f3n real</div><a class="dash-btn" style="text-decoration:none" href="/portal/admin">📋 <span><b>Bandeja de Direcci\u00f3n</b><br><span style="font-size:.8rem;color:var(--mut)">Solicitudes e inscripciones para aprobar.</span></span></a><a class="dash-btn" style="text-decoration:none" href="/portal/admin">👨‍🏫 <span><b>Herramientas docente</b><br><span style="font-size:.8rem;color:var(--mut)">Nómina, fotos y crear tarea (pestaña Docente).</span></span></a><a class="dash-btn" style="text-decoration:none" href="/portal/profesor">👨‍🏫 <span><b>Ver como docente</b><br><span style="font-size:.8rem;color:var(--mut)">Panel docente real.</span></span></a><a class="dash-btn" style="text-decoration:none" href="/portal/admin/noticias">📰 <span><b>Gestionar noticias</b><br><span style="font-size:.8rem;color:var(--mut)">Crear, publicar y borrar.</span></span></a><button class="dash-btn" onclick="dashGo(\'#noticias\')">📰 <span><b>Ver blog</b><br><span style="font-size:.8rem;color:var(--mut)">Lo que ve el p\u00fablico.</span></span></button>';
+s+='<div class="dash-sec">🛠️ Gesti\u00f3n real</div><a class="dash-btn" style="text-decoration:none" href="/portal/admin">📋 <span><b>Bandeja de Direcci\u00f3n</b><br><span style="font-size:.8rem;color:var(--mut)">Solicitudes de cuenta para aprobar.</span></span></a><a class="dash-btn" style="text-decoration:none" href="/portal/admin">👨‍🏫 <span><b>Herramientas docente</b><br><span style="font-size:.8rem;color:var(--mut)">Nómina, fotos y crear tarea (pestaña Docente).</span></span></a><a class="dash-btn" style="text-decoration:none" href="/portal/profesor">👨‍🏫 <span><b>Ver como docente</b><br><span style="font-size:.8rem;color:var(--mut)">Panel docente real.</span></span></a><a class="dash-btn" style="text-decoration:none" href="/portal/admin/noticias">📰 <span><b>Gestionar noticias</b><br><span style="font-size:.8rem;color:var(--mut)">Crear, publicar y borrar.</span></span></a><button class="dash-btn" onclick="dashGo(\'#noticias\')">📰 <span><b>Ver blog</b><br><span style="font-size:.8rem;color:var(--mut)">Lo que ve el p\u00fablico.</span></span></button>';
 s+='<div class="dash-sec">👤 Cuenta</div><p style="font-size:.8rem;color:var(--mut)">\u2709\ufe0f Avisos a: <b>colegionacionalemd6@gmail.com</b></p><button class="dash-btn" onclick="backToRoles()">🔄 <span><b>Cambiar de perfil</b><br><span style="font-size:.8rem;color:var(--mut)">Volver a Docente / Tutor.</span></span></button><button class="dash-btn" onclick="closeDash()"><span><b>Cerrar panel</b></span></button>';
 document.getElementById('dBody').innerHTML=s;document.getElementById('dashModal').classList.add('open');
-fetch('/api/solicitudes?status=PENDIENTE',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).then(function(a){fetch('/api/enrollments?status=PENDIENTE',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).then(function(b){var el=document.getElementById('dirCounts');if(!el)return;if(!a&&!b){el.innerHTML='Inici\u00e1 sesi\u00f3n real en <a href="/login?next=/portal/admin">/login</a> para ver los pendientes.';return}var ns=(a&&(a.data||[]).length)||0,ne=(b&&(b.data||[]).length)||0;el.innerHTML='<b>'+ns+'</b> solicitudes de registro · <b>'+ne+'</b> inscripciones pendientes. <a href="/portal/admin">Abrir bandeja \u2192</a>'})}).catch(function(){var el=document.getElementById('dirCounts');if(el)el.innerHTML='<a href="/portal/admin">Abrir bandeja real \u2192</a>'})}
+fetch('/api/solicitudes?status=PENDIENTE',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).then(function(a){var el=document.getElementById('dirCounts');if(!el)return;if(!a){el.innerHTML='Inici\u00e1 sesi\u00f3n real en <a href="/login?next=/portal/admin">/login</a> para ver los pendientes.';return}var ns=(a.data||[]).length;el.innerHTML='<b>'+ns+'</b> solicitudes de registro pendientes. <a href="/portal/admin">Abrir bandeja \u2192</a>'}).catch(function(){var el=document.getElementById('dirCounts');if(el)el.innerHTML='<a href="/portal/admin">Abrir bandeja real \u2192</a>'})}
 function openDash(user){document.getElementById('dIcon').textContent=roleNames[loginRole][0];document.getElementById('dHello').textContent='Hola, '+user;document.getElementById('dRole').textContent=roleNames[loginRole][2];
 if(isDirector()){openDirectorDash(user);return}
 var b='';
-if(loginRole==='alumno'){b='<button class="dash-btn" onclick="dashGo(\'#calificaciones\')">📊 <span><b>Mis calificaciones</b><br><span style="font-size:.8rem;color:var(--mut)">Materias, notas por período, promedio y estado.</span></span></button><button class="dash-btn" onclick="dashGo(\'#matriculas\')">📝 <span><b>Mi matriculación</b><br><span style="font-size:.8rem;color:var(--mut)">Estado de tu inscripción y pasos.</span></span></button><button class="dash-btn" onclick="dashGo(\'#noticias\')">📰 <span><b>Noticias del colegio</b></span></button>'}
-else if(loginRole==='docente'){b='<div class="dash-sec">Portal real del docente</div><a class="dash-btn" style="text-decoration:none" href="/portal/profesor"><span><b>Mis cursos, fotos y crear tarea</b><br><span style="font-size:.8rem;color:var(--mut)">Nómina, bitácora de fotos y tarea digital.</span></span></a><a class="dash-btn" style="text-decoration:none" href="/portal/profesor/noticias"><span><b>Gestionar noticias</b><br><span style="font-size:.8rem;color:var(--mut)">Crear y publicar en el blog.</span></span></a><a class="dash-btn" style="text-decoration:none" href="/portal/profesor/inscripciones"><span><b>Ver inscripciones</b><br><span style="font-size:.8rem;color:var(--mut)">Solo lectura.</span></span></a><a class="dash-btn" style="text-decoration:none" href="/login?next=/portal/profesor"><span><b>Iniciar sesión real</b><br><span style="font-size:.8rem;color:var(--mut)">Si aún ves la demo, entrá aquí.</span></span></a><button class="dash-btn" onclick="dashGo(\'#docentes\')">👥 <span><b>Plantel docente</b></span></button>'}
+if(loginRole==='alumno'){b='<button class="dash-btn" onclick="dashGo(\'#calificaciones\')">📊 <span><b>Mis calificaciones</b><br><span style="font-size:.8rem;color:var(--mut)">Materias, notas por período, promedio y estado.</span></span></button><button class="dash-btn" onclick="dashGo(\'#requisitos\')">📋 <span><b>Requisitos y matrículas</b><br><span style="font-size:.8rem;color:var(--mut)">Documentos y pasos de inscripción.</span></span></button><button class="dash-btn" onclick="dashGo(\'#noticias\')">📰 <span><b>Noticias del colegio</b></span></button>'}
+else if(loginRole==='docente'){b='<div class="dash-sec">Portal real del docente</div><a class="dash-btn" style="text-decoration:none" href="/portal/profesor"><span><b>Mis cursos, fotos y crear tarea</b><br><span style="font-size:.8rem;color:var(--mut)">Nómina, bitácora de fotos y tarea digital.</span></span></a><a class="dash-btn" style="text-decoration:none" href="/portal/profesor/noticias"><span><b>Gestionar noticias</b><br><span style="font-size:.8rem;color:var(--mut)">Crear y publicar en el blog.</span></span></a><a class="dash-btn" style="text-decoration:none" href="/login?next=/portal/profesor"><span><b>Iniciar sesión real</b><br><span style="font-size:.8rem;color:var(--mut)">Si aún ves la demo, entrá aquí.</span></span></a><button class="dash-btn" onclick="dashGo(\'#docentes\')">👥 <span><b>Plantel docente</b></span></button>'}
 else{b='<button class="dash-btn" onclick="dashGo(\'#calificaciones\')">📊 <span><b>Notas de mis hijos</b><br><span style="font-size:.8rem;color:var(--mut)">Hijos vinculados a tu usuario.</span></span></button><button class="dash-btn" onclick="dashGo(\'#requisitos\')">📋 <span><b>Requisitos y matrículas</b></span></button><button class="dash-btn" onclick="dashGo(\'#contacto\')">📞 <span><b>Contacto con Secretaría</b></span></button>'}
 b+='<div class="dash-sec">👤 Cuenta</div><button class="dash-btn" onclick="backToRoles()">🔄 <span><b>Cambiar de perfil</b><br><span style="font-size:.8rem;color:var(--mut)">Volver a Docente / Tutor.</span></span></button><button class="dash-btn" onclick="closeDash()"><span><b>Cerrar panel</b></span></button>';
 document.getElementById('dBody').innerHTML=b;document.getElementById('dashModal').classList.add('open')}
@@ -1449,7 +1475,7 @@ function delGalAlbum(i){galCustom.albums.splice(i,1);persistGal();paintGal();ref
 /* noticias */
 var NEWS=[
 {img:'/images/landing/c970fc533514.webp',cat:'Inscripciones',date:'2026-11-25',au:'Dirección',t:'Preinscripción 1er Curso de la Media: 09 y 10 de diciembre',x:'Fecha de preinscripción, copia de C.I. del alumno y del padre/madre o tutor, y antecedente académico de la EEB. Reunión informativa martes 09/12 a las 07:30 hs.',b:['La Dirección convoca a la preinscripción del 1er Curso del Nivel Medio los días 09 y 10 de diciembre.','Requisitos: copia de cédula de identidad del alumno y del padre, madre o tutor, más el antecedente académico de la EEB.','Reunión informativa: martes 09/12 a las 07:30 hs. en el local institucional.']},
-{img:'/images/landing/da9e2b25e31a.webp',cat:'Inscripciones',date:'2026-10-01',au:'Dirección',t:'Inscripciones abiertas para el ciclo lectivo 2026',x:'La inscripción se realiza online desde el portal o presencial en Secretaría (lunes a viernes 07:00 a 17:00).',b:['El Colegio informa que las inscripciones 2026 están abiertas para EEB (7.º a 9.º) y las 10 orientaciones del Nivel Medio.','El trámite puede iniciarse online o en Secretaría, Caaguazú, de lunes a viernes de 07:00 a 17:00.','Los documentos por nivel están en Requisitos y Matrículas.']},
+{img:'/images/landing/da9e2b25e31a.webp',cat:'Inscripciones',date:'2026-10-01',au:'Dirección',t:'Inscripciones abiertas para el ciclo lectivo 2026',x:'La inscripción se realiza presencialmente en Secretaría (lunes a viernes 07:00 a 17:00).',b:['El Colegio informa que las inscripciones 2026 están abiertas para EEB (7.º a 9.º) y las 10 orientaciones del Nivel Medio.','El trámite se realiza en Secretaría, Caaguazú, de lunes a viernes de 07:00 a 17:00.','Los documentos por nivel están en Requisitos y Matrículas.']},
 {img:'/images/landing/9d73076309b4.webp',cat:'Académico',date:'2026-09-15',au:'Coordinación Académica',t:'Sphynx, la app de nuestros alumnos, logra el 2.º puesto en el hackatón',x:'Un equipo de estudiantes representó al colegio en la competencia de hackatón con su aplicación Sphynx y regresó con el segundo puesto.',b:['Un equipo de alumnos de la institución participó en la competencia de hackatón, donde presentaron su aplicación titulada Sphynx ante el jurado y los demás competidores.','El proyecto fue reconocido con el segundo puesto de la competencia, un logro que premia la creatividad, el trabajo en equipo y la formación técnica de nuestros estudiantes.','La Dirección y toda la comunidad educativa felicitan a los alumnos por dejar en alto el nombre del Colegio Nacional Mariscal Francisco Solano López.']},
 {img:'/images/landing/9fe45d54ab34.webp',cat:'Institucional',date:'2026-10-01',au:'Dirección',t:'Somos 1.577 estudiantes: la comunidad sigue creciendo',x:'621 en EEB y 956 en Nivel Medio (Científico 337, Servicios 287, Industrial 332).',b:['En octubre de 2026 la institución alcanza 1.577 estudiantes: 621 en EEB y 956 en Nivel Medio.','Detalle por curso y turno en la sección Estadísticas.','Gracias a las familias y docentes por este crecimiento de la educación pública en Caaguazú.']}];
 function openNews(i){var n=NEWS[i];if(n&&n.slug){location.href='/noticias/'+n.slug;return}document.getElementById('nmImg').src=n.img;document.getElementById('nmMeta').textContent=n.cat+' · '+n.date+' · Por '+n.au;document.getElementById('nmTitle').textContent=n.t;document.getElementById('nmBody').innerHTML=n.b.map(function(p){return '<p>'+p+'</p>'}).join('');document.getElementById('newsModal').classList.add('open')}

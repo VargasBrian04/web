@@ -10,7 +10,7 @@ import TeacherTools from "@/components/portal/TeacherTools";
 import { PollsAdmin } from "@/components/portal/SchoolAdmin";
 
 const TABS = [
-  { id: "insc", label: "📝 Inscripciones" },
+  { id: "resumen", label: "Resumen" },
   { id: "cuentas", label: "👥 Cuentas" },
   { id: "docente", label: "👨‍🏫 Docente" },
   { id: "contenido", label: "🖼️ Contenido" },
@@ -19,7 +19,7 @@ const TABS = [
 
 /** Panel de Dirección ordenado por pestañas (una zona a la vez). */
 export default function AdminTabs() {
-  const [tab, setTab] = useState<string>("insc");
+  const [tab, setTab] = useState<string>("resumen");
   return (
     <div className="grid gap-4">
       <nav className="sticky top-16 z-30 -mx-1 flex gap-2 overflow-x-auto rounded-2xl border border-stone-200 bg-white p-2 shadow-sm">
@@ -40,7 +40,7 @@ export default function AdminTabs() {
         ))}
       </nav>
 
-      {tab === "insc" && (
+      {tab === "resumen" && (
         <div className="grid gap-6">
           <AdminBoard />
         </div>

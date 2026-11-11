@@ -669,8 +669,8 @@ export function EnrollmentInfoSection() {
                 </li>
               ))}
             </ol>
-            <a href="/inscripciones" className="btn-primary mt-6">
-              Ir a inscripciones
+            <a href="/registro" className="btn-primary mt-6">
+              Solicitar registro
             </a>
           </div>
         </Reveal>

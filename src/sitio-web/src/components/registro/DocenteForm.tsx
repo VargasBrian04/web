@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  FieldError, Field, FormError, Icon, Person, PersonErrors, PersonFields, RegFoot,
+  DemoFill, FieldError, Field, FormError, Icon, Person, PersonErrors, PersonFields, RegFoot,
   RegShell, SectionTitle, SubmitButton, SuccessView, inputCls, useCatalog,
 } from "./shared";
 
@@ -25,6 +25,7 @@ export default function DocenteForm() {
   const [sending, setSending] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [demoPending, setDemoPending] = useState(false);
 
   const subjects = cat?.subjects ?? [];
   const eeb = cat?.eebGrades ?? [];
@@ -113,6 +114,48 @@ export default function DocenteForm() {
     return s ? `${s.name} (${s.code})` : code;
   }
 
+  /** Aplica la materia principal y una extra del catálogo ya cargado. */
+  function applyDemoSubjects() {
+    const agr = subjects.filter((s) => s.gradeYear === 3 && s.academicCode === "AGR");
+    const principal = agr[0]?.code ?? subjects.find((s) => s.gradeYear === 3)?.code ?? "";
+    const extra = agr.find((s) => s.code !== principal)?.code;
+    setMateriaPrincipal(principal);
+    setOtras(extra ? [extra] : []);
+  }
+
+  /** Rellena el formulario con datos de ejemplo (demostración). */
+  function fillDemo() {
+    setPerson({
+      ci: "3456789",
+      firstName: "Carlos Alberto",
+      lastName: "Ramírez Ovelar",
+      phone: "0981 456789",
+      email: "carlos.ramirez@correo.com",
+    });
+    setPErr({});
+    setMateriaPrincipalOtra("");
+    setMpErr(undefined);
+    setOtraSel("");
+    setOtraLibre("");
+    setOtras([]);
+    setOtrasErr(undefined);
+    setNiveles(["MEDIA"]);
+    setCursos(["3.º"]);
+    setBachilleres(["AGR"]);
+    setAsigErr(undefined);
+    setServerError(null);
+    // Si el catálogo aún no llegó, las materias se completan al cargarse.
+    if (subjects.length > 0) applyDemoSubjects();
+    else setDemoPending(true);
+  }
+
+  useEffect(() => {
+    if (!demoPending || subjects.length === 0) return;
+    applyDemoSubjects();
+    setDemoPending(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoPending, subjects.length]);
+
   function validate(): boolean {
     const pe: PersonErrors = {};
     if (!/^\d{6,10}$/.test(person.ci.trim())) pe.ci = "Cédula inválida (6 a 10 dígitos)";
@@ -190,6 +233,8 @@ export default function DocenteForm() {
   return (
     <RegShell>
       <form onSubmit={submit} noValidate>
+        <DemoFill onClick={fillDemo} />
+
         <section className="reg-block">
           <SectionTitle n="1" title="Datos personales" desc="Tus datos como docente." icon={Icon.user} />
           <PersonFields

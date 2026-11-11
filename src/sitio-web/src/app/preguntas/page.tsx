@@ -7,7 +7,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "¿Cómo me inscribo?",
-    a: "Completá la solicitud en la página Inscripciones con los datos del aspirante, el tutor y los documentos. Secretaría la revisa y te contacta.",
+    a: "La inscripción se realiza presencialmente en Secretaría con los documentos del aspirante y del tutor. Consultá el calendario y los requisitos en la sección Inscripciones.",
   },
   {
     q: "¿Qué niveles ofrecen?",

@@ -25,8 +25,8 @@ export default function Hero() {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
-          <Link href="/inscripciones" className="btn-gold">
-            Inscripciones 2026
+          <Link href="/registro" className="btn-gold">
+            Solicitar registro
           </Link>
           <a href="#oferta" className="btn-outline">
             Ver oferta académica

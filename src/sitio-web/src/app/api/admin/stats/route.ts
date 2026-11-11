@@ -10,17 +10,16 @@ export async function GET() {
     return NextResponse.json({ error: "Solo Secretaría/Dirección" }, { status: 403 });
 
   try {
-    const [usersByRole, enrollByStatus, gradesCount, assignCount, attendanceCount, academics] =
+    const [usersByRole, gradesCount, assignCount, attendanceCount, academics] =
       await Promise.all([
         prisma.user.groupBy({ by: ["role"], _count: { role: true } }),
-        prisma.enrollment.groupBy({ by: ["status"], _count: { status: true } }),
         prisma.grade.count(),
         prisma.assignment.count(),
         prisma.attendance.count(),
         prisma.academic.findMany({ select: { code: true, shortName: true, name: true, _count: { select: { students: true } } } }),
       ]);
     return NextResponse.json({
-      data: { usersByRole, enrollByStatus, gradesCount, assignCount, attendanceCount, academics },
+      data: { usersByRole, gradesCount, assignCount, attendanceCount, academics },
     });
   } catch (e) {
     console.error("GET /api/admin/stats", e);

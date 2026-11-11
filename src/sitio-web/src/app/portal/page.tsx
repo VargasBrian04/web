@@ -10,6 +10,6 @@ export default async function PortalIndex() {
     case "TEACHER": redirect("/portal/profesor");
     case "STUDENT": redirect("/portal/alumno");
     case "PARENT": redirect("/portal/padre");
-    default: redirect("/inscripciones");
+    default: redirect("/registro");
   }
 }

@@ -200,7 +200,7 @@ export function AcademicOfferSection() {
 
         <p className="mt-6 text-[13px] leading-relaxed text-slate-500 sm:mt-8 sm:text-sm">
           Consulta disponibilidad de cupos, horarios y turnos en la Secretaría
-          del colegio o a través del registro de inscripciones.
+          del colegio o a través de la solicitud de registro.
         </p>
       </div>
     </section>
@@ -226,16 +226,15 @@ export function ContactSection() {
     <section id="contacto" className="bg-[var(--institutional)] py-16 text-white">
       <div className="container-c grid gap-8 md:grid-cols-2">
         <div>
-          <h2 className="text-3xl font-extrabold">Contacto e inscripciones</h2>
+          <h2 className="text-3xl font-extrabold">Contacto</h2>
           <p className="mt-3 text-stone-200">
-            La inscripción al ciclo lectivo se realiza de forma online a través
-            del portal de inscripciones, o presencial en la Secretaría del
-            colegio.
+            Las consultas y la inscripción al ciclo lectivo se realizan
+            presencialmente en la Secretaría del colegio.
           </p>
           <ul className="mt-6 space-y-2 text-sm text-stone-200">
             <li>Ciudad de Caaguazú, Departamento de Caaguazú, Paraguay</li>
             <li>Secretaría del colegio: lunes a viernes de 07:00 a 17:00</li>
-            <li>Portal de inscripciones disponible en "/registro"</li>
+            <li>Solicitud de cuenta en "/registro"</li>
             <li>
               GPS: -25.46817°, -56.01172° ·{" "}
               <a
@@ -250,8 +249,8 @@ export function ContactSection() {
           </ul>
         </div>
         <div className="flex items-end justify-start md:justify-end">
-          <a href="/inscripciones" className="btn-gold">
-            Iniciar mi inscripción
+          <a href="/registro" className="btn-gold">
+            Solicitar registro
           </a>
         </div>
       </div>

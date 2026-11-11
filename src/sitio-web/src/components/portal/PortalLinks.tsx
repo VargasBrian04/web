@@ -30,7 +30,6 @@ export default function PortalLinks({ role }: { role: string }) {
               { href: "/portal/alumno", label: "Mis notas" },
               { href: "/portal/alumno/carnet", label: "Mi carné" },
               { href: "/portal/perfil", label: "Mi perfil" },
-              { href: "/inscripciones", label: "Inscripciones" },
             ]
           : role === "TEACHER"
             ? [
@@ -43,7 +42,6 @@ export default function PortalLinks({ role }: { role: string }) {
                 { href: "/portal/perfil", label: "Mi perfil" },
                 { href: "/portal/profesor", label: "Ver como docente" },
                 { href: "/portal/alumno", label: "Ver como alumno" },
-                { href: "/inscripciones", label: "Inscripciones" },
               ];
 
   return (

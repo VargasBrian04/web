@@ -8,6 +8,13 @@ import {
   portalZoneFromPath,
   wrongZoneMessage,
 } from "@/lib/portal-access";
+import { DemoFill } from "@/components/registro/shared";
+
+/**
+ * Credenciales de ejemplo para la demostración del ingreso.
+ * Reemplazá estos valores por los reales del colegio cuando los tengas.
+ */
+const DEMO_LOGIN = { identifier: "direccion@colegio.edu.py", password: "Colegio2026" };
 
 /**
  * Formulario de ingreso RBAC. Tras validar credenciales (bcrypt en el
@@ -96,6 +103,13 @@ export default function LoginForm() {
 
   const isWrongZone = error?.startsWith("Zona de Ingreso Incorrecta");
 
+  /** Rellena usuario y contraseña de ejemplo (demostración). */
+  function fillDemo() {
+    setIdentifier(DEMO_LOGIN.identifier);
+    setPassword(DEMO_LOGIN.password);
+    setError(null);
+  }
+
   return (
     <form
       onSubmit={onSubmit}
@@ -169,14 +183,18 @@ export default function LoginForm() {
             </span>
           </label>
 
+          <div className="mt-4">
+            <DemoFill onClick={fillDemo} />
+          </div>
+
           <button type="submit" disabled={loading} className="btn-primary mt-5 w-full justify-center sm:mt-6">
             {loading ? "Verificando…" : "Ingresar"}
           </button>
 
           <p className="mt-4 text-center text-sm text-slate-500">
             ¿Aspirante nuevo?{" "}
-            <a href="/inscripciones" className="font-bold text-[var(--institutional)] underline">
-              Inscribite aquí
+            <a href="/registro" className="font-bold text-[var(--institutional)] underline">
+              Solicitá tu cuenta
             </a>
           </p>
         </>

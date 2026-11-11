@@ -6,8 +6,6 @@
  * Sin configuración no rompe: todo igual se guarda y queda pendiente.
  */
 
-const DESTINO = "colegionacionalemd6@gmail.com";
-
 export function mailConfigurado(): boolean {
   return !!(
     process.env.RESEND_API_KEY ||
@@ -68,34 +66,4 @@ export async function enviarCorreo(
   }
   console.warn("MAIL_SKIP sin correo configurado");
   return 0;
-}
-
-export async function avisarInscripcion(detalle: {
-  codigo: string;
-  alumno: string;
-  ci: string;
-  nivel: string;
-  curso: string;
-  seccion?: string | null;
-  turno: string;
-  bachiller?: string | null;
-  tutor: string;
-  tutorTelefono: string;
-}): Promise<boolean> {
-  const texto = [
-    `Nueva solicitud de inscripción (${detalle.codigo}) para revisión.`,
-    ``,
-    `Alumno: ${detalle.alumno} (CI ${detalle.ci})`,
-    `Nivel: ${detalle.nivel} ${detalle.curso}${detalle.seccion ? ` "${detalle.seccion}"` : ""} — Turno ${detalle.turno}`,
-    ...(detalle.bachiller ? [`Bachillerato: ${detalle.bachiller}`] : []),
-    `Tutor: ${detalle.tutor} — Tel: ${detalle.tutorTelefono}`,
-    ``,
-    `Revisar en el panel de administración.`,
-  ].join("\n");
-  const ok = await enviarCorreo(
-    [DESTINO],
-    `Nueva solicitud de inscripción ${detalle.codigo} — ${detalle.alumno}`,
-    texto
-  );
-  return ok > 0;
 }

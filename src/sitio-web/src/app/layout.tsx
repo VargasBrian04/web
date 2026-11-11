@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | Colegio Mariscal Solano López"
   },
   description:
-    "Institución educativa pública de Caaguazú, Paraguay. Inscripciones, oferta académica y portal para estudiantes, docentes y familias.",
+    "Institución educativa pública de Caaguazú, Paraguay. Oferta académica, requisitos de inscripción y portal para estudiantes, docentes y familias.",
   manifest: "/manifest.webmanifest",
 };
 

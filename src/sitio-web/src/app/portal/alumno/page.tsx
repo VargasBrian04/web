@@ -27,7 +27,6 @@ export default async function AlumnoPage() {
     delivered: boolean;
     score: number | null;
   }[] = [];
-  let enrollments: { academic: string; period: string; status: string }[] = [];
   let docs: { id: string; title: string; type: string; subject: string | null }[] = [];
   let obs: { id: string; text: string; date: Date }[] = [];
   let dbReady = true;
@@ -35,7 +34,7 @@ export default async function AlumnoPage() {
   try {
     const student = await prisma.student.findUnique({ where: { userId: session!.user.id } });
     if (student) {
-      const [gRows, aRows, tRows, eRows, dRows, oRows] = await Promise.all([
+      const [gRows, aRows, tRows, dRows, oRows] = await Promise.all([
         prisma.grade.findMany({
           where: { studentId: student.id },
           include: { subject: { select: { name: true, code: true } }, period: { select: { name: true, label: true } } },
@@ -55,11 +54,6 @@ export default async function AlumnoPage() {
           },
           orderBy: { createdAt: "desc" },
           take: 30,
-        }),
-        prisma.enrollment.findMany({
-          where: { studentId: student.id },
-          include: { academic: { select: { name: true } } },
-          orderBy: { createdAt: "desc" },
         }),
         prisma.document.findMany({
           where: {
@@ -88,7 +82,6 @@ export default async function AlumnoPage() {
         delivered: t.submissions.length > 0 && t.submissions[0].status !== "PENDIENTE",
         score: t.submissions[0]?.score ?? null,
       }));
-      enrollments = eRows.map((e: any) => ({ academic: e.academic.name, period: e.periodLabel, status: e.status }));
       docs = (dRows as any[]).map((d: any) => ({ id: d.id, title: d.title, type: d.type, subject: d.subject?.name ?? null }));
       obs = (oRows as any[]).map((o: any) => ({ id: o.id, text: o.text, date: o.createdAt }));
     }
@@ -206,20 +199,6 @@ export default async function AlumnoPage() {
           )}
         </section>
       </div>
-
-      {enrollments.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h2 className="text-lg font-extrabold text-[var(--institutional)]">Mis inscripciones</h2>
-          <ul className="mt-3 space-y-2 text-sm">
-            {enrollments.map((e, i) => (
-              <li key={i} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-2">
-                <span>{e.academic} · Período {e.period}</span>
-                <span className="rounded bg-slate-200 px-2 py-0.5 font-bold">{e.status}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       <div className="grid gap-8 lg:grid-cols-2">
         <section className="rounded-2xl border border-slate-200 bg-white p-6">
