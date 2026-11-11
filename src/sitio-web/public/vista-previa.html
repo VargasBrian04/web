@@ -1393,12 +1393,23 @@ var teachers=[
 ['Ciencias Sociales','Nivel Medio · Docente · Humanidades','/images/landing/75935bd3d1ef.webp']];
 var areas=['Todas','Técnica','Humanidades','Ciencias','EEB'],af=document.getElementById('areaFilters'),tg=document.getElementById('teacherGrid'),curA='Todas';
 var TEACHERS_LIVE=null;
-function paintTeachers(){tg.innerHTML='';var list=TEACHERS_LIVE||teachers.map(function(t){return{nombre:t[3]||'Docente',materia:t[0],area:t[1],img:t[2],titulo:t[4]||'',materias:'',bio:t[5]||'',horario:t[6]||''}});
-list=list.filter(function(t){return curA==='Todas'||t.area.indexOf(curA)>=0});
-list.forEach(function(t){var d=document.createElement('div');d.className='card reveal visible';d.style.cursor='pointer';
-var pic=t.img?'<img src="'+t.img+'" alt="" loading="lazy" style="width:100%;height:170px;object-fit:cover;border-radius:12px" onerror="this.style.display=\'none\'">':'<div style="width:100%;height:170px;border-radius:12px;background:linear-gradient(135deg,var(--inst),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.6rem;font-weight:900">'+t.nombre.charAt(0)+'</div>';
+/* Área del docente según el bachillerato de sus materias (para los filtros). */
+function tArea(x){var c=(x.materias||[]).map(function(m){return m.academic&&m.academic.code}).filter(Boolean);
+if(!c.length)return '';if(c.indexOf('CCB')>=0)return 'Ciencias';if(c.indexOf('CCS')>=0)return 'Humanidades';if(c.indexOf('EEB')>=0)return 'EEB';return 'Técnica'}
+function tNorm(s){return (s==null?'':String(s)).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
+function tCard(t){var d=document.createElement('div');d.className='card reveal visible';d.style.cursor='pointer';
+var inicial=(t.nombre||'D').charAt(0);
+var pic=t.img?'<img src="'+t.img+'" alt="" loading="lazy" style="width:100%;height:170px;object-fit:cover;border-radius:12px" onerror="this.style.display=\'none\'">':'<div style="width:100%;height:170px;border-radius:12px;background:linear-gradient(135deg,var(--inst),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.6rem;font-weight:900">'+inicial+'</div>';
 d.innerHTML=pic+'<p style="margin-top:12px;font-weight:800;font-size:1.02rem">'+t.nombre+'</p><p style="font-size:.86rem;font-weight:700;color:var(--inst);margin-top:4px">'+t.materia+'</p>';
-d.onclick=(function(tt){return function(){openTeacher(tt)}})(t);tg.appendChild(d)});tg._list=list}
+d.onclick=function(){openTeacher(t)};return d}
+function paintTeachers(){tg.innerHTML='';
+var input=document.getElementById('teacherSearch'),q=tNorm(input?input.value:'');
+var list=TEACHERS_LIVE||teachers.map(function(t){return{nombre:t[3]||'Docente',materia:t[0],area:t[1],img:t[2],titulo:t[4]||'',materias:'',bio:t[5]||'',horario:t[6]||''}});
+list=list.filter(function(t){return curA==='Todas'||(t.area||'').indexOf(curA)>=0});
+if(q){list=list.filter(function(t){return tNorm([t.nombre,t.materia,t.materias,t.titulo,t.area].join(' ')).indexOf(q)>=0})}
+list.forEach(function(t){tg.appendChild(tCard(t))});
+if(!list.length){tg.innerHTML='<p class="muted" style="grid-column:1/-1;padding:16px 0">No se encontró ningún docente con ese nombre o materia.</p>'}
+tg._list=list}
 document.getElementById('teacherModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')});function openTeacher(t){if(!t)return;
 document.getElementById('tmName').textContent=t.nombre;
 var h='';
@@ -1411,7 +1422,7 @@ h+='<div style="margin-top:14px"><a class="btn btn-gold" style="text-decoration:
 document.getElementById('tmBody').innerHTML=h;
 document.getElementById('teacherModal').classList.add('open')}
 
-document.getElementById('teacherSearch').addEventListener('input',function(){var q=this.value.toLowerCase();var list=(tg._list||[]);tg.innerHTML='';list.filter(function(t){return (t.nombre+' '+t.materia).toLowerCase().indexOf(q)>=0}).forEach(function(t){tg.appendChild(tCard(t))})});areas.forEach(function(a){var b=document.createElement('button');b.textContent=a;if(a==='Todas')b.classList.add('on');b.onclick=function(){curA=a;af.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');paintTeachers()};af.appendChild(b)});
+document.getElementById('teacherSearch').addEventListener('input',paintTeachers);areas.forEach(function(a){var b=document.createElement('button');b.textContent=a;if(a==='Todas')b.classList.add('on');b.onclick=function(){curA=a;af.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');paintTeachers()};af.appendChild(b)});
 paintTeachers();
 /* galeria */
 var GAL=[
@@ -1452,7 +1463,7 @@ if(!gg.children.length){gg.innerHTML='<p class="muted">Aún no hay fotos en esta
 cats.forEach(function(c){var b=document.createElement('button');b.textContent=c;if(c==='Todas')b.classList.add('on');b.onclick=function(){curC=c;gf.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');paintGal()};gf.appendChild(b)});
 paintGal();document.getElementById('lightbox').onclick=function(){document.getElementById('lightbox').classList.remove('open')};
 try{if(location.protocol.indexOf('http')===0){
-fetch('/api/teachers').then(function(r){return r.json()}).then(function(j){var d=(j&&j.data)||[];if(!d.length)return;TEACHERS_LIVE=d.map(function(x){var ms=(x.materias||[]).map(function(m){return m.name});return{nombre:x.nombre,materia:ms[0]||x.titulo||'Docente',area:'',img:x.foto||'',titulo:x.titulo||'',materias:ms.join(', '),bio:x.bio||'',horario:x.horario||''}});paintTeachers()}).catch(function(){});
+fetch('/api/teachers').then(function(r){return r.json()}).then(function(j){var d=(j&&j.data)||[];if(!d.length)return;TEACHERS_LIVE=d.map(function(x){var ms=(x.materias||[]).map(function(m){return m.name});return{nombre:x.nombre,materia:ms[0]||x.titulo||'Docente',area:tArea(x),img:x.foto||'',titulo:x.titulo||'',materias:ms.join(', '),bio:x.bio||'',horario:x.horario||''}});paintTeachers()}).catch(function(){});
 fetch('/api/media').then(function(r){return r.json()}).then(function(j){var d=(j&&j.data)||[];var g={};var gal=[];d.forEach(function(m){if(m.slot==='GALERIA'){gal.push([m.url,m.category||'Institución',m.caption||''])}else{(g[m.slot]=g[m.slot]||[]).push([m.url,m.caption||''])}});window.__galServer=gal;window.__bachMedia=g;paintGal();paintBach()}).catch(function(){});
 fetch('/api/contenido').then(function(r){return r.json()}).then(function(j){var d=(j&&j.data)||[];d.forEach(function(x){var el=x.key==='historia'?document.getElementById('cmsHistoria'):x.key==='mision'?document.getElementById('cmsMision'):x.key==='vision'?document.getElementById('cmsVision'):null;if(el&&x.body){var t=x.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').split('\n\n').join('<br><br>').split('\n').join('<br>');el.innerHTML=t}})}).catch(function(){});
 }}catch(e){}
