@@ -913,7 +913,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <div class="hist reveal"><h3>Gratuita y sin aranceles</h3>
 <p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Institución pública: la enseñanza es gratuita y no se cobra matrícula ni aranceles.</p>
 <p style="margin-top:10px;font-size:.9rem;color:#f5ece2">Calendario oficial de inscripciones a confirmar por la Dirección.</p></div>
-<div class="card reveal"><h3 style="color:var(--inst)">Procedimiento</h3><div style="margin-top:14px"><a class="btn btn-gold shine" style="text-decoration:none;justify-content:center;width:100%" href="#contacto">Consultar en Secretaría</a></div><ul style="margin-top:12px;display:grid;gap:10px;font-size:.9rem;color:#57534e;list-style:none">
+<div class="card reveal"><h3 style="color:var(--inst)">Procedimiento</h3><ul style="margin-top:14px;display:grid;gap:10px;font-size:.9rem;color:#57534e;list-style:none">
 <li><b>1.</b> Acercarse a Secretaría con la documentación del aspirante.</li>
 <li><b>2.</b> Presentar los documentos del nivel (ver Requisitos).</li>
 <li><b>3.</b> Aguardar la revisión (Pendiente / En revisión / Aprobada).</li>
@@ -1277,7 +1277,6 @@ if(e.key==='Enter'||e.key===' '||e.key==='Spacebar'||e.code==='Space'){
 var tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
 e.preventDefault();
 var fi=document.getElementById('flameIntro');if(fi&&!fi.classList.contains('gone')){fiGo();return}
-var rg=document.getElementById('roleGate');if(rg&&!rg.classList.contains('gone')){roleTop();return}
 return}
 var lbx=document.getElementById('lightbox');
 if(lbx.classList.contains('open')){if(e.key==='ArrowRight')lbNav(1);else if(e.key==='ArrowLeft')lbNav(-1);else if(e.key==='Escape')lbx.classList.remove('open')}
@@ -1308,7 +1307,7 @@ topBtn.onclick=function(){scrollTo({top:0,behavior:'smooth'})};
 (function(){var secs=[['oferta','Oferta'],['niveles','Niveles'],['galeria','Galería'],['noticias','Noticias'],['docentes','Docentes'],['matriculas','Matrículas'],['contacto','Contacto']];var d=document.createElement('div');d.id='dots';d.innerHTML=secs.map(function(s){return '<a href="#'+s[0]+'" title="'+s[1]+'" aria-label="'+s[1]+'"></a>'}).join('');document.body.appendChild(d);var links=d.querySelectorAll('a');if(!('IntersectionObserver' in window))return;var io2=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){for(var i=0;i<links.length;i++){links[i].classList.toggle('on',links[i].getAttribute('href')==='#'+e.target.id)}}})},{rootMargin:'-40% 0px -55% 0px'});secs.forEach(function(s){var el=document.getElementById(s[0]);if(el)io2.observe(el)})})();
 document.getElementById('burger').onclick=function(){document.getElementById('mobileMenu').classList.toggle('open')};
 try{if(location.protocol.indexOf('http')===0){fetch('/api/auth/session').then(function(r){return r.json()}).then(function(j){if(j&&j.user){var u=j.user;realRole=u.role||'';lastUser=u.username||u.email||'Usuario';userRole=(u.role==='PARENT'?'padre':u.role==='STUDENT'?'alumno':'docente');profile={name:u.name||lastUser,avatar:u.role==='ADMIN'?'🏛️':(typeof roleAvatar!=='undefined'&&roleAvatar[userRole])||'🎒',extra:''};paintChip();try{var justLogged=sessionStorage.getItem('csl-just-logged')==='1';if(justLogged)sessionStorage.removeItem('csl-just-logged');var navBack=false;try{var navEnt=performance.getEntriesByType('navigation');if(navEnt&&navEnt[0]&&navEnt[0].type==='back_forward')navBack=true}catch(e){}if(justLogged||navBack)skipIntroOnce()}catch(e){}}else{}}).catch(function(){})}}catch(e){}
-document.addEventListener('keydown',function(e){if(e.key!==' '&&e.key!=='Enter')return;var t=e.target&&e.target.tagName;if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||t==='BUTTON')return;var iv=document.getElementById('introNew');if(iv){e.preventDefault();introGo();return}var rg=document.getElementById('roleGate');if(rg){e.preventDefault();showRoles()}});
+document.addEventListener('keydown',function(e){if(e.key!==' '&&e.key!=='Enter')return;var t=e.target&&e.target.tagName;if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||t==='BUTTON')return;var iv=document.getElementById('introNew');if(iv){e.preventDefault();introGo();return}});
 document.querySelectorAll('#mobileMenu a').forEach(function(a){a.onclick=function(){document.getElementById('mobileMenu').classList.remove('open')}});
 /* reveal */
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}})},{threshold:.12});
