@@ -38,7 +38,8 @@
 #flameIntro,.rg-card,.rg-visit{user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .rg-card:focus,.rg-card:active,.rg-visit:focus,.rg-visit:active{outline:none!important;box-shadow:none}
 html{scroll-behavior:smooth;scroll-padding-top:76px;overflow-x:clip}
-body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--paper);color:var(--ink);overflow-x:clip}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--paper);color:var(--ink);overflow-x:clip;-webkit-user-select:none;user-select:none}
+input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-select:text}
 a{text-decoration:none;color:inherit}
 img{max-width:100%}
 section{scroll-margin-top:70px}
@@ -761,9 +762,42 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <style>@media(max-width:640px){#waFloat{width:46px;height:46px;font-size:1.3rem;left:12px;bottom:16px}}</style>
 </header>
 
+<style>
+/* Encuesta interactiva dentro del hero (datos reales de /api/encuestas) */
+.hero-inner{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr);gap:42px;align-items:center}
+.hero-copy{min-width:0}
+.hero-poll{position:relative;background:linear-gradient(165deg,#fdf9f2 0%,#f5e7d5 100%);border:1px solid #e7d4bb;border-radius:22px;padding:18px;box-shadow:0 26px 60px rgba(30,16,9,.42);color:#4b291b;overflow:hidden;text-align:left}
+.hero-poll .hp-ill{position:absolute;right:-16px;bottom:-18px;width:132px;opacity:.18;pointer-events:none}
+.hp-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
+.hp-tag{display:inline-flex;align-items:center;gap:7px;background:#6b4430;color:#fff;font-weight:800;font-size:.78rem;padding:8px 14px;border-radius:12px;letter-spacing:.01em}
+.hp-tag svg{width:15px;height:15px}
+.hp-more{color:#6b4430;font-size:.76rem;font-weight:700;text-decoration:underline;text-underline-offset:3px;position:relative;z-index:1}
+.hp-q{position:relative;z-index:1;margin-top:14px;font-size:1.05rem;line-height:1.35;font-weight:900;color:#4b291b;max-width:94%}
+.hp-sub{position:relative;z-index:1;margin-top:5px;font-size:.78rem;color:#8a6c57}
+.hp-opts{position:relative;z-index:1;display:grid;gap:8px;margin-top:12px}
+.hp-opt{position:relative;display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fffdfa;border:1.5px solid #eadbc8;border-radius:11px;padding:10px 12px;font:inherit;font-size:.84rem;font-weight:600;color:#4b291b;cursor:pointer;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.hp-opt:hover{border-color:#b88957;box-shadow:0 4px 12px rgba(75,41,27,.08)}
+.hp-opt[aria-pressed="true"]{border-color:#6b4430;background:#fff8ee}
+.hp-dot{flex:none;width:17px;height:17px;border-radius:50%;border:2px solid #bda184;background:#fff}
+.hp-opt[aria-pressed="true"] .hp-dot{border-color:#6b4430;box-shadow:inset 0 0 0 3px #6b4430}
+.hp-done{cursor:default;align-items:center}
+.hp-done.mine{border-color:#6b4430}
+.hp-fill{position:absolute;inset:0 auto 0 0;background:#f0dfc6;z-index:0}
+.hp-label{position:relative;z-index:1;display:flex;justify-content:space-between;gap:10px;width:100%}
+.hp-pct{color:#7a5a44;font-weight:800;font-size:.76rem;white-space:nowrap}
+.hp-vote{position:relative;z-index:1;margin-top:14px;width:100%;border:0;border-radius:12px;padding:13px;background:linear-gradient(135deg,#6b4430,#8a5a3b);color:#fff;font:inherit;font-weight:900;font-size:.92rem;cursor:pointer;box-shadow:0 10px 22px rgba(75,41,27,.28);transition:transform .2s,box-shadow .2s}
+.hp-vote:hover{transform:translateY(-1px);box-shadow:0 14px 26px rgba(75,41,27,.32)}
+.hp-vote:disabled{opacity:.72;cursor:wait;transform:none}
+.hp-note{position:relative;z-index:1;margin-top:9px;font-size:.74rem;color:#7a5a44}
+.hp-note a{font-weight:700;text-decoration:underline}
+.hp-empty{position:relative;z-index:1;margin-top:14px;font-size:.85rem;color:#6b5a4c}
+@media(max-width:1024px){.hero-inner{grid-template-columns:1fr;gap:28px}.hero-poll{max-width:520px}}
+@media(max-width:640px){.hero-poll{padding:16px}.hp-q{max-width:100%;font-size:1rem}.hero-poll .hp-ill{display:none}}
+</style>
 <section class="hero">
 <div class="hero-bg"></div><div class="hero-veil"></div><canvas id="particles"></canvas>
 <div class="hero-inner">
+<div class="hero-copy">
 <div class="badge">✦ Nivel Básico y Nivel Medio público</div>
 <h1>Colegio Nacional Mariscal <span>Francisco Solano López</span></h1>
 <p class="sub">Formamos ciudadanos íntegros y técnicos altamente capacitados en Caaguazú. Educación Escolar Básica y 10 orientaciones del Nivel Medio. Educación pública, gratuita y de calidad.</p>
@@ -776,6 +810,10 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <div><b data-count="10">0</b><span>Orientaciones de Nivel Medio</span></div>
 <div><b data-count="100" data-suffix="%">0</b><span>Educación pública y gratuita</span></div>
 </div>
+</div>
+<aside class="hero-poll" id="heroPoll" aria-label="Encuesta reciente" aria-live="polite">
+<div class="hp-empty">Cargando encuesta…</div>
+</aside>
 </div>
 <div class="scroll-hint">▼ desliza para explorar</div>
 </section>
@@ -1460,11 +1498,45 @@ var flat=rest.concat(srv).concat(singles);
 flat.forEach(function(g){var ix=flat.indexOf(g);var f=document.createElement('figure');f.innerHTML='<img src="'+g[0]+'" alt="'+(g[2]||'')+'" loading="lazy" onerror="this.parentElement.style.background=\'linear-gradient(135deg,#5d4037,#a67c52)\'"><figcaption><span class="pill">'+g[1]+'</span><br>'+(g[2]||'')+'</figcaption>';f.onclick=function(){openLb(flat,ix)};gg.appendChild(f)});
 if(!gg.children.length){gg.innerHTML='<p class="muted">Aún no hay fotos en esta categoría. Información pendiente.</p>'}}
 cats.forEach(function(c){var b=document.createElement('button');b.textContent=c;if(c==='Todas')b.classList.add('on');b.onclick=function(){curC=c;gf.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');paintGal()};gf.appendChild(b)});
+/* Encuesta reciente del hero: misma API y mismo sistema de votos que /encuestas. */
+var hpPoll=null,hpLogin=false,hpSel=null,hpReady=false;
+function hpEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function hpBars(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>'}
+function hpIll(){return '<svg class="hp-ill" viewBox="0 0 120 120" fill="none" aria-hidden="true"><rect x="16" y="62" width="88" height="44" rx="7" fill="#8a5a3b"/><path d="M28 62V48h64v14" stroke="#6b4430" stroke-width="5" stroke-linejoin="round"/><rect x="44" y="14" width="34" height="46" rx="5" fill="#fffdfa" stroke="#6b4430" stroke-width="3"/><path d="M52 36l6 6 12-14" stroke="#6b4430" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 76h52" stroke="#e9d5ba" stroke-width="4" stroke-linecap="round"/></svg>'}
+function hpRender(){
+var el=document.getElementById('heroPoll');if(!el)return;
+if(!hpReady){el.innerHTML='<div class="hp-empty">Cargando encuesta…</div>';return}
+if(!hpPoll){el.innerHTML='<div class="hp-top"><span class="hp-tag">'+hpBars()+' Encuesta reciente</span><a class="hp-more" href="/encuestas">Ver encuestas anteriores →</a></div><p class="hp-empty">Actualmente no hay encuestas disponibles.</p>';return}
+var p=hpPoll,votado=p.miVoto!==null,total=p.total||0;
+var opts=p.options.map(function(op,i){
+var pct=total?Math.round((p.counts[i]||0)/total*100):0;
+if(votado)return '<div class="hp-opt hp-done'+(p.miVoto===i?' mine':'')+'"><span class="hp-fill" style="width:'+pct+'%"></span><span class="hp-label"><span>'+hpEsc(op)+'</span><span class="hp-pct">'+pct+'% · '+(p.counts[i]||0)+'</span></span></div>';
+return '<button type="button" class="hp-opt" aria-pressed="'+(hpSel===i?'true':'false')+'" onclick="hpPick('+i+')"><span class="hp-dot"></span><span class="hp-label">'+hpEsc(op)+'</span></button>';
+}).join('');
+el.innerHTML='<div class="hp-top"><span class="hp-tag">'+hpBars()+' Encuesta reciente</span><a class="hp-more" href="/encuestas">Ver encuestas anteriores →</a></div><h3 class="hp-q">'+hpEsc(p.question)+'</h3><p class="hp-sub">Tu opinión nos ayuda a seguir mejorando.</p><div class="hp-opts">'+opts+'</div>'+(votado?'<p class="hp-note">Ya registramos tu voto · '+total+' voto'+(total===1?'':'s')+' en total.</p>':'<button type="button" class="hp-vote" onclick="hpVote()">Votar</button>'+(hpLogin?'':'<p class="hp-note">Necesitás <a href="/login?next=/encuestas">ingresar</a> para votar.</p>'))+hpIll();
+}
+function hpPick(i){if(!hpPoll||hpPoll.miVoto!==null)return;hpSel=i;hpRender()}
+function hpLoad(){
+fetch('/api/encuestas',{credentials:'same-origin',cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
+hpPoll=(j&&j.data&&j.data.length)?j.data[0]:null;hpLogin=!!(j&&j.login);hpReady=true;hpSel=null;hpRender();
+}).catch(function(){hpReady=true;hpPoll=null;hpRender()});
+}
+function hpVote(){
+if(!hpPoll)return;
+if(!hpLogin){location.href='/login?next=/encuestas';return}
+if(hpSel===null){if(typeof toast==='function')toast('Elegí una opción para votar');return}
+var btn=document.querySelector('.hp-vote');if(btn){btn.disabled=true;btn.textContent='Enviando…'}
+fetch('/api/encuestas',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({pollId:hpPoll.id,optionIdx:hpSel})})
+.then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j}})})
+.then(function(x){if(!x.ok&&typeof toast==='function')toast(x.j.error||'No se pudo votar');hpSel=null;hpLoad()})
+.catch(function(){if(typeof toast==='function')toast('Error de red al votar');hpSel=null;hpLoad()});
+}
 paintGal();document.getElementById('lightbox').onclick=function(){document.getElementById('lightbox').classList.remove('open')};
 try{if(location.protocol.indexOf('http')===0){
 fetch('/api/teachers').then(function(r){return r.json()}).then(function(j){var d=(j&&j.data)||[];if(!d.length)return;TEACHERS_LIVE=d.map(function(x){var ms=(x.materias||[]).map(function(m){return m.name});return{nombre:x.nombre,materia:ms[0]||x.titulo||'Docente',area:tArea(x),img:x.foto||'',titulo:x.titulo||'',materias:ms.join(', '),bio:x.bio||'',horario:x.horario||''}});paintTeachers()}).catch(function(){});
 fetch('/api/media').then(function(r){return r.json()}).then(function(j){var d=(j&&j.data)||[];var g={};var gal=[];d.forEach(function(m){if(m.slot==='GALERIA'){gal.push([m.url,m.category||'Institución',m.caption||''])}else{(g[m.slot]=g[m.slot]||[]).push([m.url,m.caption||''])}});window.__galServer=gal;window.__bachMedia=g;paintGal();paintBach()}).catch(function(){});
 fetch('/api/contenido').then(function(r){return r.json()}).then(function(j){var d=(j&&j.data)||[];d.forEach(function(x){var el=x.key==='historia'?document.getElementById('cmsHistoria'):x.key==='mision'?document.getElementById('cmsMision'):x.key==='vision'?document.getElementById('cmsVision'):null;if(el&&x.body){var t=x.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').split('\n\n').join('<br><br>').split('\n').join('<br>');el.innerHTML=t}})}).catch(function(){});
+hpLoad();
 }}catch(e){}
 
 /* Editor de galería solo-Dirección */

@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Sin selección de texto al tocar/clic (quita la "rayita" y el resaltado),
+   manteniendo la selección y edición normal dentro de campos de formulario. */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 :root {
   --institutional: #5d4037; /* marrón institucional */
   --institutional-light: #795548;
