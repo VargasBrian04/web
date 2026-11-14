@@ -40,6 +40,10 @@
 html{scroll-behavior:smooth;scroll-padding-top:76px;overflow-x:clip}
 body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--paper);color:var(--ink);overflow-x:clip;-webkit-user-select:none;user-select:none}
 input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-select:text}
+.skip-link{position:fixed;top:8px;left:8px;z-index:600;padding:10px 16px;border-radius:10px;background:var(--inst);color:#fff;font-weight:800;font-size:.9rem;text-decoration:none;transform:translateY(-180%);transition:transform .15s}
+.skip-link:focus,.skip-link:focus-visible{transform:translateY(0);outline:3px solid var(--gold2);outline-offset:2px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 a{text-decoration:none;color:inherit}
 img{max-width:100%}
 section{scroll-margin-top:70px}
@@ -570,6 +574,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#inicio">Saltar al contenido</a>
 <script>try{if(localStorage.getItem("csl-theme")==="oscuro"){document.documentElement.dataset.theme="oscuro"}}catch(e){}</script>
 <div id="progress"></div>
 <div id="loader"><div class="loader-badge">SL</div></div>
@@ -790,7 +795,7 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 @media(max-width:1024px){.hero-inner{grid-template-columns:1fr;gap:28px}.hero-poll{max-width:520px}}
 @media(max-width:640px){.hero-poll{padding:16px}.hp-q{max-width:100%;font-size:1rem}.hero-poll .hp-ill{display:none}}
 </style>
-<section class="hero">
+<section class="hero" id="inicio">
 <div class="hero-bg"></div><div class="hero-veil"></div><canvas id="particles"></canvas>
 <div class="hero-inner">
 <div class="hero-copy">
