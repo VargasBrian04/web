@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  DemoFill, FieldError, Field, FormError, Icon, Person, PersonErrors, PersonFields, RegFoot,
+  FieldError, Field, FormError, Icon, Person, PersonErrors, PersonFields, RegFoot,
   RegShell, SectionTitle, SubmitButton, SuccessView, inputCls, necesitaSeccion, useCatalog,
 } from "./shared";
 
@@ -40,23 +40,6 @@ export default function TutorForm() {
       })
     );
   };
-
-  /** Rellena el formulario con datos de ejemplo (demostración). */
-  function fillDemo() {
-    setPerson({
-      ci: "4567890",
-      firstName: "María Elena",
-      lastName: "Gómez Benítez",
-      phone: "0975 1234567",
-      email: "maria.gomez@correo.com",
-    });
-    setPErr({});
-    setHijos([
-      { nombre: "Ana Belén Gómez", nivel: "MEDIA", curso: "2.º", seccion: "A", turno: "MAÑANA", bachiller: "CCB" },
-    ]);
-    setHErr([]);
-    setServerError(null);
-  }
 
   function validate(): boolean {
     const pe: PersonErrors = {};
@@ -143,8 +126,6 @@ export default function TutorForm() {
   return (
     <RegShell>
       <form onSubmit={submit} noValidate>
-        <DemoFill onClick={fillDemo} />
-
         <section className="reg-block">
           <SectionTitle n="1" title="Datos personales" desc="Tus datos como tutor o encargado." icon={Icon.user} />
           <PersonFields

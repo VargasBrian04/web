@@ -470,10 +470,6 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 [data-theme="oscuro"] .menu{background:#1b1b1b!important;border-color:#2e2e2e!important}
 [data-theme="oscuro"] .menu a{color:#e7e7e7!important}
 .demo-tag{display:inline-block;background:#fef3c7;color:#92400e;font-size:.65rem;font-weight:800;padding:2px 9px;border-radius:99px;text-transform:uppercase}
-.demo-fill{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin:12px 0 2px;min-height:38px;padding:8px 14px;color:#673d29;background:#fdf6ec;border:1.5px dashed #b88957;border-radius:10px;font-size:.79rem;font-weight:800;cursor:pointer;transition:background .16s,border-color .16s,transform .16s}
-.demo-fill:hover{background:#f8ecdc;border-color:#673d29;transform:translateY(-1px)}
-.demo-fill:active{transform:translateY(0)}
-.demo-fill svg{flex:0 0 auto}
 #toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:#2e201b;color:#fff;padding:12px 22px;border-radius:12px;font-size:.86rem;z-index:460;transition:transform .35s;box-shadow:0 12px 30px rgba(0,0,0,.4);border-left:5px solid var(--gold)}
 #toast.show{transform:translate(-50%,0)}
 .pulse{animation:pulseBtn 2.2s infinite}
@@ -998,7 +994,6 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <input id="liUser" type="text" placeholder="Ej. 4.567.890" autocomplete="username">
 <label for="liPass">Contraseña</label>
 <input id="liPass" type="password" placeholder="••••••••" autocomplete="current-password">
-<button type="button" class="demo-fill" onclick="fillDemoLogin()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Rellenar con datos de ejemplo</button>
 <div class="login-err" id="liErr">Completá usuario y contraseña para ingresar.</div>
 <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:16px;padding:13px" type="submit">Ingresar →</button>
 </form>
@@ -1032,7 +1027,6 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 </div>
 <div class="reg-error-top" id="regTopErr" style="display:none"></div>
 <form id="regFormT" onsubmit="return submitRegT(event)">
-<button type="button" class="demo-fill" onclick="fillDemoTutor()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Rellenar con datos de ejemplo</button>
 <div class="reg-sec"><span class="reg-sec-n">1</span> Datos personales</div>
 <label for="rtNom">Nombres *</label>
 <input id="rtNom" type="text" placeholder="Tus nombres" autocomplete="given-name">
@@ -1054,7 +1048,6 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <button class="reg-btn reg-btn-primary" id="rtSend" type="submit">Enviar solicitud <span aria-hidden="true">→</span></button>
 </form>
 <form id="regFormD" style="display:none" onsubmit="return submitRegD(event)">
-<button type="button" class="demo-fill" onclick="fillDemoDocente()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Rellenar con datos de ejemplo</button>
 <div class="reg-sec"><span class="reg-sec-n">1</span> Datos personales</div>
 <label for="rdNom">Nombres *</label>
 <input id="rdNom" type="text" placeholder="Tus nombres" autocomplete="given-name">
@@ -1183,27 +1176,7 @@ var done=false;function fail(m){if(done)return;done=true;loginVeil(false);if(btn
 var timer=setTimeout(function(){fail('Tardó demasiado (servidor frío). Probá en /login.')},25000);
 realLogin(u,p).then(function(r){if(done)return;if(r.error){clearTimeout(timer);fail(r.code==='wrong_zone'?wrongZoneText():(r.error==='CredentialsSignin'?'Usuario o contraseña incorrectos. Revisá los datos.':'No se pudo ingresar. Probá en /login.'));return}
 fetch('/api/auth/session',{credentials:'same-origin',cache:'no-store'}).then(function(s){return s.json()}).then(function(j){if(!j||!j.user){clearTimeout(timer);fail('No se pudo confirmar la sesión. Probá en /login.');return}var uu=j.user;var allowed=(loginRole==='docente'&&(uu.role==='TEACHER'||uu.role==='ADMIN'))||(loginRole==='padre'&&uu.role==='PARENT')||(loginRole==='alumno'&&uu.role==='STUDENT');if(!allowed){clearTimeout(timer);realSignout(function(){fail(wrongZoneText())});return}realRole=uu.role||'';lastUser=uu.username||uu.email||'Usuario';userRole=(uu.role==='PARENT'?'padre':uu.role==='STUDENT'?'alumno':'docente');profile={name:uu.name||lastUser,avatar:uu.role==='ADMIN'?'🏛️':(typeof roleAvatar!=='undefined'&&roleAvatar[userRole])||'🎒',extra:'',bio:'',color:'var(--gold)',photo:null};paintChip();done=true;clearTimeout(timer);if(btn){btn.disabled=false;btn.textContent='Ingresar →'}loginVeil(true,'¡Bienvenido/a, '+displayName()+'!');if(typeof sfx==='function')sfx('ok');setTimeout(function(){loginVeil(false);closeLogin();hideRoles();try{scrollTo({top:0,behavior:'smooth'})}catch(e){}},800)}).catch(function(){clearTimeout(timer);fail('Error de red. Probá en /login.')})}).catch(function(){fail('Error de red. Probá en /login.')});return false}
-/* Cuentas de demostración por rol (creadas en la base). */
-var DEMO_LOGIN={docente:['demo.docente','Demo2026colegio'],padre:['demo.padre','Demo2026colegio'],alumno:['demo.alumno','Demo2026colegio']};
-function fillDemoLogin(){var d=DEMO_LOGIN[loginRole]||DEMO_LOGIN.docente;document.getElementById('liUser').value=d[0];document.getElementById('liPass').value=d[1];document.getElementById('liErr').style.display='none'}
-function fillDemoTutor(){
-document.getElementById('rtNom').value='María Elena';
-document.getElementById('rtApe').value='Gómez Benítez';
-document.getElementById('rtCi').value='4567890';
-document.getElementById('rtTel').value='0975 1234567';
-document.getElementById('rtMail').value='maria.gomez@correo.com';
-['e-rtNom','e-rtApe','e-rtCi','e-rtTel','e-rtMail'].forEach(function(id){setErr(id,null)});
-rtHijos=[{nombre:'Ana Belén Gómez',nivel:'MEDIA',curso:'2.º',seccion:'A',turno:'MAÑANA',bachiller:'CCB'}];
-regTopErr(null);var tries=0;function paint(){rtPaintHijos();if(!REG_CAT&&tries++<40)setTimeout(paint,200)}paint();if(!REG_CAT)loadRegCat();}
-function fillDemoDocente(){
-document.getElementById('rdNom').value='Carlos Alberto';
-document.getElementById('rdApe').value='Ramírez Ovelar';
-document.getElementById('rdCi').value='3456789';
-document.getElementById('rdTel').value='0981 456789';
-document.getElementById('rdMail').value='carlos.ramirez@correo.com';
-['e-rdNom','e-rdApe','e-rdCi','e-rdTel','e-rdMail'].forEach(function(id){setErr(id,null)});
-rdNiveles=['MEDIA'];rdCursosSel=['3.º Media'];rdBachSel=['AGR'];
-regTopErr(null);var tries=0;function paint(){paintRegChips();paintRegSubj();if(REG_CAT){var agr=rdSubjVisibles().filter(function(s){return s.gradeYear===3&&s.academicCode==='AGR'});if(agr.length){document.getElementById('rdMP').value=agr[0].code;rdOtras=agr[1]?[agr[1].code]:[]}rdPaintOtras()}if(!REG_CAT&&tries++<40)setTimeout(paint,200)}paint();if(!REG_CAT)loadRegCat();}
+/* Cuentas de demostración: eliminadas del sitio público. */
 /* Solicitudes reales a la base de datos (POST /api/solicitudes + catálogo). */
 var REG_CAT=null,REG_TAB='tutor',REG_SENDING=false;
 function openReg(tab){closeLogin();regTab(tab||'tutor');if(!rtHijos.length)rtAddHijo();document.getElementById('regTopErr').style.display='none';document.getElementById('regModal').classList.add('open');loadRegCat()}

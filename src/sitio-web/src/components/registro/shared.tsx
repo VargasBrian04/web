@@ -336,22 +336,6 @@ export function SubmitButton({ sending, label = "Enviar solicitud" }: { sending:
   );
 }
 
-/**
- * Botón de demostración: completa el formulario con datos de ejemplo para
- * mostrar su funcionamiento sin tipear todo a mano.
- */
-export function DemoFill({ onClick, label = "Rellenar con datos de ejemplo" }: { onClick: () => void; label?: string }) {
-  return (
-    <button type="button" onClick={onClick} className="reg-demo-fill">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M12 20h9" />
-        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-      </svg>
-      {label}
-    </button>
-  );
-}
-
 /** Pie del formulario: aviso y acceso al inicio de sesión. */
 export function RegFoot({ note }: { note?: string }) {
   return (

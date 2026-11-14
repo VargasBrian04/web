@@ -8,17 +8,6 @@ import {
   portalZoneFromPath,
   wrongZoneMessage,
 } from "@/lib/portal-access";
-import { DemoFill } from "@/components/registro/shared";
-
-/**
- * Cuentas de demostración por zona (creadas en la base). No hay cuenta demo
- * de Administración: ese acceso queda reservado a las cuentas reales.
- */
-const DEMO_LOGIN: Record<string, { identifier: string; password: string }> = {
-  docente: { identifier: "demo.docente", password: "Demo2026colegio" },
-  padre: { identifier: "demo.padre", password: "Demo2026colegio" },
-  alumno: { identifier: "demo.alumno", password: "Demo2026colegio" },
-};
 
 /**
  * Formulario de ingreso RBAC. Tras validar credenciales (bcrypt en el
@@ -106,14 +95,6 @@ export default function LoginForm() {
   }
 
   const isWrongZone = error?.startsWith("Zona de Ingreso Incorrecta");
-  const demo = DEMO_LOGIN[zone ?? "docente"] ?? DEMO_LOGIN.docente;
-
-  /** Rellena usuario y contraseña de ejemplo (demostración). */
-  function fillDemo() {
-    setIdentifier(demo.identifier);
-    setPassword(demo.password);
-    setError(null);
-  }
 
   return (
     <form
@@ -187,12 +168,6 @@ export default function LoginForm() {
               </button>
             </span>
           </label>
-
-          {zone !== "admin" && (
-            <div className="mt-4">
-              <DemoFill onClick={fillDemo} />
-            </div>
-          )}
 
           <button type="submit" disabled={loading} className="btn-primary mt-5 w-full justify-center sm:mt-6">
             {loading ? "Verificando…" : "Ingresar"}
