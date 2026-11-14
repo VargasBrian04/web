@@ -24,6 +24,7 @@ const groups = [
       { href: "/#oferta", label: "Oferta académica" },
       { href: "/#niveles", label: "Niveles" },
       { href: "/#estadisticas", label: "Estadísticas" },
+      { href: "/calendario", label: "Calendario" },
       { href: "/noticias", label: "Noticias" },
       { href: "/encuestas", label: "Encuestas" },
     ],

@@ -26,6 +26,9 @@ export default function Footer() {
           <Link href="/galeria" className="hover:text-white">
             Galería
           </Link>
+          <Link href="/calendario" className="hover:text-white">
+            Calendario
+          </Link>
           <Link href="/preguntas" className="hover:text-white">
             Ayuda
           </Link>
