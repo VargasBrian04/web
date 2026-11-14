@@ -21,6 +21,16 @@ type View = {
   image: string | null;
 };
 
+type Relacionada = {
+  key: string;
+  href: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  date: string;
+  image: string | null;
+};
+
 async function getPost(slug: string): Promise<View | null> {
   try {
     const n = await prisma.newsPost.findUnique({
@@ -64,16 +74,64 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return { title: "Noticia no encontrada" };
-  return { title: post.title, description: post.excerpt };
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.excerpt,
+      ...(post.image ? { images: [post.image] } : {}),
+    },
+  };
+}
+
+/** Tres noticias publicadas de la misma categoría, sin repetir la actual. */
+async function getRelacionadas(category: string, slug: string): Promise<Relacionada[]> {
+  try {
+    const rows = await prisma.newsPost.findMany({
+      where: { status: "PUBLICADA", category, slug: { not: slug } },
+      select: {
+        id: true, slug: true, title: true, excerpt: true, category: true,
+        imageUrl: true, imageFile: true, publishedAt: true,
+      },
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+      take: 3,
+    });
+    return rows.map((n) => ({
+      key: n.id,
+      href: `/noticias/${n.slug}`,
+      title: n.title,
+      excerpt: n.excerpt ?? "",
+      category: n.category,
+      date: fmtDate(n.publishedAt),
+      image: n.imageFile ? `/api/news/${n.id}/image` : n.imageUrl,
+    }));
+  } catch {
+    return newsPosts
+      .filter((p) => p.category === category && p.slug !== slug)
+      .slice(0, 3)
+      .map((p) => ({
+        key: p.slug,
+        href: `/noticias/${p.slug}`,
+        title: p.title,
+        excerpt: p.excerpt,
+        category: p.category,
+        date: p.date.split("-").reverse().join("/"),
+        image: p.image,
+      }));
+  }
 }
 
 export default async function NoticiaPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) notFound();
+  const relacionadas = await getRelacionadas(post.category, slug);
 
   return (
-    <article className="container-c max-w-4xl py-16">
+    <div className="container-c max-w-4xl py-16">
+      <article>
       <a href="/noticias" className="text-sm font-semibold text-[var(--institutional)] hover:underline">
         ← Todas las noticias
       </a>
@@ -124,6 +182,51 @@ export default async function NoticiaPage({ params }: { params: Promise<{ slug: 
           </span>
         </div>
       </div>
-    </article>
+      </article>
+
+      {relacionadas.length > 0 && (
+        <section className="mt-12" aria-labelledby="relacionadas">
+          <h2 id="relacionadas" className="text-xl font-extrabold text-[var(--institutional)]">
+            Más de {post.category}
+          </h2>
+          <div className="mt-5 grid gap-4 sm:grid-cols-3">
+            {relacionadas.map((r) => (
+              <a
+                key={r.key}
+                href={r.href}
+                className="group overflow-hidden rounded-2xl border border-[#e6d8c9] bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              >
+                {r.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={r.image}
+                    alt=""
+                    className="h-32 w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-32 items-center justify-center bg-[#fbf7f1] text-3xl text-[var(--gold)]" aria-hidden="true">
+                    📰
+                  </div>
+                )}
+                <div className="p-4">
+                  <p className="text-[0.68rem] font-bold uppercase tracking-wide text-[var(--gold)]">
+                    {r.category}
+                    {r.date ? ` · ${r.date}` : ""}
+                  </p>
+                  <h3 className="mt-1 line-clamp-2 font-extrabold leading-snug text-[var(--institutional)] group-hover:underline">
+                    {r.title}
+                  </h3>
+                  {r.excerpt && (
+                    <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-stone-600">
+                      {r.excerpt}
+                    </p>
+                  )}
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   );
 }
