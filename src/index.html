@@ -696,7 +696,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 <a href="#historia">Historia</a><a href="#mision">Misión</a><a href="#vision">Visión</a><a href="#docentes">Docentes</a><a href="#normas">Convivencia</a>
 </div></div>
 <div class="drop"><button>📚 Académica ▾</button><div class="menu">
-<a href="#oferta">Oferta académica</a><a href="#niveles">Niveles</a><a href="#estadisticas">Estadísticas</a><a href="/calendario">Calendario</a><a href="#noticias">Noticias</a><a href="/encuestas">Encuestas</a>
+<a href="#oferta">Oferta académica</a><a href="#niveles">Niveles</a><a href="#estadisticas">Estadísticas</a><a href="/calendario">Calendario</a><a href="/comunicados">Comunicados</a><a href="#noticias">Noticias</a><a href="/encuestas">Encuestas</a>
 </div></div>
 <div class="drop"><button>📝 Admisiones ▾</button><div class="menu">
 <a href="#requisitos">Requisitos</a><a href="#contacto">Contacto</a>
@@ -723,7 +723,7 @@ section:not(.hero){content-visibility:auto;contain-intrinsic-size:900px}
 <div id="mobileMenu">
 <a class="l" href="#" onclick="togglePreviewTheme();return false" style="font-weight:800">🌙/☀️ Cambiar apariencia</a>
 <a class="cat">Institución</a><a class="l" href="#historia">Historia</a><a class="l" href="#mision">Misión</a><a class="l" href="#vision">Visión</a><a class="l" href="#docentes">Docentes</a><a class="l" href="#normas">Convivencia</a>
-<a class="cat">Académica</a><a class="l" href="#oferta">Oferta académica</a><a class="l" href="#niveles">Niveles</a><a class="l" href="#estadisticas">Estadísticas</a><a class="l" href="/calendario">Calendario</a><a class="l" href="#noticias">Noticias</a><a class="l" href="/encuestas">Encuestas</a>
+<a class="cat">Académica</a><a class="l" href="#oferta">Oferta académica</a><a class="l" href="#niveles">Niveles</a><a class="l" href="#estadisticas">Estadísticas</a><a class="l" href="/calendario">Calendario</a><a class="l" href="/comunicados">Comunicados</a><a class="l" href="#noticias">Noticias</a><a class="l" href="/encuestas">Encuestas</a>
 <a class="l" href="https://aprendizaje.mec.edu.py/aprendizaje/familia/documentos" target="_blank" rel="noopener">✓ Calificaciones MEC ↗</a><a class="cat">Admisiones</a><a class="l" href="#requisitos">Requisitos</a><a class="l" href="#galeria">Galería</a><a class="l" href="#contacto">Contacto</a>
 </div>
 <style>
@@ -762,6 +762,49 @@ html[data-theme="oscuro"] #newsModal .news-paper{background:#1d1917!important;co
 <style>@media(max-width:640px){.hero-inner{padding:44px 14px}.hero h1{font-size:1.65rem}.hero .stats{gap:14px}.bach-btns{gap:8px}.bach-btn{flex:1 1 29%;font-size:.72rem;padding:9px 6px}.bach-btn small{display:none}.bach-detail{padding:18px 14px}.bach-meta{flex-direction:column;gap:6px}.acc-head{padding:13px 14px}.acc-title{font-size:.92rem}.ncard h3{font-size:1rem}.book .pg{padding:18px 14px}#galFilters button,#areaFilters button{font-size:.75rem;padding:7px 12px}footer .foot{flex-direction:column;text-align:center}#dots{display:none}}</style>
 <style>@media(max-width:640px){#waFloat{width:46px;height:46px;font-size:1.3rem;left:12px;bottom:16px}}</style>
 </header>
+<div id="avisosInstitucionales" aria-label="Avisos del colegio" hidden></div>
+<style>
+#avisosInstitucionales{background:var(--paper);border-bottom:1px solid rgba(0,0,0,.06)}
+#avisosInstitucionales .alerta-inner{max-width:1200px;margin:0 auto;padding:8px 20px;display:grid;gap:8px}
+#avisosInstitucionales .alerta-item{display:flex;align-items:flex-start;gap:10px;border:1px solid #e6d8c9;border-radius:12px;padding:8px 12px;font-size:.9rem;line-height:1.45}
+#avisosInstitucionales .alerta-item p{flex:1;min-width:0;margin:0;font-weight:600}
+#avisosInstitucionales .alerta-nivel{flex:none;border-radius:6px;padding:2px 7px;font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+#avisosInstitucionales .alerta-item button{flex:none;background:none;border:0;font-size:1.25rem;line-height:1;opacity:.6;cursor:pointer;padding:0 4px;color:inherit}
+#avisosInstitucionales .alerta-item button:hover{opacity:1}
+html[data-theme="oscuro"] #avisosInstitucionales{background:#141110;border-bottom-color:#2a2320}
+</style>
+<script>
+(function(){
+  var cont=document.getElementById('avisosInstitucionales');
+  if(!cont) return;
+  var CLAVE='csl-aviso-cerrado-';
+  var ESTILOS={INFO:['#fbf7f1','#4B291B','#e6d8c9','Aviso'],AVISO:['#fffbeb','#92400e','#fde68a','Importante'],URGENTE:['#fdf2f2','#7a1b1b','#e6c4c4','Urgente']};
+  function cerrado(id){try{return localStorage.getItem(CLAVE+id)==='1'}catch(e){return false}}
+  function esc(s){var d=document.createElement('div');d.textContent=String(s==null?'':s);return d.innerHTML}
+  fetch('/api/alertas',{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
+    var lista=((j&&j.data)||[]).filter(function(a){return a&&a.id&&!cerrado(a.id)});
+    if(!lista.length) return;
+    var html='';
+    lista.forEach(function(a){
+      var e=ESTILOS[a.level]||ESTILOS.INFO;
+      var enlace=a.link?' <a href="'+esc(a.link)+'" style="font-weight:800;text-decoration:underline">'+esc(a.linkLabel||'Ver más')+'</a>':'';
+      html+='<div class="alerta-item" role="status" style="background:'+e[0]+';color:'+e[1]+';border-color:'+e[2]+'">'
+        +'<span class="alerta-nivel" style="background:rgba(255,255,255,.7)">'+e[3]+'</span>'
+        +'<p>'+esc(a.message)+enlace+'</p>'
+        +'<button type="button" aria-label="Cerrar aviso" data-id="'+esc(a.id)+'">\u00d7</button></div>';
+    });
+    cont.innerHTML='<div class="alerta-inner">'+html+'</div>';
+    cont.hidden=false;
+    cont.querySelectorAll('button[data-id]').forEach(function(b){
+      b.addEventListener('click',function(){
+        try{localStorage.setItem(CLAVE+b.getAttribute('data-id'),'1')}catch(e){}
+        var item=b.closest('.alerta-item');if(item)item.remove();
+        if(!cont.querySelector('.alerta-item'))cont.hidden=true;
+      });
+    });
+  }).catch(function(){});
+})();
+</script>
 
 <style>
 /* Encuesta interactiva dentro del hero (datos reales de /api/encuestas) */

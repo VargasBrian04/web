@@ -563,6 +563,60 @@ model CalendarEvent {
   @@map("calendar_events")
 }
 
+/// Banner de avisos que Dirección publica arriba del sitio (opcional, con vigencia).
+model SiteAlert {
+  id        String    @id @default(cuid())
+  message   String
+  level     String    @default("INFO") // INFO | AVISO | URGENTE
+  link      String?
+  linkLabel String?
+  active    Boolean   @default(true)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdBy String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([active, startsAt, endsAt])
+  @@map("site_alerts")
+}
+
+/// Comunicado público de Dirección/Secretaría, con adjuntos en formato data URI.
+model PublicNotice {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  summary     String? // resumen corto para el listado
+  body        String // HTML del editor (se sanitiza al mostrar)
+  category    String    @default("Comunicado") // Comunicado | Inscripciones | Secretaría
+  pinned      Boolean   @default(false)
+  active      Boolean   @default(true)
+  publishedAt DateTime?
+  createdBy   String?
+  createdByName String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  files       PublicNoticeFile[]
+
+  @@index([active, publishedAt])
+  @@map("public_notices")
+}
+
+/// Adjunto de un comunicado. Se guarda como data URI en la DB.
+model PublicNoticeFile {
+  id        String   @id @default(cuid())
+  notice    PublicNotice @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  noticeId  String
+  name      String // nombre visible del archivo (ej. "Planilla de inscripción.pdf")
+  mime      String // application/pdf | image/jpeg | image/png
+  size      Int
+  data      String // data:<mime>;base64,...
+  createdAt DateTime @default(now())
+
+  @@index([noticeId])
+  @@map("public_notice_files")
+}
+
 model Poll {
   id       String   @id @default(cuid())
   question String

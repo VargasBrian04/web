@@ -25,6 +25,7 @@ const groups = [
       { href: "/#niveles", label: "Niveles" },
       { href: "/#estadisticas", label: "Estadísticas" },
       { href: "/calendario", label: "Calendario" },
+      { href: "/comunicados", label: "Comunicados" },
       { href: "/noticias", label: "Noticias" },
       { href: "/encuestas", label: "Encuestas" },
     ],

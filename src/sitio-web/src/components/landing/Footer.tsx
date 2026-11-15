@@ -27,7 +27,10 @@ export default function Footer() {
             Galería
           </Link>
           <Link href="/calendario" className="hover:text-white">
-            Calendario
+ Calendario
+          </Link>
+          <Link href="/comunicados" className="hover:text-white">
+            Comunicados
           </Link>
           <Link href="/preguntas" className="hover:text-white">
             Ayuda

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "@/components/landing/Navbar";
+import AlertBanner from "@/components/landing/AlertBanner";
 import Footer from "@/components/landing/Footer";
 import WhatsAppFloat from "@/components/landing/WhatsAppFloat";
 
@@ -56,6 +57,7 @@ export default function RootLayout({
           Saltar al contenido
         </a>
         <Navbar />
+        <AlertBanner />
         <main id="contenido">{children}</main>
         <Footer />
         <WhatsAppFloat />
