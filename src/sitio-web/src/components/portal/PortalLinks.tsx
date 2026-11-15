@@ -40,6 +40,7 @@ export default function PortalLinks({ role }: { role: string }) {
                 { href: "/portal/admin", label: "Administración" },
                 { href: "/portal/admin/noticias", label: "Blog / Noticias" },
                 { href: "/portal/admin/calendario", label: "Calendario escolar" },
+                { href: "/portal/admin/directorio", label: "Directorio de contactos" },
                 { href: "/portal/admin/alertas", label: "Avisos del sitio" },
                 { href: "/portal/admin/comunicados", label: "Comunicados oficiales" },
                 { href: "/portal/perfil", label: "Mi perfil" },

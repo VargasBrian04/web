@@ -602,6 +602,23 @@ model PublicNotice {
   @@map("public_notices")
 }
 
+/// Área de contacto del directorio público (Secretaría, Dirección, bedelía...).
+model ContactArea {
+  id      String         @id @default(cuid())
+  name    String // "Secretaría"
+  detail  String? // qué se atiende ahí
+  phone   String?
+  email   String?
+  hours   String? // "Lun a Vie 07:00 - 12:00"
+  order   Int            @default(0)
+  active  Boolean        @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([active, order])
+  @@map("contact_areas")
+}
+
 /// Adjunto de un comunicado. Se guarda como data URI en la DB.
 model PublicNoticeFile {
   id        String   @id @default(cuid())

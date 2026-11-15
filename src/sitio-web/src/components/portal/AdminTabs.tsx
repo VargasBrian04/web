@@ -11,6 +11,7 @@ import { PollsAdmin } from "@/components/portal/SchoolAdmin";
 import AlertsAdmin from "@/components/portal/AlertsAdmin";
 import NoticesAdmin from "@/components/portal/NoticesAdmin";
 import CalendarAdmin from "@/components/portal/CalendarAdmin";
+import DirectoryAdmin from "@/components/portal/DirectoryAdmin";
 
 const TABS = [
   { id: "resumen", label: "Resumen" },
@@ -20,6 +21,7 @@ const TABS = [
   { id: "avisos", label: "📣 Avisos" },
   { id: "comunicados", label: "📄 Comunicados" },
   { id: "calendario", label: "📅 Calendario" },
+  { id: "directorio", label: "📇 Directorio" },
   { id: "encuestas", label: "📊 Encuestas" },
 ] as const;
 
@@ -84,6 +86,11 @@ export default function AdminTabs() {
       {tab === "calendario" && (
         <div className="grid gap-6">
           <CalendarAdmin />
+        </div>
+      )}
+      {tab === "directorio" && (
+        <div className="grid gap-6">
+          <DirectoryAdmin />
         </div>
       )}
       {tab === "encuestas" && (

@@ -26,6 +26,7 @@ const groups = [
       { href: "/#estadisticas", label: "Estadísticas" },
       { href: "/calendario", label: "Calendario" },
       { href: "/comunicados", label: "Comunicados" },
+      { href: "/directorio", label: "Contactos" },
       { href: "/noticias", label: "Noticias" },
       { href: "/encuestas", label: "Encuestas" },
     ],
