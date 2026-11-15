@@ -77,6 +77,18 @@ export function parseDataUri(
   return { mime: m[1], buf: Buffer.from(m[2], "base64") };
 }
 
+/**
+ * Decodifica un data URI de adjunto (PDF/JPG/PNG). A diferencia de
+ * parseDataUri (imágenes del blog), acepta application/pdf.
+ */
+export function parseFileDataUri(
+  uri: string
+): { mime: string; buf: Buffer } | null {
+  const m = /^data:(application\/pdf|image\/jpeg|image\/png);base64,([A-Za-z0-9+/=]+)$/.exec(uri);
+  if (!m) return null;
+  return { mime: m[1], buf: Buffer.from(m[2], "base64") };
+}
+
 export function uploadsDir() {
   // En Vercel el disco es de solo lectura salvo /tmp: allí van los uploads.
   // (Fase siguiente: R2/Blob. Firma idéntica, solo cambia este archivo.)
